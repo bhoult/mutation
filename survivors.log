@@ -1,0 +1,66 @@
+
+================================================================================
+# Survivor 1 logged at 2025-07-05 13:21:52 -0500
+# Generation: 1
+# Energy: 10
+# Fitness: 20
+# Mutations: 0
+# Code Hash: 59de156745922966099ce85eca78f0ad38dd9e5789b342d14950e478d5d9dd7c
+================================================================================
+
+```ruby
+Proc.new do |env|
+  if env[:neighbor_energy] < 6
+    :attack
+  elsif rand < 0.1
+    :replicate
+  else
+    :rest
+  end
+end
+```
+
+
+================================================================================
+# Survivor 2 logged at 2025-07-05 13:21:52 -0500
+# Generation: 1
+# Energy: 10
+# Fitness: 20
+# Mutations: 0
+# Code Hash: 0556d734f207d819ef14dda71794a98609d65631179039d59f23bdb9a9f3d1d5
+================================================================================
+
+```ruby
+Proc.new do |env|
+  if env[:neighbor_energy] < 6
+    :attack
+  elsif rand < 0.2
+    :replicate
+  else
+    :rest
+  end
+end
+```
+
+
+================================================================================
+# Survivor 3 logged at 2025-07-05 13:21:52 -0500
+# Generation: 1
+# Energy: 10
+# Fitness: 20
+# Mutations: 0
+# Code Hash: da3e88350edeb2969632e2ac2e805d245bd87fd3667a33ca63b59e0ffdad3113
+================================================================================
+
+```ruby
+Proc.new do |env|
+  if env[:neighbor_energy] < 4
+    :attack
+  elsif rand < 0.1
+    :replicate
+  else
+    :rest
+  end
+end
+```
+

@@ -1,0 +1,37 @@
+# Mutation Simulator Configuration
+# All values are optional - defaults will be used if not specified
+
+# World settings
+world_size: 20              # Number of agent slots in the world (used for square grid if width/height not specified)
+world_width: null           # World width (optional, use with world_height for rectangular grid)
+world_height: null          # World height (optional, use with world_width for rectangular grid)
+initial_energy: 10          # Starting energy for new agents
+initial_coverage: 0.1       # Percentage of world to populate with agents initially (0.1 = 10%)
+
+# Energy system
+energy_decay: 1             # Energy lost per tick
+attack_damage: 3            # Damage dealt when attacking
+attack_energy_gain: 1       # Energy gained when attacking
+rest_energy_gain: 1         # Energy gained when resting
+replication_cost: 5         # Energy cost to replicate
+
+# Mutation settings
+mutation_rate: 0.5          # Probability of mutating each line
+mutation_probability: 0.05  # Probability of logging mutations
+
+# Simulation settings
+simulation_delay: 0.2       # Delay between ticks (seconds)
+max_ticks: null            # Maximum ticks to run (null = unlimited)
+auto_reset: true           # Auto-reset after extinction
+safe_mode: true            # Enable safe code execution
+
+# Parallel processing (Note: Limited benefit due to Ruby GIL)
+parallel_agents: false     # Enable parallel agent processing
+processor_count: null      # Number of processors to use (null = all available)
+
+# Logging
+log_level: info            # debug, info, warn, error, fatal
+
+# Display
+visual_mode: false         # Use curses display by default
+survivors_log: survivors.log  # File to log survivor codes 
