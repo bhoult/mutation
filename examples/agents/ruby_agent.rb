@@ -23,12 +23,16 @@ rescue
 end
 
 def choose_action(world_state, memory)
-  neighbors = world_state['neighbors']
-  my_energy = world_state['energy']
+  neighbors = world_state['neighbors'] || {}
+  my_energy = world_state['energy'] || 0
   
-  # Find the neighbor with the highest energy
-  best_target = neighbors.max_by { |direction, info| info['energy'] }
-  target_direction, target_info = best_target
+  # Find the neighbor with the highest energy (handle empty neighbors)
+  if neighbors.empty?
+    target_direction, target_info = ['north', { 'energy' => 0 }]
+  else
+    best_target = neighbors.max_by { |direction, info| (info || {})['energy'] || 0 }
+    target_direction, target_info = best_target
+  end
   
   # Update memory with observations
   memory['turns_played'] = (memory['turns_played'] || 0) + 1
@@ -37,11 +41,11 @@ def choose_action(world_state, memory)
   memory['energy_history'] << my_energy
   memory['energy_history'] = memory['energy_history'].last(10) # Keep last 10
   
-  # Strategy: Attack if target has significant energy, replicate if we have excess energy
+  # Strategy: Attack if target has significant energy, replicate if we have excess energy and low population
   if target_info['energy'] >= 5 && my_energy >= 3
     action = { action: 'attack', target: target_direction }
     memory['attacks_made'] = (memory['attacks_made'] || 0) + 1
-  elsif my_energy >= 8 && any_empty_neighbors?(neighbors)
+  elsif my_energy >= 12 && any_empty_neighbors?(neighbors) && should_replicate?(memory)
     action = { action: 'replicate' }
     memory['replications_made'] = (memory['replications_made'] || 0) + 1
   else
@@ -54,6 +58,19 @@ end
 
 def any_empty_neighbors?(neighbors)
   neighbors.any? { |_, info| info['energy'] == 0 }
+end
+
+def should_replicate?(memory)
+  # Only replicate occasionally to prevent population explosion
+  replications = memory['replications_made'] || 0
+  turns = memory['turns_played'] || 1
+  
+  # Limit replication to once every 5 turns minimum
+  return false if replications > 0 && turns - (memory['last_replication_turn'] || 0) < 5
+  
+  # Update last replication turn
+  memory['last_replication_turn'] = turns
+  true
 end
 
 # Main agent loop

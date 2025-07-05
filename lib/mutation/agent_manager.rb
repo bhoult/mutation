@@ -13,12 +13,19 @@ module Mutation
     end
 
     def spawn_agent(executable_path, x, y, energy = nil, generation = 1)
+      # Safety check to prevent too many agents
+      return nil if @agents.size >= 100
+      
       agent_id = generate_agent_id
       
       begin
         agent = AgentProcess.new(agent_id, executable_path, x, y, energy, generation)
-        @agents[agent_id] = agent
-        agent
+        if agent.alive?
+          @agents[agent_id] = agent
+          agent
+        else
+          nil
+        end
       rescue => e
         Mutation.logger.error("Failed to spawn agent: #{e.message}")
         nil
@@ -53,16 +60,37 @@ module Mutation
     def get_agent_actions_with_individual_states(agent_world_states)
       actions = {}
       
-      # Process all agents sequentially to avoid threading issues
-      @agents.each do |agent_id, agent|
-        begin
-          if agent.alive && agent_world_states[agent_id]
+      # Use parallel processing for better performance with many agents
+      if @agents.size > 5 && Mutation.configuration.parallel_agents
+        require 'parallel'
+        
+        # Process agents in parallel using threads
+        agent_pairs = @agents.select { |agent_id, agent| agent.alive && agent_world_states[agent_id] }
+        
+        results = Parallel.map(agent_pairs, in_threads: [agent_pairs.size, 8].min) do |agent_id, agent|
+          begin
             action = agent.act(agent_world_states[agent_id].merge(agent_id: agent_id))
-            actions[agent_id] = action
+            [agent_id, action]
+          rescue => e
+            Mutation.logger.error("Error getting action from agent #{agent_id}: #{e.message}")
+            [agent_id, { type: :rest }]
           end
-        rescue => e
-          Mutation.logger.error("Error getting action from agent #{agent_id}: #{e.message}")
-          actions[agent_id] = { type: :rest }
+        end
+        
+        # Convert results back to hash
+        results.each { |agent_id, action| actions[agent_id] = action }
+      else
+        # Process all agents sequentially for small populations
+        @agents.each do |agent_id, agent|
+          begin
+            if agent.alive && agent_world_states[agent_id]
+              action = agent.act(agent_world_states[agent_id].merge(agent_id: agent_id))
+              actions[agent_id] = action
+            end
+          rescue => e
+            Mutation.logger.error("Error getting action from agent #{agent_id}: #{e.message}")
+            actions[agent_id] = { type: :rest }
+          end
         end
       end
       

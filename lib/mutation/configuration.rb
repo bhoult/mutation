@@ -34,12 +34,12 @@ module Mutation
       @max_ticks = nil
       @auto_reset = true
       @safe_mode = true
-      @parallel_agents = false # Disabled by default due to Ruby GIL limitations
+      @parallel_agents = true # Enabled for process-based agents (GIL doesn't affect external processes)
       @processor_count = nil   # nil means use all available processors
       @visual_mode = false     # Use curses display
       @survivors_log = 'survivors.log' # Survivor codes log file
       @initial_coverage = 0.1 # 10% initial world coverage
-      @process_based_agents = true # Use external process agents instead of in-process Ruby
+      @process_based_agents = false # Temporarily disable to test regular agents
       @agent_timeout_ms = 1000 # Timeout for agent responses in milliseconds
       @default_agent_executable = File.join(Dir.pwd, 'examples', 'agents', 'ruby_agent.rb') # Default agent executable path
     end

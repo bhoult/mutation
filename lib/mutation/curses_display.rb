@@ -244,21 +244,8 @@ module Mutation
         end
       end
 
-      # Auto-quit after the population dies down to very few agents
-      # But only if auto-reset is disabled - otherwise let the simulation continue
-      if @world.agent_count <= 2 && !Mutation.configuration.auto_reset
-        @auto_quit_counter ||= 0
-        @auto_quit_counter += 1
-
-        # Give it some time to potentially recover
-        if @auto_quit_counter > 20 # About 4 seconds at 0.2s per step
-          @running = false
-          @last_key = 'AUTO-QUIT'
-          input_received = true
-        end
-      else
-        @auto_quit_counter = 0
-      end
+      # Auto-quit disabled in visual mode - let user control when to quit
+      # Users can press 'q' to quit manually
 
       input_received
     end

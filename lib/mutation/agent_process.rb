@@ -44,7 +44,7 @@ module Mutation
         
         # Wait for response with timeout
         response = nil
-        timeout_seconds = (world_state[:timeout_ms] || 1000) / 1000.0
+        timeout_seconds = 0.5 # Reduced timeout to prevent hanging
         
         Timeout.timeout(timeout_seconds) do
           response_line = @stdout.gets
@@ -167,11 +167,18 @@ module Mutation
       }
       
       # Skip firejail for now - go straight to direct execution
-      @stdin, @stdout, @stderr, @process_thread = Open3.popen3(env, @executable_path)
-      @pid = @process_thread.pid
-      
-      unless process_alive?
-        Mutation.logger.error("Agent #{@agent_id} process died immediately after spawn")
+      begin
+        @stdin, @stdout, @stderr, @process_thread = Open3.popen3(env, @executable_path)
+        @pid = @process_thread.pid
+        
+        unless process_alive?
+          Mutation.logger.error("Agent #{@agent_id} process died immediately after spawn")
+          @alive = false
+        end
+      rescue => e
+        Mutation.logger.error("Failed to spawn agent #{@agent_id}: #{e.message}")
+        @alive = false
+        @pid = nil
       end
     end
 

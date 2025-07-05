@@ -184,6 +184,9 @@ module Mutation
     def execute_replicate(agent, x, y, new_grid)
       return if agent.energy < Mutation.configuration.replication_cost
 
+      # Population cap to prevent excessive spawning
+      return if agent_count >= @size # Don't exceed grid capacity
+
       # Find empty adjacent position
       empty_positions = get_empty_adjacent_positions(x, y)
       return if empty_positions.empty?
