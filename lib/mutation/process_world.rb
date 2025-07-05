@@ -60,13 +60,18 @@ module Mutation
       end
       positions.shuffle!
 
-      # Spawn initial agents
+      # Spawn initial agents from genetic pool or provided executables
       agent_count.times do |i|
         break if positions.empty?
-        break if @agent_executables.empty?
 
         x, y = positions.pop
-        executable = @agent_executables.sample # Random executable
+        
+        # Prefer genetic pool over provided executables
+        executable = if @mutation_engine.respond_to?(:random_agent_from_pool)
+          @mutation_engine.random_agent_from_pool || default_executable
+        else
+          default_executable
+        end
         
         agent = @agent_manager.spawn_agent(
           executable, x, y, 
@@ -351,6 +356,15 @@ module Mutation
     end
 
     private
+
+    def default_executable
+      # Use provided executables or fall back to base agent
+      if @agent_executables&.any?
+        @agent_executables.sample
+      else
+        Mutation.configuration.default_agent_executable
+      end
+    end
 
     def update_statistics
       # Update max fitness if we have living agents

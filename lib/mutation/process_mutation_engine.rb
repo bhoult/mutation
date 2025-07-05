@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'fileutils'
+require 'digest'
+require_relative 'genetic_pool'
 
 module Mutation
   class ProcessMutationEngine
@@ -14,22 +16,34 @@ module Mutation
         operator: method(:mutate_operator),
         personality: method(:mutate_personality)
       }
+      @genetic_pool = GeneticPool.new
     end
 
     def create_mutated_agent_script(parent_agent)
-      # Read the base agent script
-      base_script_path = parent_agent.executable_path
-      base_code = File.read(base_script_path)
+      # Read the parent agent script
+      parent_script_path = parent_agent.executable_path
+      parent_code = read_agent_code(parent_script_path)
+      
+      # Get parent fingerprint for lineage tracking
+      parent_fingerprint = extract_fingerprint(parent_script_path)
       
       # Apply mutations to the code
-      mutated_code = mutate_code(base_code)
+      mutated_code = mutate_code(parent_code)
       
-      # Create a new script file for the offspring
-      offspring_script_path = create_offspring_script(mutated_code, parent_agent.agent_id)
+      # Add mutated agent to genetic pool
+      offspring_script_path = @genetic_pool.add_agent(mutated_code, parent_fingerprint)
       
-      Mutation.logger.debug("Created mutated script for offspring of #{parent_agent.agent_id}") if should_log_mutation?
+      Mutation.logger.debug("Created mutated agent: #{File.basename(offspring_script_path)}") if should_log_mutation?
       
       offspring_script_path
+    end
+
+    def random_agent_from_pool
+      @genetic_pool.random_agent_path
+    end
+
+    def genetic_pool_statistics
+      @genetic_pool.statistics
     end
 
     private
@@ -161,19 +175,37 @@ module Mutation
       end
     end
 
-    def create_offspring_script(mutated_code, parent_id)
-      # Create a unique script file for the offspring
-      offspring_id = "offspring_#{parent_id}_#{Time.now.to_i}_#{rand(1000)}"
-      script_dir = "/tmp/agents/scripts"
-      FileUtils.mkdir_p(script_dir)
+    def read_agent_code(script_path)
+      content = File.read(script_path)
+      lines = content.lines
       
-      script_path = File.join(script_dir, "#{offspring_id}.rb")
+      # Find where metadata ends (look for non-comment line or shebang)
+      code_start = 0
+      lines.each_with_index do |line, i|
+        if line.start_with?('#!/usr/bin/env ruby')
+          code_start = i
+          break
+        elsif !line.strip.start_with?('#') && !line.strip.empty?
+          code_start = i
+          break
+        end
+      end
       
-      # Write the mutated code to the new script
-      File.write(script_path, mutated_code)
-      File.chmod(0755, script_path) # Make executable
+      # Return code from shebang/first code line onwards
+      lines[code_start..-1].join
+    end
+
+    def extract_fingerprint(script_path)
+      return nil unless File.exist?(script_path)
       
-      script_path
+      content = File.read(script_path)
+      content.lines.each do |line|
+        if line =~ /^# Fingerprint: (.+)$/
+          return $1.strip
+        end
+      end
+      
+      nil
     end
   end
 end
