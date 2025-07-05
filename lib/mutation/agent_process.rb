@@ -203,14 +203,15 @@ module Mutation
     end
 
     def build_input_data(world_state)
+      # World is now the authoritative source of all agent state
       {
         tick: world_state[:tick],
-        agent_id: @agent_id,
-        position: @position,
-        energy: @energy,
+        agent_id: world_state[:agent_id],
+        position: world_state[:position],
+        energy: world_state[:energy],  # World-controlled energy, not agent's
         world_size: world_state[:world_size],
         neighbors: format_neighbors(world_state[:neighbors]),
-        generation: @generation,
+        generation: world_state[:generation],
         timeout_ms: world_state[:timeout_ms] || 1000
       }
     end

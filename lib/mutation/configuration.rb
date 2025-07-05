@@ -22,10 +22,10 @@ module Mutation
       @world_width = nil   # nil means use square grid from world_size
       @world_height = nil  # nil means use square grid from world_size
       @initial_energy = 10
-      @energy_decay = 1.2  # Slightly more aggressive energy decay
+      @energy_decay = 0.3  # Reduced metabolic cost
       @attack_damage = 3
-      @attack_energy_gain = 1
-      @rest_energy_gain = 1  # Now balanced - agents must work to survive
+      @attack_energy_gain = 2   # Successful attacks are rewarding
+      @rest_energy_gain = 1.0  # Resting provides some energy
       @replication_cost = 5
       @mutation_rate = 0.15  # More frequent mutations
       @mutation_probability = 0.1  # More mutation logging

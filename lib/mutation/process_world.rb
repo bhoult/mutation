@@ -99,9 +99,13 @@ module Mutation
           
           agent_world_states[agent.agent_id] = {
             tick: @tick,
+            agent_id: agent.agent_id,
+            position: [x, y],
+            energy: agent.energy,
             world_size: [@width, @height],
             timeout_ms: Mutation.configuration.agent_timeout_ms,
-            neighbors: neighbors
+            neighbors: neighbors,
+            generation: agent.generation
           }
         end
       end
@@ -119,14 +123,16 @@ module Mutation
           action = actions[agent.agent_id] || { type: :rest }
           execute_action(agent, action, x, y, new_grid)
 
-          # Apply energy decay
-          new_energy = agent.energy - Mutation.configuration.energy_decay
+          # Apply additional energy decay (aging/metabolism)
+          current_energy = agent.energy
+          new_energy = current_energy - Mutation.configuration.energy_decay
           @agent_manager.update_agent_energy(agent.agent_id, new_energy)
 
-          # Keep agent if still alive
+          # Keep agent if still alive after all energy deductions
           if agent.alive && new_energy > 0
             new_grid[y][x] = agent
           else
+            agent.die! if agent.alive
             @agent_manager.remove_agent(agent.agent_id)
           end
         end
@@ -139,17 +145,36 @@ module Mutation
     end
 
     def execute_action(agent, action, x, y, new_grid)
+      # Calculate base action cost (all actions cost energy)
+      base_action_cost = 0.2  # Reduced action cost
+      
       case action[:type]
       when :attack
+        action_cost = base_action_cost + 1.0  # Attacking costs extra energy
         execute_attack(agent, action[:target], x, y)
       when :rest
+        action_cost = base_action_cost  # Resting still costs some energy
         execute_rest(agent)
       when :replicate
+        action_cost = base_action_cost + Mutation.configuration.replication_cost
         execute_replicate(agent, x, y, new_grid)
       when :die
+        action_cost = 0  # Dying is free
         agent.die!
       else
-        execute_rest(agent) # Default action
+        action_cost = base_action_cost  # Default to rest cost
+        execute_rest(agent)
+      end
+      
+      # Apply action cost (world enforces this, agents can't cheat)
+      current_energy = agent.energy
+      new_energy = current_energy - action_cost
+      @agent_manager.update_agent_energy(agent.agent_id, new_energy)
+      
+      # Kill agent if energy depleted
+      if new_energy <= 0
+        agent.die!
+        @agent_manager.remove_agent(agent.agent_id)
       end
     end
 
@@ -177,13 +202,15 @@ module Mutation
     end
 
     def execute_rest(agent)
+      # Resting provides energy gain to offset action and decay costs
       energy_gain = Mutation.configuration.rest_energy_gain
       new_energy = agent.energy + energy_gain
       @agent_manager.update_agent_energy(agent.agent_id, new_energy)
     end
 
     def execute_replicate(agent, x, y, new_grid)
-      return if agent.energy < Mutation.configuration.replication_cost
+      total_replication_cost = 0.5 + Mutation.configuration.replication_cost
+      return if agent.energy < total_replication_cost
 
       # Population cap to prevent excessive spawning
       return if agent_count >= @size # Don't exceed grid capacity
@@ -198,11 +225,7 @@ module Mutation
       offspring = @agent_manager.create_offspring(agent, offspring_x, offspring_y, @mutation_engine)
       return unless offspring
 
-      # Subtract replication cost from parent
-      cost = Mutation.configuration.replication_cost
-      new_parent_energy = agent.energy - cost
-      @agent_manager.update_agent_energy(agent.agent_id, new_parent_energy)
-
+      # Note: Replication cost is now handled in execute_action, not here
       # Place offspring in grid
       new_grid[offspring_y][offspring_x] = offspring
       @statistics[:total_agents_created] += 1
