@@ -15,6 +15,9 @@ module Mutation
       @last_key = nil
       @paused = false
       @last_step_time = Time.now
+      @display_fps = 30 # Target display refresh rate (frames per second)
+      @frame_count = 0
+      @fps_start_time = Time.now
 
       # Initialize curses
       Curses.init_screen
@@ -87,7 +90,11 @@ module Mutation
     private
 
     def display_loop
+      frame_time = 1.0 / @display_fps
+      
       while @running
+        frame_start = Time.now
+        
         begin
           # Check for input first (OS buffers keypresses)
           handle_input
@@ -95,8 +102,8 @@ module Mutation
           # Exit immediately if quit was pressed
           break unless @running
 
-          # Step the simulation only if still running
-          step_simulation
+          # Step the simulation based on its own timing
+          step_simulation_with_timing
 
           # Exit immediately if quit was pressed during simulation step
           break unless @running
@@ -107,11 +114,16 @@ module Mutation
           draw_help
           Curses.refresh
 
+          # Track FPS
+          @frame_count += 1
+
           # Check for terminal resize
           check_terminal_resize
 
-          # Sleep for the simulation delay
-          sleep(Mutation.configuration.simulation_delay) if Mutation.configuration.simulation_delay.positive?
+          # Sleep to maintain target FPS
+          frame_elapsed = Time.now - frame_start
+          sleep_time = frame_time - frame_elapsed
+          sleep(sleep_time) if sleep_time > 0
         rescue StandardError => e
           # Log error but continue running unless we're trying to quit
           Mutation.logger.debug("Display error: #{e.message}")
@@ -127,6 +139,36 @@ module Mutation
       return unless @running # Stop stepping if quit was pressed
 
       @simulator.step
+    end
+
+    def step_simulation_with_timing
+      return if @paused
+      return unless @simulator
+      return unless @running # Stop stepping if quit was pressed
+
+      current_time = Time.now
+      simulation_delay = Mutation.configuration.simulation_delay
+      
+      # Only step if enough time has passed since last step
+      if current_time - @last_step_time >= simulation_delay
+        @simulator.step
+        @last_step_time = current_time
+      end
+    end
+
+    def calculate_fps
+      current_time = Time.now
+      elapsed = current_time - @fps_start_time
+      
+      # Update FPS every second
+      if elapsed >= 1.0
+        fps = (@frame_count / elapsed).round(1)
+        @frame_count = 0
+        @fps_start_time = current_time
+        @current_fps = fps
+      end
+      
+      @current_fps || 0.0
     end
 
     def handle_input
@@ -322,7 +364,10 @@ module Mutation
       agents = @world.agent_count
       avg_energy = @world.average_energy.round(1)
 
-      status_text = "T:#{tick} G:#{generation} Agents:#{agents} AvgE:#{avg_energy}"
+      # Calculate FPS
+      fps = calculate_fps
+
+      status_text = "T:#{tick} G:#{generation} Agents:#{agents} AvgE:#{avg_energy} FPS:#{fps}"
 
       # Camera position if world is larger than screen
       if @needs_scrolling_x || @needs_scrolling_y
