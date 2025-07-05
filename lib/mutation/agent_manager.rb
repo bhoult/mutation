@@ -1,0 +1,162 @@
+# frozen_string_literal: true
+
+require 'fileutils'
+
+module Mutation
+  class AgentManager
+    attr_reader :agents
+
+    def initialize
+      @agents = {}
+      @agent_counter = 0
+      setup_agent_workspace
+    end
+
+    def spawn_agent(executable_path, x, y, energy = nil, generation = 1)
+      agent_id = generate_agent_id
+      
+      begin
+        agent = AgentProcess.new(agent_id, executable_path, x, y, energy, generation)
+        @agents[agent_id] = agent
+        
+        Mutation.logger.info("Spawned agent #{agent_id} at (#{x}, #{y}) with energy #{agent.energy}")
+        agent
+      rescue => e
+        Mutation.logger.error("Failed to spawn agent: #{e.message}")
+        nil
+      end
+    end
+
+    def get_agent_actions(world_state)
+      timeout_ms = world_state[:timeout_ms] || 1000
+      actions = {}
+      
+      # Process all agents in parallel
+      threads = @agents.map do |agent_id, agent|
+        Thread.new do
+          begin
+            if agent.alive
+              action = agent.act(world_state.merge(agent_id: agent_id))
+              actions[agent_id] = action
+            end
+          rescue => e
+            Mutation.logger.error("Error getting action from agent #{agent_id}: #{e.message}")
+            actions[agent_id] = { type: :rest }
+          end
+        end
+      end
+      
+      # Wait for all threads with global timeout
+      threads.each { |t| t.join(timeout_ms / 1000.0 + 0.1) }
+      
+      actions
+    end
+
+    def remove_agent(agent_id)
+      agent = @agents.delete(agent_id)
+      if agent
+        agent.kill_process
+        cleanup_agent_files(agent_id)
+        Mutation.logger.debug("Removed agent #{agent_id}")
+      end
+    end
+
+    def kill_all_agents
+      @agents.each do |agent_id, agent|
+        agent.kill_process
+      end
+      @agents.clear
+      cleanup_workspace
+    end
+
+    def living_agents
+      @agents.values.select(&:alive)
+    end
+
+    def agent_count
+      living_agents.count
+    end
+
+    def get_agent_at(x, y)
+      @agents.values.find { |agent| agent.position == [x, y] && agent.alive }
+    end
+
+    def move_agent(agent_id, new_x, new_y)
+      agent = @agents[agent_id]
+      return false unless agent&.alive
+      
+      agent.position[0] = new_x
+      agent.position[1] = new_y
+      true
+    end
+
+    def update_agent_energy(agent_id, new_energy)
+      agent = @agents[agent_id]
+      return false unless agent
+      
+      agent.instance_variable_set(:@energy, new_energy)
+      
+      if new_energy <= 0
+        agent.die!
+        false
+      else
+        true
+      end
+    end
+
+    def create_offspring(parent_agent, x, y, mutation_engine)
+      return nil unless parent_agent&.alive
+      
+      # For now, offspring use the same executable as parent
+      # TODO: Implement mutation of agent programs
+      offspring_energy = Mutation.configuration.initial_energy
+      offspring_generation = parent_agent.generation + 1
+      
+      spawn_agent(
+        parent_agent.executable_path,
+        x, y,
+        offspring_energy,
+        offspring_generation
+      )
+    end
+
+    def statistics
+      agents = living_agents
+      return {} if agents.empty?
+      
+      {
+        total_agents: agents.count,
+        average_energy: agents.sum(&:energy) / agents.count.to_f,
+        max_energy: agents.map(&:energy).max,
+        min_energy: agents.map(&:energy).min,
+        average_generation: agents.sum(&:generation) / agents.count.to_f,
+        max_generation: agents.map(&:generation).max
+      }
+    end
+
+    private
+
+    def generate_agent_id
+      @agent_counter += 1
+      "agent_#{@agent_counter}_#{Time.now.to_i}"
+    end
+
+    def setup_agent_workspace
+      workspace_dir = '/tmp/agents'
+      FileUtils.mkdir_p(workspace_dir)
+      
+      # Clean up any existing agent files
+      FileUtils.rm_rf(Dir.glob("#{workspace_dir}/*"))
+    end
+
+    def cleanup_agent_files(agent_id)
+      agent_dir = "/tmp/agents/#{agent_id}"
+      FileUtils.rm_rf(agent_dir) if Dir.exist?(agent_dir)
+    end
+
+    def cleanup_workspace
+      workspace_dir = '/tmp/agents'
+      FileUtils.rm_rf(Dir.glob("#{workspace_dir}/*"))
+    end
+  end
+end
