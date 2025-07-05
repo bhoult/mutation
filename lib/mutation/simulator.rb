@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module Mutation
   class Simulator
     attr_reader :world, :running, :statistics
-    
+
     def initialize(world_size: nil, width: nil, height: nil, seed_code: nil, curses_mode: false)
       # Auto-size world to screen if curses mode and no size specified
       if curses_mode && !world_size && !width && !height
@@ -9,23 +11,24 @@ module Mutation
           require 'curses'
           Curses.init_screen
           screen_width = Curses.cols
-          screen_height = Curses.lines - 2  # Leave room for status
+          screen_height = Curses.lines - 2 # Leave room for status
           Curses.close_screen
-          
+
           width = screen_width
           height = screen_height
-        rescue => e
+        rescue StandardError
           # Fallback to default size if curses initialization fails
           width = 80
           height = 24
         end
       end
-      
+
       @world = World.new(size: world_size, width: width, height: height, seed_code: seed_code)
       @curses_mode = curses_mode
       @curses_display = nil
       @survivor_logger = SurvivorLogger.new
       @running = false
+      @quit_requested = false
       @statistics = {
         start_time: nil,
         total_runtime: 0,
@@ -33,89 +36,99 @@ module Mutation
         extinctions: 0
       }
     end
-    
+
     def start
       @running = true
       @statistics[:start_time] = Time.now
-      
+
       if @curses_mode
         # Suppress logging immediately in curses mode
         Mutation.logger.suppress_output = true
+        # Force disable parallel processing in curses mode
+        Mutation.configuration.parallel_agents = false
         start_curses_mode
       else
-        Mutation.logger.info("🚀 Starting mutation simulation")
+        Mutation.logger.info('🚀 Starting mutation simulation')
         Mutation.logger.info("Configuration: #{Mutation.configuration.to_hash}")
         run_simulation_loop
       end
     end
-    
+
     def stop
       @running = false
+      @quit_requested = true
       @statistics[:total_runtime] = Time.now - @statistics[:start_time]
-      
+
       # Stop curses display if active
       @curses_display&.stop
-      
-      Mutation.logger.info("⏹️  Simulation stopped")
-      
+
+      Mutation.logger.info('⏹️  Simulation stopped')
+
       # Log survivors when simulation ends
       log_final_survivors
-      
+
       print_final_statistics unless @curses_mode
     end
-    
+
     def pause
       @running = false
-      Mutation.logger.info("⏸️  Simulation paused")
+      Mutation.logger.info('⏸️  Simulation paused')
     end
-    
+
     def resume
       @running = true
-      Mutation.logger.info("▶️  Simulation resumed")
+      Mutation.logger.info('▶️  Simulation resumed')
       run_simulation_loop
     end
-    
+
+    def request_quit
+      @quit_requested = true
+      @running = false
+    end
+
     def step
+      return unless @running  # Don't step if stopped
+      return if @quit_requested  # Don't step if quit was requested
+      
       @world.step
       @statistics[:total_ticks] += 1
-      
-      if @world.all_dead?
-        handle_extinction
-      end
-      
+
+      # Only handle extinction if we're still running and quit wasn't requested
+      handle_extinction if @running && !@quit_requested && @world.all_dead?
+
       log_status if should_log_status?
     end
-    
+
     def run_for_ticks(ticks)
       Mutation.logger.info("Running simulation for #{ticks} ticks")
-      
+
       ticks.times do
         step
         break if @world.all_dead? && !Mutation.configuration.auto_reset
-        
-        sleep(Mutation.configuration.simulation_delay) if Mutation.configuration.simulation_delay > 0
+
+        sleep(Mutation.configuration.simulation_delay) if Mutation.configuration.simulation_delay.positive?
       end
     end
-    
+
     def run_until_extinction
-      Mutation.logger.info("Running simulation until extinction")
-      
+      Mutation.logger.info('Running simulation until extinction')
+
       until @world.all_dead?
         step
-        sleep(Mutation.configuration.simulation_delay) if Mutation.configuration.simulation_delay > 0
+        sleep(Mutation.configuration.simulation_delay) if Mutation.configuration.simulation_delay.positive?
       end
-      
+
       handle_extinction
     end
-    
+
     def reset
       @world.reset_grid
       @statistics[:extinctions] = 0
       @statistics[:total_ticks] = 0
-      
-      Mutation.logger.info("🔄 Simulation reset")
+
+      Mutation.logger.info('🔄 Simulation reset')
     end
-    
+
     def current_status
       {
         tick: @world.tick,
@@ -127,36 +140,36 @@ module Mutation
         total_ticks: @statistics[:total_ticks]
       }
     end
-    
+
     def detailed_report
       status = current_status
       world_stats = @world.statistics
-      
+
       report = []
-      report << "=" * 50
-      report << "MUTATION SIMULATION REPORT"
-      report << "=" * 50
-      report << ""
-      report << "Current Status:"
+      report << '=' * 50
+      report << 'MUTATION SIMULATION REPORT'
+      report << '=' * 50
+      report << ''
+      report << 'Current Status:'
       report << "  Tick: #{status[:tick]}"
       report << "  Generation: #{status[:generation]}"
       report << "  Agents Alive: #{status[:agents_alive]}"
       report << "  Average Energy: #{status[:average_energy].round(2)}"
       report << "  Max Fitness: #{status[:max_fitness]}"
-      report << ""
-      report << "World Statistics:"
+      report << ''
+      report << 'World Statistics:'
       report << "  Total Agents Created: #{world_stats[:total_agents_created]}"
       report << "  Total Generations: #{world_stats[:total_generations]}"
       report << "  Max Fitness Achieved: #{world_stats[:max_fitness_achieved]}"
       report << "  Longest Survival: #{world_stats[:longest_survival_ticks]} ticks"
-      report << ""
-      report << "Simulation Statistics:"
+      report << ''
+      report << 'Simulation Statistics:'
       report << "  Total Extinctions: #{@statistics[:extinctions]}"
       report << "  Total Ticks: #{@statistics[:total_ticks]}"
       report << "  Runtime: #{format_runtime(@statistics[:total_runtime])}"
-      report << ""
-      report << "Fittest Agent:"
-      
+      report << ''
+      report << 'Fittest Agent:'
+
       if @world.fittest_agent
         agent = @world.fittest_agent
         report << "  ID: #{agent.id}"
@@ -165,154 +178,151 @@ module Mutation
         report << "  Fitness: #{agent.fitness}"
         report << "  Mutations: #{agent.mutations_count}"
       else
-        report << "  None"
+        report << '  None'
       end
-      
+
       report.join("\n")
     end
-    
+
     private
-    
+
     def run_simulation_loop
       while @running
         step
-        
-        if should_exit?
-          break
-        end
-        
-        sleep(Mutation.configuration.simulation_delay) if Mutation.configuration.simulation_delay > 0
+
+        break if should_exit?
+
+        sleep(Mutation.configuration.simulation_delay) if Mutation.configuration.simulation_delay.positive?
       end
     rescue Interrupt
-      Mutation.logger.info("Simulation interrupted by user")
+      Mutation.logger.info('Simulation interrupted by user')
       stop
     end
-    
+
     def handle_extinction
       @statistics[:extinctions] += 1
-      
+
       # Log survivors before extinction
       @survivor_logger.log_survivors(@world.living_agents)
-      
+
       @world.prepare_for_reset
-      
+
       Mutation.logger.generation("💀 Extinction ##{@statistics[:extinctions]} - Generation #{@world.generation}")
-      
-      if Mutation.configuration.auto_reset
+
+      # Don't auto-reset if simulator has been stopped or quit was requested
+      if @running && !@quit_requested && Mutation.configuration.auto_reset
         @world.reset_grid
-        Mutation.logger.generation("🔄 Auto-reset enabled, starting new generation")
+        Mutation.logger.generation('🔄 Auto-reset enabled, starting new generation')
       else
-        Mutation.logger.info("Auto-reset disabled, stopping simulation")
+        Mutation.logger.info('Auto-reset disabled, stopping simulation')
         @running = false
       end
     end
-    
+
     def should_log_status?
-      @world.tick % 10 == 0 || @world.tick < 5
+      (@world.tick % 10).zero? || @world.tick < 5
     end
-    
+
     def should_exit?
       max_ticks = Mutation.configuration.max_ticks
       return false unless max_ticks
-      
+
       @statistics[:total_ticks] >= max_ticks
     end
-    
+
     def log_status
       status = @world.status_line
       detail = @world.detailed_status
-      
+
       Mutation.logger.simulation(status)
       Mutation.logger.debug(detail)
     end
-    
+
     def format_runtime(seconds)
-      return "0s" unless seconds
-      
+      return '0s' unless seconds
+
       hours = (seconds / 3600).to_i
       minutes = ((seconds % 3600) / 60).to_i
       secs = (seconds % 60).to_i
-      
-      if hours > 0
+
+      if hours.positive?
         "#{hours}h #{minutes}m #{secs}s"
-      elsif minutes > 0
+      elsif minutes.positive?
         "#{minutes}m #{secs}s"
       else
         "#{secs}s"
       end
     end
-    
+
     def print_final_statistics
       puts detailed_report
     end
-    
+
     def start_curses_mode
       @curses_display = CursesDisplay.new(@world, self)
-      
+
       # Start the display (blocks until user quits)
       # Display will handle simulation stepping internally
       @curses_display.start
-      
+
       # Clean up
       @running = false
-      
+
       # Re-enable logging and show final results
       Mutation.logger.suppress_output = false
       show_final_results
     end
-    
+
     def curses_simulation_loop
       last_step_time = Time.now
-      
+
       while @running && @curses_display&.running
         current_time = Time.now
-        
+
         # Only step if display is not paused and enough time has passed
         unless @curses_display.send(:paused?)
           time_since_last_step = current_time - last_step_time
           simulation_delay = Mutation.configuration.simulation_delay
-          
+
           if time_since_last_step >= simulation_delay
             step
             last_step_time = current_time
-            
-            if should_exit?
-              break
-            end
+
+            break if should_exit?
           end
         end
-        
+
         # Short sleep to prevent busy waiting and allow input processing
         sleep(0.01)
       end
     end
-    
+
     def log_final_survivors
       survivors = @world.living_agents
-      if survivors.any?
-        count = @survivor_logger.log_survivors(survivors)
-        if count > 0
-          Mutation.logger.info("Final simulation: logged #{count} new survivor codes")
-        end
-      end
+      return unless survivors.any?
+
+      count = @survivor_logger.log_survivors(survivors)
+      return unless count.positive?
+
+      Mutation.logger.info("Final simulation: logged #{count} new survivor codes")
     end
-    
+
     def show_final_results
-      puts "\n" + "=" * 60
-      puts "SIMULATION COMPLETED"
-      puts "=" * 60
-      
+      puts "\n#{'=' * 60}"
+      puts 'SIMULATION COMPLETED'
+      puts '=' * 60
+
       # Show final statistics
       puts detailed_report
-      
+
       # Show final survivor codes if any
       survivors = @world.living_agents.select(&:alive?).sort_by(&:fitness).reverse.first(3)
-      
+
       if survivors.any?
-        puts "\n" + "=" * 60
-        puts "FINAL SURVIVOR CODES"
-        puts "=" * 60
-        
+        puts "\n#{'=' * 60}"
+        puts 'FINAL SURVIVOR CODES'
+        puts '=' * 60
+
         survivors.each_with_index do |agent, index|
           puts "\n--- Survivor #{index + 1} (Fitness: #{agent.fitness}, Generation: #{agent.generation}) ---"
           puts agent.code_str
@@ -320,8 +330,8 @@ module Mutation
       else
         puts "\nNo survivors found."
       end
-      
-      puts "\n" + "=" * 60
+
+      puts "\n#{'=' * 60}"
     end
   end
-end 
+end

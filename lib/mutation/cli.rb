@@ -1,60 +1,62 @@
+# frozen_string_literal: true
+
 require 'thor'
 
 module Mutation
   class CLI < Thor
-    desc "start", "Start the mutation simulation"
-    option :size, type: :numeric, aliases: '-s', desc: "World size (for square grid)"
-    option :width, type: :numeric, aliases: '-w', desc: "World width (for rectangular grid)"
-    option :height, type: :numeric, aliases: '-h', desc: "World height (for rectangular grid)"
-    option :energy, type: :numeric, aliases: '-e', desc: "Initial energy"
-    option :delay, type: :numeric, aliases: '-d', desc: "Simulation delay"
-    option :ticks, type: :numeric, aliases: '-t', desc: "Max ticks to run"
-    option :config, type: :string, aliases: '-c', desc: "Configuration file"
-    option :verbose, type: :boolean, aliases: '-v', desc: "Verbose output"
-    option :safe, type: :boolean, desc: "Safe mode (default: true)"
-    option :parallel, type: :boolean, aliases: '-p', desc: "Enable parallel processing"
-    option :processors, type: :numeric, desc: "Number of processors to use"
+    desc 'start', 'Start the mutation simulation'
+    option :size, type: :numeric, aliases: '-s', desc: 'World size (for square grid)'
+    option :width, type: :numeric, aliases: '-w', desc: 'World width (for rectangular grid)'
+    option :height, type: :numeric, aliases: '-h', desc: 'World height (for rectangular grid)'
+    option :energy, type: :numeric, aliases: '-e', desc: 'Initial energy'
+    option :delay, type: :numeric, aliases: '-d', desc: 'Simulation delay'
+    option :ticks, type: :numeric, aliases: '-t', desc: 'Max ticks to run'
+    option :config, type: :string, aliases: '-c', desc: 'Configuration file'
+    option :verbose, type: :boolean, aliases: '-v', desc: 'Verbose output'
+    option :safe, type: :boolean, desc: 'Safe mode (default: true)'
+    option :parallel, type: :boolean, aliases: '-p', desc: 'Enable parallel processing'
+    option :processors, type: :numeric, desc: 'Number of processors to use'
     def start
       configure_from_options
-      
+
       simulator = Simulator.new(
         world_size: options[:size],
         width: options[:width],
         height: options[:height]
       )
-      
+
       if options[:ticks]
         simulator.run_for_ticks(options[:ticks])
       else
         simulator.start
       end
     end
-    
-    desc "interactive", "Start interactive simulation mode"
-    option :size, type: :numeric, aliases: '-s', desc: "World size (for square grid)"
-    option :width, type: :numeric, aliases: '-w', desc: "World width (for rectangular grid)"
-    option :height, type: :numeric, aliases: '-h', desc: "World height (for rectangular grid)"
-    option :config, type: :string, aliases: '-c', desc: "Configuration file"
-    option :parallel, type: :boolean, aliases: '-p', desc: "Enable parallel processing"
-    option :processors, type: :numeric, desc: "Number of processors to use"
+
+    desc 'interactive', 'Start interactive simulation mode'
+    option :size, type: :numeric, aliases: '-s', desc: 'World size (for square grid)'
+    option :width, type: :numeric, aliases: '-w', desc: 'World width (for rectangular grid)'
+    option :height, type: :numeric, aliases: '-h', desc: 'World height (for rectangular grid)'
+    option :config, type: :string, aliases: '-c', desc: 'Configuration file'
+    option :parallel, type: :boolean, aliases: '-p', desc: 'Enable parallel processing'
+    option :processors, type: :numeric, desc: 'Number of processors to use'
     def interactive
       configure_from_options
-      
+
       simulator = Simulator.new(
         world_size: options[:size],
         width: options[:width],
         height: options[:height]
       )
-      
-      puts "Interactive Mutation Simulation"
-      puts "Commands: start, stop, pause, resume, step, status, report, reset, grid, quit"
+
+      puts 'Interactive Mutation Simulation'
+      puts 'Commands: start, stop, pause, resume, step, status, report, reset, grid, quit'
       puts "Type 'help' for more information"
-      
+
       loop do
-        print "> "
+        print '> '
         input = gets.chomp.split
         command = input[0]&.downcase
-        
+
         case command
         when 'start'
           simulator.start
@@ -77,49 +79,49 @@ module Mutation
           simulator.reset
         when 'help'
           print_interactive_help
-        when 'quit', 'exit'
+        when 'quit', 'exit', 'q'
           break
         else
           puts "Unknown command: #{command}"
         end
       end
     end
-    
-    desc "config", "Show current configuration"
+
+    desc 'config', 'Show current configuration'
     def config
-      puts "Current Configuration:"
-      puts "=" * 30
-      
+      puts 'Current Configuration:'
+      puts '=' * 30
+
       Mutation.configuration.to_hash.each do |key, value|
         puts "#{key.to_s.ljust(20)}: #{value}"
       end
     end
-    
-    desc "benchmark", "Run benchmark tests"
-    option :size, type: :numeric, default: 20, desc: "World size"
-    option :generations, type: :numeric, default: 10, desc: "Number of generations"
-    option :runs, type: :numeric, default: 3, desc: "Number of runs"
+
+    desc 'benchmark', 'Run benchmark tests'
+    option :size, type: :numeric, default: 20, desc: 'World size'
+    option :generations, type: :numeric, default: 10, desc: 'Number of generations'
+    option :runs, type: :numeric, default: 3, desc: 'Number of runs'
     def benchmark
-      puts "Running benchmark tests..."
-      
+      puts 'Running benchmark tests...'
+
       results = []
-      
+
       options[:runs].times do |run|
         puts "Run #{run + 1}/#{options[:runs]}"
-        
+
         start_time = Time.now
         simulator = Simulator.new(world_size: options[:size])
-        
+
         # Run until specified number of extinctions
         extinctions = 0
         while extinctions < options[:generations]
           simulator.run_until_extinction
           extinctions += 1
         end
-        
+
         end_time = Time.now
         runtime = end_time - start_time
-        
+
         results << {
           run: run + 1,
           runtime: runtime,
@@ -127,23 +129,26 @@ module Mutation
           total_ticks: simulator.statistics[:total_ticks]
         }
       end
-      
+
       print_benchmark_results(results)
     end
-    
-    desc "visual", "Start visual simulation with curses display"
-    option :size, type: :numeric, aliases: '-s', desc: "World size (for square grid)"
-    option :width, type: :numeric, aliases: '-w', desc: "World width (for rectangular grid)"
-    option :height, type: :numeric, aliases: '-h', desc: "World height (for rectangular grid)"
-    option :energy, type: :numeric, aliases: '-e', desc: "Initial energy"
-    option :delay, type: :numeric, aliases: '-d', desc: "Simulation delay"
-    option :config, type: :string, aliases: '-c', desc: "Configuration file"
-    option :safe, type: :boolean, desc: "Safe mode (default: true)"
-    option :parallel, type: :boolean, aliases: '-p', desc: "Enable parallel processing"
-    option :processors, type: :numeric, desc: "Number of processors to use"
+
+    desc 'visual', 'Start visual simulation with curses display'
+    option :size, type: :numeric, aliases: '-s', desc: 'World size (for square grid)'
+    option :width, type: :numeric, aliases: '-w', desc: 'World width (for rectangular grid)'
+    option :height, type: :numeric, aliases: '-h', desc: 'World height (for rectangular grid)'
+    option :energy, type: :numeric, aliases: '-e', desc: 'Initial energy'
+    option :delay, type: :numeric, aliases: '-d', desc: 'Simulation delay'
+    option :config, type: :string, aliases: '-c', desc: 'Configuration file'
+    option :safe, type: :boolean, desc: 'Safe mode (default: true)'
+    option :parallel, type: :boolean, aliases: '-p', desc: 'Enable parallel processing'
+    option :processors, type: :numeric, desc: 'Number of processors to use'
     def visual
       configure_from_options
       
+      # Force disable parallel processing in visual mode
+      Mutation.configuration.parallel_agents = false
+
       begin
         simulator = Simulator.new(
           world_size: options[:size],
@@ -151,22 +156,22 @@ module Mutation
           height: options[:height],
           curses_mode: true
         )
-        
+
         simulator.start
-      rescue => e
+      rescue StandardError => e
         puts "Error starting visual mode: #{e.message}"
         puts "Make sure you're running in a terminal that supports curses"
         exit 1
       end
     end
-    
-    desc "version", "Show version information"
+
+    desc 'version', 'Show version information'
     def version
       puts "Mutation Simulator v#{Mutation::VERSION}"
     end
-    
+
     private
-    
+
     def configure_from_options
       if options[:config]
         # Load custom config file
@@ -183,7 +188,7 @@ module Mutation
           exit 1
         end
       end
-      
+
       # Override with command line options
       Mutation.configure do |config|
         config.world_size = options[:size] if options[:size]
@@ -195,17 +200,15 @@ module Mutation
         config.safe_mode = options[:safe] if options.key?(:safe)
         config.parallel_agents = options[:parallel] if options.key?(:parallel)
         config.processor_count = options[:processors] if options[:processors]
-        
-        if options[:verbose]
-          config.log_level = :debug
-        end
+
+        config.log_level = :debug if options[:verbose]
       end
     end
-    
+
     def print_interactive_help
       puts <<~HELP
         Interactive Commands:
-        
+
         start       - Start the simulation
         stop        - Stop the simulation
         pause       - Pause the simulation
@@ -219,11 +222,11 @@ module Mutation
         quit/exit   - Exit the program
       HELP
     end
-    
+
     def print_benchmark_results(results)
       puts "\nBenchmark Results:"
-      puts "=" * 50
-      
+      puts '=' * 50
+
       results.each do |result|
         puts "Run #{result[:run]}:"
         puts "  Runtime: #{format_time(result[:runtime])}"
@@ -232,16 +235,16 @@ module Mutation
         puts "  Ticks/sec: #{(result[:total_ticks] / result[:runtime]).round(2)}"
         puts
       end
-      
+
       avg_runtime = results.sum { |r| r[:runtime] } / results.size
       avg_ticks = results.sum { |r| r[:total_ticks] } / results.size
-      
-      puts "Averages:"
+
+      puts 'Averages:'
       puts "  Runtime: #{format_time(avg_runtime)}"
       puts "  Total Ticks: #{avg_ticks.round(2)}"
       puts "  Ticks/sec: #{(avg_ticks / avg_runtime).round(2)}"
     end
-    
+
     def format_time(seconds)
       if seconds < 60
         "#{seconds.round(2)}s"
@@ -252,4 +255,4 @@ module Mutation
       end
     end
   end
-end 
+end
