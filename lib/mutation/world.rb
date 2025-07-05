@@ -6,6 +6,7 @@ require_relative 'process_world'
 module Mutation
   class World
     attr_accessor :grid, :tick, :last_survivor_code, :generation, :statistics
+    attr_reader :width, :height
 
     def initialize(width: nil, height: nil, size: nil, seed_code: nil, agent_executables: nil)
       # Support both 1D (size) and 2D (width/height) initialization
@@ -32,13 +33,22 @@ module Mutation
       @agent_executables = agent_executables
       
       # Choose implementation based on configuration
-      if Mutation.configuration.process_based_agents && @agent_executables
-        @implementation = ProcessWorld.new(
-          width: @width, height: @height,
-          seed_code: seed_code,
-          agent_executables: @agent_executables
-        )
-        @use_process_agents = true
+      if Mutation.configuration.process_based_agents
+        # Use provided agent executables or default to configured default agent
+        executables = @agent_executables || [Mutation.configuration.default_agent_executable].compact
+        
+        if executables.any?
+          @implementation = ProcessWorld.new(
+            width: @width, height: @height,
+            seed_code: seed_code,
+            agent_executables: executables
+          )
+          @use_process_agents = true
+          # Sync initial state for curses display
+          sync_state_from_implementation
+        else
+          raise "Process-based agents enabled but no agent executables provided and no default agent executable configured"
+        end
       else
         @mutation_engine = MutationEngine.new
         @use_process_agents = false
@@ -336,6 +346,12 @@ module Mutation
         end
 
         @tick = 0
+      end
+    end
+    
+    def cleanup
+      if @use_process_agents
+        @implementation.cleanup
       end
     end
 

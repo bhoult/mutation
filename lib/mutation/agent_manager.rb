@@ -18,8 +18,6 @@ module Mutation
       begin
         agent = AgentProcess.new(agent_id, executable_path, x, y, energy, generation)
         @agents[agent_id] = agent
-        
-        Mutation.logger.info("Spawned agent #{agent_id} at (#{x}, #{y}) with energy #{agent.energy}")
         agent
       rescue => e
         Mutation.logger.error("Failed to spawn agent: #{e.message}")
@@ -52,6 +50,25 @@ module Mutation
       actions
     end
 
+    def get_agent_actions_with_individual_states(agent_world_states)
+      actions = {}
+      
+      # Process all agents sequentially to avoid threading issues
+      @agents.each do |agent_id, agent|
+        begin
+          if agent.alive && agent_world_states[agent_id]
+            action = agent.act(agent_world_states[agent_id].merge(agent_id: agent_id))
+            actions[agent_id] = action
+          end
+        rescue => e
+          Mutation.logger.error("Error getting action from agent #{agent_id}: #{e.message}")
+          actions[agent_id] = { type: :rest }
+        end
+      end
+      
+      actions
+    end
+
     def remove_agent(agent_id)
       agent = @agents.delete(agent_id)
       if agent
@@ -63,7 +80,11 @@ module Mutation
 
     def kill_all_agents
       @agents.each do |agent_id, agent|
-        agent.kill_process
+        begin
+          agent.kill_process
+        rescue => e
+          Mutation.logger.error("Failed to kill agent #{agent_id}: #{e.message}")
+        end
       end
       @agents.clear
       cleanup_workspace

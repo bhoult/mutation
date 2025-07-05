@@ -86,15 +86,27 @@ module Mutation
     end
 
     def step
-      # Build world state for all agents
-      world_state = {
-        tick: @tick,
-        world_size: [@width, @height],
-        timeout_ms: Mutation.configuration.agent_timeout_ms
-      }
+      # Build individual world states for each agent including their neighbors
+      agent_world_states = {}
+      
+      @grid.each_with_index do |row, y|
+        row.each_with_index do |agent, x|
+          next unless agent&.alive
 
-      # Get all agent actions in parallel
-      actions = @agent_manager.get_agent_actions(world_state)
+          # Get neighbors for this specific agent
+          neighbors = get_neighbors(x, y)
+          
+          agent_world_states[agent.agent_id] = {
+            tick: @tick,
+            world_size: [@width, @height],
+            timeout_ms: Mutation.configuration.agent_timeout_ms,
+            neighbors: neighbors
+          }
+        end
+      end
+
+      # Get all agent actions
+      actions = @agent_manager.get_agent_actions_with_individual_states(agent_world_states)
 
       # Apply actions sequentially to avoid race conditions
       new_grid = Array.new(@height) { Array.new(@width) { nil } }
@@ -301,6 +313,14 @@ module Mutation
         @statistics[:max_fitness_achieved] = [@statistics[:max_fitness_achieved], max_fitness].max
         @statistics[:longest_survival_ticks] = [@statistics[:longest_survival_ticks], @tick].max
       end
+      
+      # Clean up current agents
+      @agent_manager.kill_all_agents
+    end
+    
+    def cleanup
+      # Ensure all agent processes are properly terminated
+      @agent_manager.kill_all_agents
     end
 
     private

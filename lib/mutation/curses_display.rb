@@ -222,8 +222,15 @@ module Mutation
     end
 
     def move_camera(dx, dy)
-      world_width = @world.instance_variable_get(:@width)
-      world_height = @world.instance_variable_get(:@height)
+      # Get world dimensions through proper accessors
+      if @world.respond_to?(:width) && @world.respond_to?(:height)
+        world_width = @world.width
+        world_height = @world.height
+      else
+        # Fallback to instance variables if accessors don't exist
+        world_width = @world.instance_variable_get(:@width)
+        world_height = @world.instance_variable_get(:@height)
+      end
 
       new_x = @camera_x + dx
       new_y = @camera_y + dy
@@ -237,7 +244,7 @@ module Mutation
     end
 
     def draw_world
-      grid = @world.instance_variable_get(:@grid)
+      grid = @world.grid
       return unless grid
 
       # Clear screen first

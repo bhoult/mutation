@@ -39,9 +39,9 @@ module Mutation
       @visual_mode = false     # Use curses display
       @survivors_log = 'survivors.log' # Survivor codes log file
       @initial_coverage = 0.1 # 10% initial world coverage
-      @process_based_agents = false # Use external process agents instead of in-process Ruby
+      @process_based_agents = true # Use external process agents instead of in-process Ruby
       @agent_timeout_ms = 1000 # Timeout for agent responses in milliseconds
-      @default_agent_executable = nil # Default agent executable path
+      @default_agent_executable = File.join(Dir.pwd, 'examples', 'agents', 'ruby_agent.rb') # Default agent executable path
     end
 
     def load_config_file

@@ -62,6 +62,9 @@ module Mutation
       # Stop curses display if active
       @curses_display&.stop
 
+      # Clean up any running processes
+      @world.cleanup
+
       Mutation.logger.info('⏹️  Simulation stopped')
 
       # Log survivors when simulation ends
@@ -102,12 +105,23 @@ module Mutation
     def run_for_ticks(ticks)
       Mutation.logger.info("Running simulation for #{ticks} ticks")
 
-      ticks.times do
+      ticks.times do |i|
+        Mutation.logger.info("Simulator.run_for_ticks: Starting tick #{i+1}/#{ticks}")
         step
-        break if @world.all_dead? && !Mutation.configuration.auto_reset
+        Mutation.logger.info("Simulator.run_for_ticks: Step #{i+1} completed")
+        
+        if @world.all_dead? && !Mutation.configuration.auto_reset
+          Mutation.logger.info("Simulator.run_for_ticks: Breaking due to all dead and no auto-reset")
+          break
+        end
 
-        sleep(Mutation.configuration.simulation_delay) if Mutation.configuration.simulation_delay.positive?
+        if Mutation.configuration.simulation_delay.positive?
+          Mutation.logger.info("Simulator.run_for_ticks: Sleeping for #{Mutation.configuration.simulation_delay}s")
+          sleep(Mutation.configuration.simulation_delay)
+        end
       end
+      
+      Mutation.logger.info("Simulator.run_for_ticks: Completed all #{ticks} ticks")
     end
 
     def run_until_extinction
@@ -197,6 +211,9 @@ module Mutation
     rescue Interrupt
       Mutation.logger.info('Simulation interrupted by user')
       stop
+    ensure
+      # Always cleanup processes on exit
+      @world.cleanup
     end
 
     def handle_extinction

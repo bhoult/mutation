@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'logger'
 require 'colorize'
 
@@ -14,17 +16,15 @@ module Mutation
     def initialize(level = :info)
       @level = LEVELS[level] || LEVELS[:info]
       @logger = ::Logger.new($stdout)
-      @logger.formatter = proc do |severity, datetime, progname, msg|
-        timestamp = datetime.strftime("%H:%M:%S")
+      @logger.formatter = proc do |severity, datetime, _progname, msg|
+        timestamp = datetime.strftime('%H:%M:%S')
         "[#{timestamp}] #{severity}: #{msg}\n"
       end
       @suppress_output = false
     end
-    
-    def suppress_output=(value)
-      @suppress_output = value
-    end
-    
+
+    attr_writer :suppress_output
+
     def suppress_output?
       @suppress_output
     end
@@ -66,7 +66,7 @@ module Mutation
     def log(level, message)
       return unless should_log?(level)
       return if @suppress_output
-      
+
       @logger.send(level, message)
     end
 
@@ -74,4 +74,4 @@ module Mutation
       LEVELS[level] >= @level
     end
   end
-end 
+end

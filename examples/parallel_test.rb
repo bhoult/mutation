@@ -1,12 +1,13 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 # Add the lib directory to the load path
 $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 
 require 'mutation'
 
-puts "🧬 Parallel Processing Test"
-puts "=" * 50
+puts '🧬 Parallel Processing Test'
+puts '=' * 50
 
 # Get processor count
 require 'parallel'
@@ -15,10 +16,10 @@ puts "Available processors: #{total_processors}"
 
 # Configure for parallel processing
 Mutation.configure do |config|
-  config.world_size = 200  # Much larger world for better parallel benefit
+  config.world_size = 200 # Much larger world for better parallel benefit
   config.initial_energy = 15
-  config.simulation_delay = 0.0  # No delay for performance test
-  config.log_level = :warn  # Reduce logging for cleaner output
+  config.simulation_delay = 0.0 # No delay for performance test
+  config.log_level = :warn # Reduce logging for cleaner output
   config.parallel_agents = true
   config.processor_count = total_processors
 end
@@ -58,4 +59,4 @@ puts "- Speedup:    #{speedup.round(2)}x"
 puts "- Efficiency: #{((speedup / total_processors) * 100).round(1)}%"
 
 puts "\n📊 Performance Summary:"
-puts "Using #{total_processors} processors achieved #{speedup.round(2)}x speedup" 
+puts "Using #{total_processors} processors achieved #{speedup.round(2)}x speedup"

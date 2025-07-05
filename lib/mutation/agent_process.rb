@@ -8,6 +8,8 @@ require 'fileutils'
 module Mutation
   class AgentProcess
     attr_reader :agent_id, :executable_path, :position, :energy, :generation, :pid
+    
+    @@firejail_warning_shown = false
     attr_accessor :alive
 
     def initialize(agent_id, executable_path, x, y, energy = nil, generation = 1)
@@ -35,12 +37,16 @@ module Mutation
       begin
         # Send world state to agent
         input_data = build_input_data(world_state)
-        @stdin.puts(JSON.generate(input_data))
+        json_data = JSON.generate(input_data)
+        
+        @stdin.puts(json_data)
         @stdin.flush
         
         # Wait for response with timeout
         response = nil
-        Timeout.timeout(world_state[:timeout_ms] / 1000.0) do
+        timeout_seconds = (world_state[:timeout_ms] || 1000) / 1000.0
+        
+        Timeout.timeout(timeout_seconds) do
           response_line = @stdout.gets
           response = JSON.parse(response_line) if response_line
         end
@@ -66,13 +72,23 @@ module Mutation
       return unless @pid
       
       begin
-        # Try graceful termination first
-        Process.kill('TERM', @pid)
+        # Close stdin first to signal agent to exit
+        @stdin&.close rescue nil
+        
+        # Give process a chance to exit gracefully
         sleep(0.1)
         
-        # Force kill if still alive
+        # Check if process is still alive
         if process_alive?
-          Process.kill('KILL', @pid)
+          # Try graceful termination first
+          Process.kill('TERM', @pid)
+          sleep(0.1)
+          
+          # Force kill if still alive
+          if process_alive?
+            Process.kill('KILL', @pid)
+            sleep(0.1)
+          end
         end
         
         cleanup_process
@@ -81,6 +97,7 @@ module Mutation
         cleanup_process
       rescue => e
         Mutation.logger.error("Failed to kill agent process #{@pid}: #{e.message}")
+        cleanup_process
       end
     end
 
@@ -89,9 +106,31 @@ module Mutation
       kill_process
     end
 
+    def alive?
+      @alive
+    end
+
+    def dead?
+      !@alive
+    end
+
     def fitness
       # Simple fitness calculation based on survival time and energy
       (@energy * 10) + (@generation * 5)
+    end
+
+    def id
+      @agent_id
+    end
+
+    def mutations_count
+      # AgentProcess doesn't track mutations in the same way as regular agents
+      0
+    end
+
+    def code_str
+      # For process-based agents, the code is the executable path
+      "Process Agent: #{@executable_path}"
     end
 
     private
@@ -127,18 +166,12 @@ module Mutation
         'AGENT_DIR' => @agent_dir
       }
       
-      begin
-        @stdin, @stdout, @stderr, @process_thread = Open3.popen3(env, *firejail_cmd)
-        @pid = @process_thread.pid
-        
-        Mutation.logger.debug("Spawned sandboxed agent #{@agent_id} with PID #{@pid}")
-      rescue => e
-        Mutation.logger.warn("Failed to spawn with firejail, falling back to direct execution: #{e.message}")
-        # Fallback to direct execution if firejail fails
-        @stdin, @stdout, @stderr, @process_thread = Open3.popen3(env, @executable_path)
-        @pid = @process_thread.pid
-        
-        Mutation.logger.debug("Spawned agent #{@agent_id} with PID #{@pid} (no sandbox)")
+      # Skip firejail for now - go straight to direct execution
+      @stdin, @stdout, @stderr, @process_thread = Open3.popen3(env, @executable_path)
+      @pid = @process_thread.pid
+      
+      unless process_alive?
+        Mutation.logger.error("Agent #{@agent_id} process died immediately after spawn")
       end
     end
 
