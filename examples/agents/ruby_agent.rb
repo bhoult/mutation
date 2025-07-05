@@ -41,16 +41,42 @@ def choose_action(world_state, memory)
   memory['energy_history'] << my_energy
   memory['energy_history'] = memory['energy_history'].last(10) # Keep last 10
   
-  # Strategy: Focus on growth first, then replication, attack only high-energy targets
-  if my_energy >= 8 && any_empty_neighbors?(neighbors) && should_replicate?(memory)
+  # Initialize agent personality if not set (adds variation)
+  if memory['personality'].nil?
+    memory['personality'] = {
+      'aggression' => rand(0.3..0.9),        # How likely to attack
+      'greed' => rand(0.2..0.8),            # Energy thresholds
+      'cooperation' => rand(0.1..0.6),      # Willingness to not attack
+      'death_threshold' => rand(1..3)       # When to give up
+    }
+  end
+  
+  personality = memory['personality']
+  
+  # Strategy: Dynamic behavior with personality variation
+  if my_energy <= personality['death_threshold'] && (memory['energy_history'][-3..-1] || []).all? { |e| e <= personality['death_threshold'] + 1 }
+    # Die if consistently very low energy - makes room for evolution
+    action = { action: 'die' }
+  elsif my_energy >= (6 + personality['greed'] * 4).round && any_empty_neighbors?(neighbors) && should_replicate?(memory)
     action = { action: 'replicate' }
     memory['replications_made'] = (memory['replications_made'] || 0) + 1
-  elsif target_info['energy'] >= 8 && my_energy >= 5
+  elsif target_info['energy'] >= 3 && my_energy >= 3 && target_info['energy'] > my_energy && rand < personality['aggression']
+    # Attack if target has more energy than us and we're feeling aggressive
     action = { action: 'attack', target: target_direction }
     memory['attacks_made'] = (memory['attacks_made'] || 0) + 1
-  else
+  elsif my_energy < (4 + personality['greed'] * 3).round
+    # Rest if we need energy (threshold varies by personality)
     action = { action: 'rest' }
     memory['rests_made'] = (memory['rests_made'] || 0) + 1
+  else
+    # If we have good energy but can't replicate, maybe attack
+    if target_info['energy'] >= 2 && my_energy >= 4 && rand < personality['aggression'] * 0.7
+      action = { action: 'attack', target: target_direction }
+      memory['attacks_made'] = (memory['attacks_made'] || 0) + 1
+    else
+      action = { action: 'rest' }
+      memory['rests_made'] = (memory['rests_made'] || 0) + 1
+    end
   end
   
   [action, memory]

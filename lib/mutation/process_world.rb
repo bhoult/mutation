@@ -28,6 +28,7 @@ module Mutation
       @last_survivor_code = seed_code
       @agent_manager = AgentManager.new
       @agent_executables = agent_executables || []
+      @mutation_engine = ProcessMutationEngine.new
       @statistics = {
         total_agents_created: 0,
         total_generations: 0,
@@ -193,8 +194,8 @@ module Mutation
 
       offspring_x, offspring_y = empty_positions.sample
 
-      # Create offspring (for now, use same executable)
-      offspring = @agent_manager.create_offspring(agent, offspring_x, offspring_y, nil)
+      # Create offspring with mutation
+      offspring = @agent_manager.create_offspring(agent, offspring_x, offspring_y, @mutation_engine)
       return unless offspring
 
       # Subtract replication cost from parent

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'fileutils'
+require_relative 'process_mutation_engine'
 
 module Mutation
   class AgentManager
@@ -156,17 +157,29 @@ module Mutation
     def create_offspring(parent_agent, x, y, mutation_engine)
       return nil unless parent_agent&.alive
       
-      # For now, offspring use the same executable as parent
-      # TODO: Implement mutation of agent programs
       offspring_energy = Mutation.configuration.initial_energy
       offspring_generation = parent_agent.generation + 1
       
-      spawn_agent(
-        parent_agent.executable_path,
-        x, y,
-        offspring_energy,
-        offspring_generation
-      )
+      # Create mutated script for offspring
+      if mutation_engine.is_a?(ProcessMutationEngine)
+        # Use process-based mutation
+        offspring_script_path = mutation_engine.create_mutated_agent_script(parent_agent)
+        
+        spawn_agent(
+          offspring_script_path,
+          x, y,
+          offspring_energy,
+          offspring_generation
+        )
+      else
+        # Fallback to using parent's executable (no mutation)
+        spawn_agent(
+          parent_agent.executable_path,
+          x, y,
+          offspring_energy,
+          offspring_generation
+        )
+      end
     end
 
     def statistics
