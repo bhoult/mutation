@@ -4,7 +4,7 @@ module Mutation
   class Simulator
     attr_reader :world, :running, :statistics
 
-    def initialize(world_size: nil, width: nil, height: nil, seed_code: nil, curses_mode: false)
+    def initialize(world_size: nil, width: nil, height: nil, seed_code: nil, curses_mode: false, agent_executables: nil)
       # Auto-size world to screen if curses mode and no size specified
       if curses_mode && !world_size && !width && !height
         begin
@@ -23,7 +23,7 @@ module Mutation
         end
       end
 
-      @world = World.new(size: world_size, width: width, height: height, seed_code: seed_code)
+      @world = World.new(size: world_size, width: width, height: height, seed_code: seed_code, agent_executables: agent_executables)
       @curses_mode = curses_mode
       @curses_display = nil
       @survivor_logger = SurvivorLogger.new
@@ -215,7 +215,8 @@ module Mutation
         Mutation.logger.generation('🔄 Auto-reset enabled, starting new generation')
       else
         Mutation.logger.info('Auto-reset disabled, stopping simulation')
-        @running = false
+        # Don't stop the simulator in curses mode - let curses display control it
+        @running = false unless @curses_mode
       end
     end
 

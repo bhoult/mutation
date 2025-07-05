@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'yaml'
 
 module Mutation
@@ -7,13 +9,14 @@ module Mutation
                   :mutation_rate, :mutation_probability, :log_level,
                   :simulation_delay, :max_ticks, :auto_reset, :safe_mode,
                   :parallel_agents, :processor_count, :visual_mode, :survivors_log,
-                  :initial_coverage
-    
+                  :initial_coverage, :process_based_agents, :agent_timeout_ms,
+                  :default_agent_executable
+
     def initialize
       set_defaults
       load_config_file if config_file_exists?
     end
-    
+
     def set_defaults
       @world_size = 20
       @world_width = nil   # nil means use square grid from world_size
@@ -31,30 +34,33 @@ module Mutation
       @max_ticks = nil
       @auto_reset = true
       @safe_mode = true
-      @parallel_agents = false  # Disabled by default due to Ruby GIL limitations
+      @parallel_agents = false # Disabled by default due to Ruby GIL limitations
       @processor_count = nil   # nil means use all available processors
       @visual_mode = false     # Use curses display
-      @survivors_log = 'survivors.log'  # Survivor codes log file
-      @initial_coverage = 0.1  # 10% initial world coverage
+      @survivors_log = 'survivors.log' # Survivor codes log file
+      @initial_coverage = 0.1 # 10% initial world coverage
+      @process_based_agents = false # Use external process agents instead of in-process Ruby
+      @agent_timeout_ms = 1000 # Timeout for agent responses in milliseconds
+      @default_agent_executable = nil # Default agent executable path
     end
-    
+
     def load_config_file
       config = YAML.load_file(config_file_path)
       config.each do |key, value|
         instance_variable_set("@#{key}", value) if respond_to?("#{key}=")
       end
-    rescue => e
+    rescue StandardError => e
       puts "Warning: Could not load config file: #{e.message}"
     end
-    
+
     def config_file_exists?
       File.exist?(config_file_path)
     end
-    
+
     def config_file_path
       File.join(Dir.pwd, 'config', 'mutation.yml')
     end
-    
+
     def to_hash
       instance_variables.each_with_object({}) do |var, hash|
         key = var.to_s.delete('@')
@@ -62,4 +68,4 @@ module Mutation
       end
     end
   end
-end 
+end

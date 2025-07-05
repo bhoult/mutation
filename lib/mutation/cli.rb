@@ -16,13 +16,18 @@ module Mutation
     option :safe, type: :boolean, desc: 'Safe mode (default: true)'
     option :parallel, type: :boolean, aliases: '-p', desc: 'Enable parallel processing'
     option :processors, type: :numeric, desc: 'Number of processors to use'
+    option :agents, type: :array, desc: 'Agent executable paths for process-based agents'
+    option :process_agents, type: :boolean, desc: 'Use process-based agents instead of in-process Ruby'
     def start
       configure_from_options
 
+      agent_executables = options[:agents]
+      
       simulator = Simulator.new(
         world_size: options[:size],
         width: options[:width],
-        height: options[:height]
+        height: options[:height],
+        agent_executables: agent_executables
       )
 
       if options[:ticks]
@@ -39,13 +44,18 @@ module Mutation
     option :config, type: :string, aliases: '-c', desc: 'Configuration file'
     option :parallel, type: :boolean, aliases: '-p', desc: 'Enable parallel processing'
     option :processors, type: :numeric, desc: 'Number of processors to use'
+    option :agents, type: :array, desc: 'Agent executable paths for process-based agents'
+    option :process_agents, type: :boolean, desc: 'Use process-based agents instead of in-process Ruby'
     def interactive
       configure_from_options
 
+      agent_executables = options[:agents]
+      
       simulator = Simulator.new(
         world_size: options[:size],
         width: options[:width],
-        height: options[:height]
+        height: options[:height],
+        agent_executables: agent_executables
       )
 
       puts 'Interactive Mutation Simulation'
@@ -143,6 +153,8 @@ module Mutation
     option :safe, type: :boolean, desc: 'Safe mode (default: true)'
     option :parallel, type: :boolean, aliases: '-p', desc: 'Enable parallel processing'
     option :processors, type: :numeric, desc: 'Number of processors to use'
+    option :agents, type: :array, desc: 'Agent executable paths for process-based agents'
+    option :process_agents, type: :boolean, desc: 'Use process-based agents instead of in-process Ruby'
     def visual
       configure_from_options
       
@@ -150,11 +162,14 @@ module Mutation
       Mutation.configuration.parallel_agents = false
 
       begin
+        agent_executables = options[:agents]
+        
         simulator = Simulator.new(
           world_size: options[:size],
           width: options[:width],
           height: options[:height],
-          curses_mode: true
+          curses_mode: true,
+          agent_executables: agent_executables
         )
 
         simulator.start
@@ -200,6 +215,7 @@ module Mutation
         config.safe_mode = options[:safe] if options.key?(:safe)
         config.parallel_agents = options[:parallel] if options.key?(:parallel)
         config.processor_count = options[:processors] if options[:processors]
+        config.process_based_agents = options[:process_agents] if options.key?(:process_agents)
 
         config.log_level = :debug if options[:verbose]
       end

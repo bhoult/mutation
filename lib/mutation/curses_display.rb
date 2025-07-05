@@ -203,7 +203,8 @@ module Mutation
       end
 
       # Auto-quit after the population dies down to very few agents
-      if @world.agent_count <= 2
+      # But only if auto-reset is disabled - otherwise let the simulation continue
+      if @world.agent_count <= 2 && !Mutation.configuration.auto_reset
         @auto_quit_counter ||= 0
         @auto_quit_counter += 1
 
