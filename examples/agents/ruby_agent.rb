@@ -41,13 +41,13 @@ def choose_action(world_state, memory)
   memory['energy_history'] << my_energy
   memory['energy_history'] = memory['energy_history'].last(10) # Keep last 10
   
-  # Strategy: Attack if target has significant energy, replicate if we have excess energy and low population
-  if target_info['energy'] >= 5 && my_energy >= 3
-    action = { action: 'attack', target: target_direction }
-    memory['attacks_made'] = (memory['attacks_made'] || 0) + 1
-  elsif my_energy >= 12 && any_empty_neighbors?(neighbors) && should_replicate?(memory)
+  # Strategy: Focus on growth first, then replication, attack only high-energy targets
+  if my_energy >= 8 && any_empty_neighbors?(neighbors) && should_replicate?(memory)
     action = { action: 'replicate' }
     memory['replications_made'] = (memory['replications_made'] || 0) + 1
+  elsif target_info['energy'] >= 8 && my_energy >= 5
+    action = { action: 'attack', target: target_direction }
+    memory['attacks_made'] = (memory['attacks_made'] || 0) + 1
   else
     action = { action: 'rest' }
     memory['rests_made'] = (memory['rests_made'] || 0) + 1
@@ -65,8 +65,8 @@ def should_replicate?(memory)
   replications = memory['replications_made'] || 0
   turns = memory['turns_played'] || 1
   
-  # Limit replication to once every 5 turns minimum
-  return false if replications > 0 && turns - (memory['last_replication_turn'] || 0) < 5
+  # Limit replication to once every 3 turns minimum, and allow more replications early on
+  return false if replications > 2 && turns - (memory['last_replication_turn'] || 0) < 3
   
   # Update last replication turn
   memory['last_replication_turn'] = turns

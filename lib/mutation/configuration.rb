@@ -25,7 +25,7 @@ module Mutation
       @energy_decay = 1
       @attack_damage = 3
       @attack_energy_gain = 1
-      @rest_energy_gain = 1
+      @rest_energy_gain = 2
       @replication_cost = 5
       @mutation_rate = 0.5
       @mutation_probability = 0.05
