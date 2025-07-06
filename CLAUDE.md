@@ -272,6 +272,40 @@ The simulator includes a curses-based visual display that shows the simulation l
 - Recommended for complex agent behaviors that benefit from isolation
 - Agent process limit of 100 to prevent resource exhaustion
 
+## Agent Command Reference
+
+### Available Actions
+All agents (both in-memory and process-based) can perform exactly four actions:
+
+1. **attack** - Attack a neighboring agent
+   - In-memory: Automatically targets highest energy neighbor
+   - Process-based: Must specify target direction
+   - Energy dynamics: Attacker gains energy, target loses energy
+   
+2. **rest** - Restore energy
+   - Default action for invalid commands
+   - Gains energy based on `rest_energy_gain` config
+   
+3. **replicate** - Create offspring
+   - Requires minimum energy threshold
+   - Places mutated offspring in adjacent empty cell
+   - Parent pays replication cost
+   
+4. **die** - Voluntary termination
+   - Immediately removes agent from world
+   - No energy cost
+
+### Direction Constants
+Valid target directions for attacks (Moore neighborhood):
+- `north`, `south`, `east`, `west`
+- `north_east`, `north_west`, `south_east`, `south_west`
+
+### Action Validation
+- Invalid actions default to `rest`
+- Attack actions require valid direction (process agents)
+- Replicate requires sufficient energy and empty adjacent space
+- All actions validated before execution
+
 ## Development Notes
 
 - The project uses Ruby ~> 3.0

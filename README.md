@@ -330,6 +330,199 @@ while input = $stdin.gets
 end
 ```
 
+## Agent Protocol Reference
+
+### Agent Actions
+
+Agents can perform exactly four actions:
+
+| Action | Description | Energy Cost | Requirements |
+|--------|-------------|-------------|--------------|
+| `attack` | Attack a neighbor for energy | 1.2 units | Valid target direction |
+| `rest` | Gain energy by resting | 0.2 units | None |
+| `replicate` | Create mutated offspring | 0.2 + replication_cost | Sufficient energy, empty adjacent space |
+| `die` | Voluntarily end existence | 0 units | None |
+
+### Input Format (World → Agent)
+
+#### In-Memory Agents
+Agents receive an environment hash:
+
+```ruby
+{
+  neighbor_energy: 12,              # Maximum energy among neighbors
+  neighbors: [0, 5, 3, 0, 0, 8, 2, 0],  # Array of 8 neighbor energies
+  position: [5, 10],               # Current [x, y] position
+  world_size: [20, 20],            # World [width, height]
+  tick: 42                         # Current simulation tick
+}
+```
+
+#### Process-Based Agents
+Agents receive a JSON object via stdin:
+
+```json
+{
+  "tick": 42,
+  "agent_id": "agent_1_1234567890",
+  "position": [5, 10],
+  "energy": 15,
+  "world_size": [20, 20],
+  "neighbors": {
+    "north_west": {"energy": 10, "agent_id": "agent_2_..."},
+    "north": {"energy": 0, "agent_id": null},
+    "north_east": {"energy": 5, "agent_id": "agent_3_..."},
+    "west": {"energy": 3, "agent_id": "agent_4_..."},
+    "east": {"energy": 0, "agent_id": null},
+    "south_west": {"energy": 8, "agent_id": "agent_5_..."},
+    "south": {"energy": 0, "agent_id": null},
+    "south_east": {"energy": 12, "agent_id": "agent_6_..."}
+  },
+  "generation": 5,
+  "timeout_ms": 1000,
+  "memory": {
+    "turns_played": 10,
+    "last_action": "rest"
+  }
+}
+```
+
+### Output Format (Agent → World)
+
+#### In-Memory Agents
+Return a symbol:
+
+```ruby
+:attack    # Attack highest energy neighbor
+:rest      # Rest to gain energy
+:replicate # Create offspring
+:die       # End existence
+```
+
+#### Process-Based Agents
+Return JSON via stdout:
+
+```json
+// Attack action
+{
+  "action": "attack",
+  "target": "north_east"  // Required for attack
+}
+
+// Rest action
+{
+  "action": "rest"
+}
+
+// Replicate action
+{
+  "action": "replicate"
+}
+
+// Die action
+{
+  "action": "die"
+}
+
+// With memory (optional)
+{
+  "action": "rest",
+  "memory": {
+    "turns_played": 11,
+    "energy_history": [15, 14, 13, 12, 13]
+  }
+}
+```
+
+### Neighbor Directions
+
+The 8 valid directions for attacks (Moore neighborhood):
+
+```
+north_west   north   north_east
+     \        |        /
+      \       |       /
+west ---   agent   --- east
+      /       |       \
+     /        |        \
+south_west   south   south_east
+```
+
+### Energy Dynamics
+
+All actions have energy implications:
+
+- **Base action cost**: 0.2 units (process agents only)
+- **Attack**: Costs 1.0 extra, gains `attack_energy_gain`
+- **Rest**: Gains `rest_energy_gain`
+- **Replicate**: Costs `replication_cost`
+- **Die**: No cost
+- **Passive decay**: All agents lose `energy_decay` per tick
+
+### Memory Persistence
+
+Process agents can maintain state between turns:
+
+```ruby
+# Load memory
+memory = world_state['memory'] || {}
+
+# Update memory
+memory['turns_played'] = (memory['turns_played'] || 0) + 1
+memory['attack_count'] = (memory['attack_count'] || 0) + 1
+
+# Return with action
+action = {
+  'action' => 'attack',
+  'target' => 'north',
+  'memory' => memory
+}
+```
+
+### Error Handling
+
+- Invalid actions default to `rest`
+- Timeout triggers default action
+- JSON parse errors trigger default action
+- Process crashes are handled gracefully
+
+### Example Agent Implementation
+
+```ruby
+#!/usr/bin/env ruby
+require 'json'
+
+while input = $stdin.gets
+  world_state = JSON.parse(input)
+  
+  my_energy = world_state['energy']
+  neighbors = world_state['neighbors']
+  memory = world_state['memory'] || {}
+  
+  # Find best target
+  best_target = neighbors.max_by { |dir, info| info['energy'] }
+  target_dir, target_info = best_target
+  
+  # Decision logic
+  action = if my_energy <= 2
+    { 'action' => 'die' }
+  elsif my_energy >= 8 && neighbors.values.any? { |n| n['energy'] == 0 }
+    { 'action' => 'replicate' }
+  elsif target_info['energy'] >= 5
+    { 'action' => 'attack', 'target' => target_dir }
+  else
+    { 'action' => 'rest' }
+  end
+  
+  # Update memory
+  memory['decisions'] = (memory['decisions'] || 0) + 1
+  action['memory'] = memory
+  
+  puts JSON.generate(action)
+  $stdout.flush
+end
+```
+
 ## Parallel Processing
 
 The simulator includes experimental parallel processing support for agent decisions:
