@@ -18,11 +18,20 @@ This is a Ruby-based evolutionary simulation called "Mutation Simulator" where a
 - **Logger**: Specialized logging with colorized output
 
 ### Key Components
+
+#### In-Memory Agent System (Traditional)
 - **lib/mutation/agent.rb**: Agent behavior, code compilation, and safety validation
 - **lib/mutation/simulator.rb**: Main simulation loop and lifecycle management
 - **lib/mutation/world.rb**: 2D grid environment and agent interactions
 - **lib/mutation/mutation_engine.rb**: Code mutation algorithms
 - **lib/mutation/configuration.rb**: Configuration loading and validation
+
+#### Process-Based Agent System (Advanced)
+- **lib/mutation/agent_process.rb**: Manages individual agent OS processes with stdin/stdout IPC
+- **lib/mutation/process_world.rb**: 2D grid environment for process-based agents
+- **lib/mutation/agent_manager.rb**: Orchestrates collection of agent processes
+- **lib/mutation/process_mutation_engine.rb**: Mutates agent scripts and manages genetic pool
+- **lib/mutation/genetic_pool.rb**: Persistent storage of evolved agent scripts
 
 ## Common Development Commands
 
@@ -111,19 +120,47 @@ Agents contain Ruby code that returns one of four actions:
 - `:replicate` - Create mutated offspring
 - `:die` - End existence
 
-### Code Safety
+### In-Memory Agent System
+Traditional agents run within the main Ruby process:
+- **Code compilation**: Agent code is compiled and executed in a sandboxed context
 - **Safe mode**: Restricts dangerous operations (system calls, file access)
 - **Code validation**: Prevents malicious patterns
 - **Fallback behavior**: Agents get default behavior if compilation fails
 - **Error handling**: Graceful degradation for invalid mutations
 
+### Process-Based Agent System
+Process-based agents run as separate OS processes for enhanced isolation:
+- **Process Spawning**: Each agent runs as an independent Ruby process using `Open3.popen3`
+- **IPC Protocol**: JSON-based communication over stdin/stdout pipes
+- **Process Management**: 
+  - Tracks PIDs and monitors process health with `Process.getpgid`
+  - Graceful shutdown (TERM signal) followed by force kill (KILL) if needed
+  - Automatic cleanup of dead processes
+- **Agent Scripts**: Standalone Ruby executables that implement the agent protocol
+- **Memory Persistence**: Agents can maintain state across turns via `/tmp/agents/{agent_id}/` directories
+- **Timeout Handling**: Each agent action has a configurable timeout (default 500ms)
+- **Parallel Processing**: Optional parallel execution using threads (bypasses Ruby's GIL)
+
 ## Mutation System
 
+### In-Memory Mutation Engine
 The MutationEngine modifies agent code through:
 - Numeric mutations (threshold values)
 - Probability mutations (randomness factors)
 - Operator mutations (comparison operators)
 - Threshold mutations (decision boundaries)
+
+### Process-Based Mutation Engine
+The ProcessMutationEngine handles script-based mutations:
+- **Script Mutation**: Reads parent agent scripts and applies mutations to create offspring
+- **Genetic Pool**: Maintains a persistent collection of evolved agent scripts in `/tmp/genetic_pool/`
+- **Lineage Tracking**: Uses fingerprints to track parent-child relationships
+- **Mutation Types**:
+  - Numeric: Varies integer values by ±20% or ±1-2 for small numbers
+  - Probability: Adjusts probability thresholds by ±0.1-0.3
+  - Threshold: Modifies energy/condition thresholds by ±1-3
+  - Operator: Randomly changes comparison operators (10% chance)
+  - Personality: Mutates agent behavior ranges and traits
 
 ## Parallel Processing
 
@@ -174,6 +211,67 @@ The simulator includes a curses-based visual display that shows the simulation l
 - **R**: Reset camera to origin (0,0)
 - **Q/Esc**: Quit simulation
 
+## Process Architecture Details
+
+### Agent Process Lifecycle
+1. **Spawning**: AgentManager creates new AgentProcess instances
+   - Each agent gets a unique ID and executable path
+   - Process spawned with `Open3.popen3` for bidirectional communication
+   - Initial handshake verifies process is alive
+
+2. **Communication Protocol**:
+   ```json
+   // Input (World → Agent)
+   {
+     "tick": 42,
+     "agent_id": "agent_1_1234567890",
+     "position": [5, 3],
+     "energy": 10,
+     "world_size": [20, 20],
+     "neighbors": {
+       "north": {"energy": 5, "agent_id": "agent_2_..."},
+       "south": {"energy": 0, "agent_id": null},
+       // ... other directions
+     },
+     "generation": 3,
+     "timeout_ms": 1000,
+     "memory": {...}
+   }
+   
+   // Output (Agent → World)
+   {
+     "action": "attack",
+     "target": "north",
+     "memory": {...}
+   }
+   ```
+
+3. **Process Monitoring**:
+   - Regular health checks using `Process.getpgid(pid)`
+   - Automatic cleanup of dead processes
+   - Timeout handling for unresponsive agents
+
+4. **Memory Management**:
+   - Each agent has a workspace in `/tmp/agents/{agent_id}/`
+   - Memory persisted as JSON for state between turns
+   - Cleanup on agent death (Note: cleanup_agent_files method needs implementation)
+
+### Genetic Pool System
+- **Location**: `/tmp/genetic_pool/`
+- **Structure**: Each agent script stored with metadata:
+  - Fingerprint (SHA256 hash)
+  - Parent fingerprint for lineage
+  - Generation number
+  - Creation timestamp
+- **Selection**: Random selection weighted by recency
+- **Persistence**: Survives simulation restarts for continuous evolution
+
+### Performance Considerations
+- Process-based agents have higher overhead than in-memory agents
+- IPC adds latency but provides true parallelism
+- Recommended for complex agent behaviors that benefit from isolation
+- Agent process limit of 100 to prevent resource exhaustion
+
 ## Development Notes
 
 - The project uses Ruby ~> 3.0
@@ -188,3 +286,4 @@ The simulator includes a curses-based visual display that shows the simulation l
 - Visual mode requires a curses-compatible terminal
 - Initial world coverage is configurable (default 10%) for realistic population dynamics
 - Curses display includes stability improvements for long-running simulations
+- Process-based agents bypass Ruby's GIL for true parallelism

@@ -11,11 +11,13 @@ This project implements a digital ecosystem where simple agents defined by execu
 - **Self-Modifying Code**: Agents are defined by Ruby code that can mutate and evolve
 - **Natural Selection**: Agents compete for survival based on energy and fitness
 - **Generational Evolution**: Successful traits propagate through generations
+- **Process-Based Agents**: Each agent runs as a separate OS process for true isolation
 - **Configurable Environment**: Highly customizable simulation parameters
 - **Safe Execution**: Built-in safety measures for code execution
 - **Rich Logging**: Detailed logging with colorized output
 - **CLI Interface**: Command-line tools for running simulations
 - **Interactive Mode**: Step-by-step simulation control
+- **Visual Mode**: Curses-based real-time visualization
 - **Parallel Processing**: Multi-processor agent processing for better performance
 
 ## Quick Start
@@ -52,6 +54,15 @@ chmod +x bin/mutation
 # Enable parallel processing with custom processor count
 ./bin/mutation start --parallel --processors 8
 
+# Visual mode (curses-based display)
+./bin/mutation visual
+
+# Visual mode with custom size
+./bin/mutation visual --width 20 --height 10 --delay 0.05
+
+# Process-based agents (each agent runs in separate OS process)
+./bin/mutation process --width 20 --height 20
+
 # Show configuration
 ./bin/mutation config
 ```
@@ -79,17 +90,24 @@ mutation/
 ├── lib/
 │   ├── mutation.rb              # Main module
 │   └── mutation/
-│       ├── agent.rb             # Agent class
+│       ├── agent.rb             # In-memory agent class
+│       ├── agent_process.rb     # Process-based agent class
+│       ├── agent_manager.rb     # Process agent orchestrator
 │       ├── cli.rb               # Command-line interface
 │       ├── configuration.rb     # Configuration management
+│       ├── genetic_pool.rb      # Persistent agent script storage
 │       ├── logger.rb            # Logging system
-│       ├── mutation_engine.rb   # Mutation logic
+│       ├── mutation_engine.rb   # In-memory mutation logic
+│       ├── process_mutation_engine.rb # Process-based mutations
+│       ├── process_world.rb     # Process-based world
 │       ├── simulator.rb         # Simulation orchestrator
 │       ├── version.rb           # Version information
-│       └── world.rb             # World/environment
+│       └── world.rb             # In-memory world/environment
 ├── spec/                        # Test files
 ├── config/                      # Configuration files
 ├── bin/                         # Executable files
+├── examples/
+│   └── agents/                  # Example agent scripts
 ├── Gemfile                      # Dependencies
 ├── Rakefile                     # Rake tasks
 └── README.md                    # This file
@@ -97,13 +115,32 @@ mutation/
 
 ## How It Works
 
+### Agent Systems
+
+The simulator supports two agent execution models:
+
+#### In-Memory Agents (Traditional)
+- Agents run within the main Ruby process
+- Code compiled and executed in sandboxed context
+- Fast execution with lower overhead
+- Limited by Ruby's GIL for parallelism
+
+#### Process-Based Agents (Advanced)
+- Each agent runs as a separate OS process
+- True parallelism bypassing Ruby's GIL
+- Enhanced isolation and security
+- Communication via JSON over stdin/stdout pipes
+- Persistent memory storage in `/tmp/agents/`
+- Higher overhead but better for complex behaviors
+
 ### Agent Behavior
 
 Each agent contains:
 - **Energy**: Life force that decreases over time
-- **Code**: Ruby code defining behavior
-- **Behavior**: Compiled Proc from the code
+- **Code**: Ruby code defining behavior (or executable path for process agents)
+- **Behavior**: Compiled Proc (in-memory) or external process (process-based)
 - **Generation**: Evolutionary lineage
+- **Memory**: Persistent state between turns (process-based agents)
 
 Agents can perform these actions:
 - `:attack` - Attack neighbors for energy
@@ -113,11 +150,13 @@ Agents can perform these actions:
 
 ### Environment
 
-The world is a 1D grid where:
-- Agents observe neighboring energy levels
-- Actions affect energy levels
+The world is a 2D grid where:
+- Agents observe all 8 neighboring positions (Moore neighborhood)
+- Each position contains either an agent or empty space
+- Actions affect energy levels and grid positions
 - Empty spaces can be filled by replication
-- Energy decays each tick
+- Energy decays each tick (world-controlled)
+- Grid supports both square and rectangular dimensions
 
 ### Mutation
 
@@ -223,6 +262,74 @@ puts simulator.current_status
 simulator.resume
 ```
 
+## Process-Based Agent Architecture
+
+### How Process Agents Work
+
+Each process-based agent runs as an independent Ruby process:
+
+1. **Process Spawning**: AgentManager creates processes using `Open3.popen3`
+2. **Communication Protocol**: JSON messages exchanged via stdin/stdout
+3. **State Management**: Agents maintain memory in `/tmp/agents/{agent_id}/`
+4. **Process Monitoring**: Health checks using `Process.getpgid`
+5. **Graceful Shutdown**: TERM signal followed by KILL if needed
+
+### Agent Communication Protocol
+
+```json
+// Input from World to Agent
+{
+  "tick": 42,
+  "agent_id": "agent_1_1234567890", 
+  "position": [5, 3],
+  "energy": 10,
+  "world_size": [20, 20],
+  "neighbors": {
+    "north": {"energy": 5, "agent_id": "agent_2_..."},
+    "south": {"energy": 0, "agent_id": null},
+    // ... other directions
+  },
+  "generation": 3,
+  "timeout_ms": 1000,
+  "memory": {}
+}
+
+// Output from Agent to World
+{
+  "action": "attack",
+  "target": "north", 
+  "memory": {"turns_played": 10, "last_action": "rest"}
+}
+```
+
+### Genetic Pool System
+
+Process-based agents evolve through a persistent genetic pool:
+
+- **Storage**: Scripts saved in `/tmp/genetic_pool/`
+- **Metadata**: Fingerprints track lineage and mutations
+- **Selection**: Random selection weighted by recency
+- **Persistence**: Survives simulation restarts
+
+### Writing Custom Process Agents
+
+Create executable Ruby scripts that follow the agent protocol:
+
+```ruby
+#!/usr/bin/env ruby
+require 'json'
+
+while input = $stdin.gets
+  world_state = JSON.parse(input)
+  
+  # Agent logic here
+  action = { action: 'rest' }
+  
+  puts JSON.generate(action)
+  $stdout.flush
+end
+```
+
 ## Parallel Processing
 
 The simulator includes experimental parallel processing support for agent decisions:
@@ -236,6 +343,7 @@ The simulator includes experimental parallel processing support for agent decisi
 **Important**: Due to Ruby's Global Interpreter Lock (GIL), parallel processing may not provide performance benefits for CPU-bound agent computations. However, it may be useful for:
 
 - **I/O-bound operations**: File logging, network operations
+- **Process-based agents**: True parallelism when using separate OS processes
 - **Future extensions**: External computation libraries
 - **Experimentation**: Testing different parallelization strategies
 
