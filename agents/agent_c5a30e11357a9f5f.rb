@@ -9,21 +9,7 @@
 
 require 'json'
 
-# Agent memory file
-MEMORY_FILE = "/tmp/agents/#{ENV['AGENT_ID']}/#{ENV['AGENT_ID']}.json"
 
-def load_memory
-  return {} unless File.exist?(MEMORY_FILE)
-  JSON.parse(File.read(MEMORY_FILE))
-rescue
-  {}
-end
-
-def save_memory(memory)
-  File.write(MEMORY_FILE, JSON.pretty_generate(memory))
-rescue
-  # Ignore errors - memory is optional
-end
 
 def choose_action(world_state, memory)
   neighbors = world_state['neighbors'] || {}
@@ -104,18 +90,14 @@ end
 
 # Main agent loop
 begin
-  memory = load_memory
-  
   while input = $stdin.gets
     world_state = JSON.parse(input.strip)
+    memory = world_state['memory'] || {}
     
     action, updated_memory = choose_action(world_state, memory)
-    save_memory(updated_memory)
     
-    puts JSON.generate(action)
+    puts JSON.generate(action.merge(memory: updated_memory))
     $stdout.flush
-    
-    memory = updated_memory
   end
 rescue => e
   # Fallback to rest if anything goes wrong

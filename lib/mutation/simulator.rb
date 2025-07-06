@@ -42,8 +42,7 @@ module Mutation
       @statistics[:start_time] = Time.now
 
       if @curses_mode
-        # Suppress logging immediately in curses mode
-        Mutation.logger.suppress_output = true
+        # Mutation.logger.suppress_output = true # Temporarily disable for debugging
         # Force disable parallel processing in curses mode
         Mutation.configuration.parallel_agents = false
         start_curses_mode
@@ -134,6 +133,8 @@ module Mutation
 
       handle_extinction
     end
+
+    
 
     def reset
       @world.reset_grid
@@ -236,6 +237,8 @@ module Mutation
         @running = false unless @curses_mode
       end
     end
+
+    
 
     def should_log_status?
       (@world.tick % 10).zero? || @world.tick < 5

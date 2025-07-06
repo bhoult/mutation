@@ -15,12 +15,12 @@ module Mutation
 
     def initialize(level = :info)
       @level = LEVELS[level] || LEVELS[:info]
-      @logger = ::Logger.new($stdout)
-      @logger.formatter = proc do |severity, datetime, _progname, msg|
-        timestamp = datetime.strftime('%H:%M:%S')
-        "[#{timestamp}] #{severity}: #{msg}\n"
-      end
+      @appenders = [create_default_appender]
       @suppress_output = false
+    end
+
+    def add_appender(appender)
+      @appenders << appender
     end
 
     attr_writer :suppress_output
@@ -63,11 +63,27 @@ module Mutation
 
     private
 
+    def create_default_appender
+      default_logger = ::Logger.new($stdout)
+      default_logger.formatter = proc do |severity, datetime, _progname, msg|
+        timestamp = datetime.strftime('%H:%M:%S')
+        "[#{timestamp}] #{severity}: #{msg}
+"
+      end
+      default_logger
+    end
+
     def log(level, message)
       return unless should_log?(level)
       return if @suppress_output
 
-      @logger.send(level, message)
+      @appenders.each do |appender|
+        if appender.is_a?(::Logger)
+          appender.send(level, message)
+        elsif appender.respond_to?(:log_message)
+          appender.log_message(level, message)
+        end
+      end
     end
 
     def should_log?(level)

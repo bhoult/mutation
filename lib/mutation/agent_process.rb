@@ -8,11 +8,11 @@ require 'fileutils'
 module Mutation
   class AgentProcess
     attr_reader :agent_id, :executable_path, :position, :energy, :generation, :pid
+    attr_accessor :alive, :memory
     
     @@firejail_warning_shown = false
-    attr_accessor :alive
 
-    def initialize(agent_id, executable_path, x, y, energy = nil, generation = 1)
+    def initialize(agent_id, executable_path, x, y, energy = nil, generation = 1, memory = {})
       @agent_id = agent_id
       @executable_path = executable_path
       @position = [x, y]
@@ -25,9 +25,8 @@ module Mutation
       @stderr = nil
       @process_thread = nil
       @last_action = 'rest'
-      @agent_dir = "/tmp/agents/#{@agent_id}"
+      @memory = memory
       
-      setup_agent_directory
       spawn_process
     end
 
@@ -135,40 +134,12 @@ module Mutation
 
     private
 
-    def setup_agent_directory
-      FileUtils.mkdir_p(@agent_dir)
-      
-      # Create agent state file
-      agent_state = {
-        agent_id: @agent_id,
-        created_at: Time.now.iso8601,
-        generation: @generation
-      }
-      
-      File.write(File.join(@agent_dir, "#{@agent_id}.json"), JSON.pretty_generate(agent_state))
-    end
+    
 
     def spawn_process
-      profile_path = File.join(File.dirname(__FILE__), '../../config/agent.profile')
-      
-      # Build firejail command
-      firejail_cmd = [
-        'firejail',
-        "--profile=#{profile_path}",
-        "--private=#{@agent_dir}",
-        "--whitelist=#{@agent_dir}",
-        "--read-write=#{@agent_dir}",
-        @executable_path
-      ]
-      
-      env = {
-        'AGENT_ID' => @agent_id,
-        'AGENT_DIR' => @agent_dir
-      }
-      
       # Skip firejail for now - go straight to direct execution
       begin
-        @stdin, @stdout, @stderr, @process_thread = Open3.popen3(env, @executable_path)
+        @stdin, @stdout, @stderr, @process_thread = Open3.popen3(@executable_path)
         @pid = @process_thread.pid
         
         unless process_alive?
@@ -212,7 +183,8 @@ module Mutation
         world_size: world_state[:world_size],
         neighbors: format_neighbors(world_state[:neighbors]),
         generation: world_state[:generation],
-        timeout_ms: world_state[:timeout_ms] || 1000
+        timeout_ms: world_state[:timeout_ms] || 1000,
+        memory: @memory # Pass agent's memory to the process
       }
     end
 
@@ -261,6 +233,7 @@ module Mutation
       return default_action unless response.is_a?(Hash)
       
       action_type = response['action']&.to_sym
+      @memory = response['memory'] || {}
       
       case action_type
       when :attack

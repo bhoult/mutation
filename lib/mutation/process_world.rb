@@ -3,6 +3,7 @@
 module Mutation
   class ProcessWorld
     attr_accessor :grid, :tick, :last_survivor_code, :generation, :statistics
+    attr_reader :agent_manager
 
     def initialize(width: nil, height: nil, size: nil, seed_code: nil, agent_executables: nil)
       # Support both 1D (size) and 2D (width/height) initialization
@@ -76,7 +77,8 @@ module Mutation
         agent = @agent_manager.spawn_agent(
           executable, x, y, 
           Mutation.configuration.initial_energy, 
-          @generation + 1
+          @generation + 1,
+          {} # Initial empty memory
         )
         
         if agent
@@ -110,7 +112,8 @@ module Mutation
             world_size: [@width, @height],
             timeout_ms: Mutation.configuration.agent_timeout_ms,
             neighbors: neighbors,
-            generation: agent.generation
+            generation: agent.generation,
+            memory: agent.memory # Pass agent's memory to the process
           }
         end
       end
@@ -125,7 +128,10 @@ module Mutation
         row.each_with_index do |agent, x|
           next unless agent&.alive
 
-          action = actions[agent.agent_id] || { type: :rest }
+          action_response = actions[agent.agent_id] || { type: :rest }
+          action = { type: action_response[:type], target: action_response[:target] }
+          agent.memory = action_response[:memory] || {} # Update agent's memory
+
           execute_action(agent, action, x, y, new_grid)
 
           # Apply additional energy decay (aging/metabolism)
@@ -137,6 +143,7 @@ module Mutation
           if agent.alive && new_energy > 0
             new_grid[y][x] = agent
           else
+            Mutation.logger.debug("Agent #{agent.agent_id} at (#{x},#{y}) dying (energy: #{new_energy})")
             agent.die! if agent.alive
             @agent_manager.remove_agent(agent.agent_id)
           end
@@ -227,7 +234,7 @@ module Mutation
       offspring_x, offspring_y = empty_positions.sample
 
       # Create offspring with mutation
-      offspring = @agent_manager.create_offspring(agent, offspring_x, offspring_y, @mutation_engine)
+      offspring = @agent_manager.create_offspring(agent, offspring_x, offspring_y, @mutation_engine, agent.memory)
       return unless offspring
 
       # Note: Replication cost is now handled in execute_action, not here
@@ -300,6 +307,10 @@ module Mutation
       living_agents.count
     end
 
+    def process_count
+      @agent_manager.agents.size
+    end
+
     def all_dead?
       agent_count == 0
     end
@@ -351,8 +362,10 @@ module Mutation
     end
     
     def cleanup
+      Mutation.logger.info("Starting ProcessWorld cleanup...")
       # Ensure all agent processes are properly terminated
       @agent_manager.kill_all_agents
+      Mutation.logger.info("ProcessWorld cleanup complete.")
     end
 
     private

@@ -4,7 +4,8 @@ module Mutation
   class MutationEngine
     MUTATION_TYPES = %i[numeric probability threshold operator].freeze
 
-    def initialize
+    def initialize(agent_code_pool)
+      @agent_code_pool = agent_code_pool
       @mutation_strategies = {
         numeric: method(:mutate_numeric),
         probability: method(:mutate_probability),
@@ -14,9 +15,10 @@ module Mutation
     end
 
     def mutate(agent)
-      mutated_code = mutate_code(agent.code_str)
+      base_code = @agent_code_pool.random_code
+      mutated_code = mutate_code(base_code)
 
-      Mutation.logger.mutation("Mutation from #{agent.id}:\n#{mutated_code}") if should_log_mutation?
+      Mutation.logger.mutation("Mutation from #{agent.id} (based on random pool agent):\n#{mutated_code}") if should_log_mutation?
 
       new_agent = Agent.new(
         code_str: mutated_code,

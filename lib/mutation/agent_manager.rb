@@ -10,17 +10,16 @@ module Mutation
     def initialize
       @agents = {}
       @agent_counter = 0
-      setup_agent_workspace
     end
 
-    def spawn_agent(executable_path, x, y, energy = nil, generation = 1)
+    def spawn_agent(executable_path, x, y, energy = nil, generation = 1, memory = {})
       # Safety check to prevent too many agents
       return nil if @agents.size >= 100
       
       agent_id = generate_agent_id
       
       begin
-        agent = AgentProcess.new(agent_id, executable_path, x, y, energy, generation)
+        agent = AgentProcess.new(agent_id, executable_path, x, y, energy, generation, memory)
         if agent.alive?
           @agents[agent_id] = agent
           agent
@@ -99,24 +98,32 @@ module Mutation
     end
 
     def remove_agent(agent_id)
+      Mutation.logger.debug("Attempting to remove agent #{agent_id}")
       agent = @agents.delete(agent_id)
       if agent
         agent.kill_process
         cleanup_agent_files(agent_id)
-        Mutation.logger.debug("Removed agent #{agent_id}")
+        Mutation.logger.debug("Successfully removed agent #{agent_id}. Remaining agents: #{@agents.size}")
+      else
+        Mutation.logger.warn("Agent #{agent_id} not found for removal.")
       end
     end
 
     def kill_all_agents
-      @agents.each do |agent_id, agent|
-        begin
-          agent.kill_process
-        rescue => e
-          Mutation.logger.error("Failed to kill agent #{agent_id}: #{e.message}")
+      if @agents.empty?
+        Mutation.logger.info("AgentManager: No active agents to kill. No workspace cleanup needed.")
+      else
+        Mutation.logger.info("AgentManager: Performing final sweep, killing #{@agents.size} remaining agents...")
+        @agents.each do |agent_id, agent|
+          begin
+            agent.kill_process
+          rescue => e
+            Mutation.logger.error("Failed to kill agent #{agent_id}: #{e.message}")
+          end
         end
       end
       @agents.clear
-      cleanup_workspace
+      Mutation.logger.info("AgentManager: Final sweep complete.")
     end
 
     def living_agents
@@ -154,7 +161,7 @@ module Mutation
       end
     end
 
-    def create_offspring(parent_agent, x, y, mutation_engine)
+    def create_offspring(parent_agent, x, y, mutation_engine, parent_memory = {})
       return nil unless parent_agent&.alive
       
       offspring_energy = Mutation.configuration.initial_energy
@@ -169,7 +176,8 @@ module Mutation
           offspring_script_path,
           x, y,
           offspring_energy,
-          offspring_generation
+          offspring_generation,
+          parent_memory
         )
       else
         # Fallback to using parent's executable (no mutation)
@@ -177,7 +185,8 @@ module Mutation
           parent_agent.executable_path,
           x, y,
           offspring_energy,
-          offspring_generation
+          offspring_generation,
+          parent_memory
         )
       end
     end
@@ -203,22 +212,10 @@ module Mutation
       "agent_#{@agent_counter}_#{Time.now.to_i}"
     end
 
-    def setup_agent_workspace
-      workspace_dir = '/tmp/agents'
-      FileUtils.mkdir_p(workspace_dir)
-      
-      # Clean up any existing agent files
-      FileUtils.rm_rf(Dir.glob("#{workspace_dir}/*"))
-    end
+    
 
-    def cleanup_agent_files(agent_id)
-      agent_dir = "/tmp/agents/#{agent_id}"
-      FileUtils.rm_rf(agent_dir) if Dir.exist?(agent_dir)
-    end
+    
 
-    def cleanup_workspace
-      workspace_dir = '/tmp/agents'
-      FileUtils.rm_rf(Dir.glob("#{workspace_dir}/*"))
-    end
+    
   end
 end

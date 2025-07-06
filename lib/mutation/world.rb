@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'agent_code_pool'
 require 'parallel'
 require_relative 'process_world'
 
@@ -50,7 +51,8 @@ module Mutation
           raise "Process-based agents enabled but no agent executables provided and no default agent executable configured"
         end
       else
-        @mutation_engine = MutationEngine.new
+        @agent_code_pool = AgentCodePool.new
+        @mutation_engine = MutationEngine.new(@agent_code_pool)
         @use_process_agents = false
         @statistics = {
           total_agents_created: 0,
@@ -100,11 +102,7 @@ module Mutation
     end
 
     def create_initial_agent
-      if @last_survivor_code
-        Agent.new(code_str: @last_survivor_code, generation: @generation)
-      else
-        Agent.new(generation: @generation)
-      end
+      Agent.new(code_str: @agent_code_pool.random_code, generation: @generation)
     end
 
     def step
@@ -283,6 +281,8 @@ module Mutation
       end
     end
 
+    
+
     def living_agents
       if @use_process_agents
         @implementation.living_agents
@@ -296,6 +296,14 @@ module Mutation
         @implementation.agent_count
       else
         living_agents.count
+      end
+    end
+
+    def process_count
+      if @use_process_agents
+        @implementation.agent_manager.agents.size
+      else
+        0
       end
     end
 
@@ -337,12 +345,10 @@ module Mutation
       else
         survivor = fittest_agent
         if survivor
-          @last_survivor_code = survivor.code_str
           Mutation.logger.generation("🔬 Survivor: #{survivor}")
           Mutation.logger.debug("Survivor code:\n#{survivor.code_str}")
         else
           Mutation.logger.warn('No survivors found, using default code')
-          @last_survivor_code = nil
         end
 
         @tick = 0
