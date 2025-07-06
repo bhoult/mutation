@@ -24,6 +24,7 @@ module Mutation
     attr_reader :agent_manager
 
     def initialize(width: nil, height: nil, size: nil, seed_code: nil, agent_executables: nil)
+      initialize_world_logging
       # Support both 1D (size) and 2D (width/height) initialization
       if width && height
         @width = width
@@ -112,7 +113,8 @@ module Mutation
     end
 
     def step
-      step_start = Time.now
+      begin
+        step_start = Time.now
       
       # Build individual world states for each agent including their neighbors
       world_state_start = Time.now
@@ -125,6 +127,9 @@ module Mutation
           # Get neighbors for this specific agent
           neighbors = get_neighbors(x, y)
           
+          # Get vision data for this agent (2-square radius for performance)
+          vision = get_vision(x, y, radius: 2)
+          
           agent_world_states[agent.agent_id] = {
             tick: @tick,
             agent_id: agent.agent_id,
@@ -133,6 +138,7 @@ module Mutation
             world_size: [@width, @height],
             timeout_ms: Mutation.configuration.agent_timeout_ms,
             neighbors: neighbors,
+            vision: vision,
             generation: agent.generation,
             memory: agent.memory # Pass agent's memory to the process
           }
@@ -160,8 +166,12 @@ module Mutation
       grid_setup_time = Time.now - grid_setup_start
 
       action_execution_start = Time.now
+      living_count = 0
       @grid.each_with_index do |row, y|
         row.each_with_index do |agent, x|
+          if agent&.alive?
+            living_count += 1
+          end
           next unless agent&.alive?
 
           action_response = actions[agent.agent_id] || { type: :rest }
@@ -189,6 +199,7 @@ module Mutation
             # Agent died - only remove if not already removed by execute_action
             if agent.alive
               Mutation.logger.debug("Agent #{agent.agent_id} at (#{x},#{y}) dying (energy: #{new_energy})")
+              log_world_event("DEATH_ENERGY", agent.agent_id, [x, y], { energy: new_energy })
               agent.die!
               @agent_manager.remove_agent(agent.agent_id)
             end
@@ -202,6 +213,9 @@ module Mutation
 
       @grid = new_grid
       @tick += 1
+
+      # Process any deferred agent cleanup operations
+      @agent_manager.process_cleanup_queue
 
       update_statistics
       
@@ -225,6 +239,11 @@ module Mutation
       #     Mutation.logger.debug("MISMATCH T:#{@tick} | AgentManager: #{living.count} living | Grid: #{grid_living} living")
       #   end
       # end
+      rescue => e
+        Mutation.logger.error("Exception in WorldImpl.step: #{e.message}")
+        Mutation.logger.error(e.backtrace.join("\n"))
+        raise
+      end
     end
 
     def execute_action(agent, action, x, y, new_grid)
@@ -238,22 +257,28 @@ module Mutation
       case action_type
       when :attack
         action_cost = base_action_cost + Mutation.configuration.attack_action_cost
+        log_world_event("ATTACK_START", agent.agent_id, [x, y], { target: action[:target] })
         execute_attack(agent, action[:target], x, y)
       when :rest
         action_cost = base_action_cost  # Resting still costs some energy
+        log_world_event("REST", agent.agent_id, [x, y])
         execute_rest(agent)
       when :replicate
         action_cost = base_action_cost + Mutation.configuration.replication_cost
+        log_world_event("REPLICATE_START", agent.agent_id, [x, y])
         execute_replicate(agent, x, y, new_grid)
       when :move
         action_cost = base_action_cost  # Moving costs base energy
+        log_world_event("MOVE_START", agent.agent_id, [x, y], { target: action[:target] })
         execute_move(agent, action[:target], x, y, new_grid)
       when :die
         action_cost = 0  # Dying is free
+        log_world_event("SUICIDE", agent.agent_id, [x, y])
         agent.die!
       else
         Mutation.logger.debug("Agent #{agent.agent_id} unknown action #{action[:type]} (#{action_type}), defaulting to rest")
         action_cost = base_action_cost  # Default to rest cost
+        log_world_event("UNKNOWN_ACTION", agent.agent_id, [x, y], { action: action[:type] })
         execute_rest(agent)
       end
       
@@ -297,6 +322,9 @@ module Mutation
         dead_agent = DeadAgent.new(target_agent.agent_id, [target_x, target_y])
         @agent_manager.remove_agent(target_agent.agent_id)
         @grid[target_y][target_x] = dead_agent
+        log_world_event("ATTACK_KILL", agent.agent_id, [x, y], { killed: target_agent.agent_id, at: [target_x, target_y] })
+      else
+        log_world_event("ATTACK_DAMAGE", agent.agent_id, [x, y], { target: target_agent.agent_id, damage: damage })
       end
     end
 
@@ -323,7 +351,7 @@ module Mutation
         @agent_manager.move_agent(agent.agent_id, target_x, target_y)
         new_grid[target_y][target_x] = agent
         new_grid[y][x] = nil  # Clear old position
-        # Mutation.logger.debug("Agent #{agent.agent_id} moved from (#{x},#{y}) to (#{target_x},#{target_y})")
+        log_world_event("MOVE_SUCCESS", agent.agent_id, [target_x, target_y], { from: [x, y] })
       elsif target_cell.is_a?(DeadAgent)
         # Dead agent - eat it and gain energy
         dead_agent_energy_gain = 10  # Default energy gain from eating dead agents
@@ -332,10 +360,11 @@ module Mutation
         @agent_manager.move_agent(agent.agent_id, target_x, target_y)
         new_grid[target_y][target_x] = agent
         new_grid[y][x] = nil  # Clear old position
-        # Mutation.logger.debug("Agent #{agent.agent_id} ate dead agent and gained #{dead_agent_energy_gain} energy")
+        log_world_event("MOVE_EAT_DEAD", agent.agent_id, [target_x, target_y], { from: [x, y], energy_gained: dead_agent_energy_gain })
       else
         # Position occupied by living agent - movement fails, stay at original position
         new_grid[y][x] = agent
+        log_world_event("MOVE_BLOCKED", agent.agent_id, [x, y], { target: [target_x, target_y] })
       end
     end
 
@@ -360,6 +389,7 @@ module Mutation
       # Place offspring in grid
       new_grid[offspring_y][offspring_x] = offspring
       @statistics[:total_agents_created] += 1
+      log_world_event("REPLICATE_SUCCESS", agent.agent_id, [x, y], { offspring: offspring.agent_id, at: [offspring_x, offspring_y] })
     end
 
     def get_target_position(x, y, direction)
@@ -417,6 +447,45 @@ module Mutation
       end
 
       neighbors
+    end
+
+    def get_vision(x, y, radius: 5)
+      vision = {}
+      
+      # Scan all positions within the radius
+      (-radius..radius).each do |dy|
+        (-radius..radius).each do |dx|
+          next if dx == 0 && dy == 0 # Skip center position
+          
+          vision_x = x + dx
+          vision_y = y + dy
+          
+          # Create relative coordinate key
+          relative_key = "#{dx},#{dy}"
+          
+          if valid_position?(vision_x, vision_y)
+            cell = @grid[vision_y][vision_x]
+            if cell.nil?
+              # Empty space
+              vision[relative_key] = { type: 'empty', energy: 0, alive: nil }
+            elsif cell.is_a?(DeadAgent)
+              # Dead agent
+              vision[relative_key] = { type: 'dead_agent', energy: 0, alive: false }
+            elsif cell.alive?
+              # Living agent
+              vision[relative_key] = { type: 'living_agent', energy: cell.energy, alive: true }
+            else
+              # Dead agent (should not happen with current logic but safe fallback)
+              vision[relative_key] = { type: 'dead_agent', energy: 0, alive: false }
+            end
+          else
+            # Out of bounds
+            vision[relative_key] = { type: 'boundary', energy: 0, alive: nil }
+          end
+        end
+      end
+      
+      vision
     end
 
     def living_agents
@@ -489,6 +558,40 @@ module Mutation
     end
 
     private
+
+    def initialize_world_logging
+      # Create logs directory if it doesn't exist
+      logs_dir = 'logs'
+      Dir.mkdir(logs_dir) unless Dir.exist?(logs_dir)
+      
+      # Clear existing log files
+      Dir.glob(File.join(logs_dir, '*.log')).each do |log_file|
+        File.delete(log_file) rescue nil
+      end
+      
+      # Initialize world events log
+      @world_log_file = File.join(logs_dir, 'world_events.log')
+      File.open(@world_log_file, 'w') do |f|
+        f.puts "=== WORLD EVENTS LOG - Started at #{Time.now} ==="
+      end
+    rescue => e
+      Mutation.logger.debug("Failed to initialize world logging: #{e.message}")
+    end
+
+    def log_world_event(event_type, agent_id, position, details = {})
+      return unless @world_log_file
+      
+      timestamp = Time.now.strftime("%H:%M:%S.%3N")
+      position_str = position ? "(#{position[0]},#{position[1]})" : "(?)"
+      details_str = details.empty? ? "" : " - #{details.inspect}"
+      
+      File.open(@world_log_file, 'a') do |f|
+        f.puts "[T:#{@tick} #{timestamp}] #{event_type}: Agent #{agent_id} at #{position_str}#{details_str}"
+      end
+    rescue => e
+      # Don't let logging errors break the simulation
+      Mutation.logger.debug("Failed to log world event: #{e.message}")
+    end
 
     def default_executable
       # Use provided executables or fall back to base agent

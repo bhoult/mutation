@@ -91,7 +91,7 @@ module Mutation
       @max_parallel_threads = 8
       
       # Process management
-      @agent_response_timeout = 0.5
+      @agent_response_timeout = 0.1
       @process_cleanup_delay = 0.1
       @graceful_death_timeout = 0.5
       @default_timeout_ms = 1000

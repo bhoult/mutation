@@ -39,9 +39,24 @@ module Mutation
       # Skip if agent already exists (genetic diversity preservation)
       return filepath if File.exist?(filepath)
       
+      # Extract shebang line and rest of code
+      lines = code.lines
+      shebang_line = ""
+      code_lines = []
+      
+      lines.each do |line|
+        if line.start_with?('#!/usr/bin/env ruby')
+          shebang_line = line
+        else
+          code_lines << line
+        end
+      end
+      
       # Add generation metadata as comments
       metadata = build_metadata(fingerprint, parent_fingerprint)
-      full_code = metadata + code
+      
+      # Assemble final code: shebang first, then metadata, then code
+      full_code = shebang_line + metadata + code_lines.join
       
       # Write agent to genetic pool
       File.write(filepath, full_code)

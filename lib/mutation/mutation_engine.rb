@@ -84,6 +84,8 @@ module Mutation
       when /energy.*[<>]=?\s*\d+/, /my_energy.*[<>]=?\s*\d+/
         :threshold
       when /[<>]=?/
+        # Only mutate comparison operators, not array append (<<) or other operators
+        return nil if line.include?('<<') || line.include?('>>')
         :operator
       when /'aggression'.*rand/, /'greed'.*rand/, /'cooperation'.*rand/, /'death_threshold'.*rand/
         :personality
@@ -179,20 +181,33 @@ module Mutation
       content = File.read(script_path)
       lines = content.lines
       
-      # Find where metadata ends (look for non-comment line or shebang)
-      code_start = 0
-      lines.each_with_index do |line, i|
-        if line.start_with?('#!/usr/bin/env ruby')
-          code_start = i
-          break
-        elsif !line.strip.start_with?('#') && !line.strip.empty?
-          code_start = i
-          break
+      # Filter out ALL metadata lines and keep only the actual code
+      filtered_lines = []
+      found_shebang = false
+      
+      lines.each do |line|
+        stripped = line.strip
+        
+        # Skip metadata headers entirely
+        if stripped.start_with?('# Fingerprint:') ||
+           stripped.start_with?('# Created:') ||
+           stripped.start_with?('# Parent:') ||
+           stripped.start_with?('# Generation:')
+          next
+        elsif line.start_with?('#!/usr/bin/env ruby')
+          # Include shebang only once
+          unless found_shebang
+            filtered_lines << line
+            found_shebang = true
+          end
+        else
+          # Include all other lines (code, comments, etc.)
+          filtered_lines << line
         end
       end
       
-      # Return code from shebang/first code line onwards
-      lines[code_start..-1].join
+      # Return the clean code
+      filtered_lines.join
     end
 
     def extract_fingerprint(script_path)

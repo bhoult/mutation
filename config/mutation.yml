@@ -128,7 +128,7 @@ auto_reset: true           # Auto-reset after extinction
 safe_mode: true             # Enable safe code execution
 
 # Parallel processing (True parallelism with process-based agents)
-parallel_agents: true      # Enable parallel agent processing
+parallel_agents: false     # Enable parallel agent processing
 processor_count: null      # Number of processors to use (null = all available)
 
 # Agent settings

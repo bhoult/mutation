@@ -52,7 +52,7 @@ module Mutation
       end
       
       # Wait for all threads with global timeout
-      threads.each { |t| t.join(timeout_ms / 1000.0 + 0.1) }
+      threads.each { |t| t.join(timeout_ms / 1000.0 + 0.5) }
       
       actions
     end
@@ -104,21 +104,46 @@ module Mutation
     end
 
     def remove_agent(agent_id)
-      Mutation.logger.debug("Attempting to remove agent #{agent_id}")
       agent = @agents.delete(agent_id)
       if agent
-        # Only try to kill if process is still alive
-        if agent.send(:process_alive?)
-          agent.kill_process
-        else
-          # Process already exited, just clean up
-          agent.send(:cleanup_process)
-        end
-        cleanup_agent_files(agent_id)
-        Mutation.logger.debug("Successfully removed agent #{agent_id}. Remaining agents: #{@agents.size}")
-      else
-        Mutation.logger.debug("Agent #{agent_id} not found for removal (already removed).")
+        # Mark agent as dead but defer expensive cleanup operations
+        agent.die!
+        
+        # Add to cleanup queue for batch processing
+        @cleanup_queue ||= []
+        @cleanup_queue << agent
+        
+        # Minimal logging to avoid performance impact
+        Mutation.logger.debug("Marked agent #{agent_id} for cleanup. Remaining: #{@agents.size}") if @agents.size % 10 == 0
       end
+    end
+    
+    def process_cleanup_queue
+      return unless @cleanup_queue&.any?
+      
+      # Process cleanup asynchronously to avoid blocking the simulation
+      cleanup_thread = Thread.new do
+        @cleanup_queue.each do |agent|
+          begin
+            # Only try to kill if process is still alive
+            if agent.send(:process_alive?)
+              agent.kill_process
+            else
+              # Process already exited, just clean up
+              agent.send(:cleanup_process)
+            end
+            cleanup_agent_files(agent.agent_id)
+          rescue => e
+            Mutation.logger.error("Failed to cleanup agent #{agent.agent_id}: #{e.message}")
+          end
+        end
+        
+        Mutation.logger.debug("Processed cleanup queue: #{@cleanup_queue.size} agents")
+      end
+      
+      # Don't wait for cleanup to complete - let it run in background
+      cleanup_thread.join(0.001) # Very short timeout to avoid blocking
+      @cleanup_queue.clear
     end
 
     def kill_all_agents
@@ -179,10 +204,13 @@ module Mutation
       offspring_energy = Mutation.configuration.random_initial_energy
       offspring_generation = parent_agent.generation + 1
       
-      # Create mutated script for offspring
+      # Use existing agent from genetic pool to avoid blocking file I/O during simulation
       if mutation_engine.is_a?(MutationEngine)
-        # Use process-based mutation
-        offspring_script_path = mutation_engine.create_mutated_agent_script(parent_agent)
+        # Get random existing agent from pool (fast, no file creation)
+        offspring_script_path = mutation_engine.random_agent_from_pool
+        
+        # Fallback to parent if no agents in pool
+        offspring_script_path ||= parent_agent.executable_path
         
         spawn_agent(
           offspring_script_path,

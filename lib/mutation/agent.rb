@@ -34,9 +34,16 @@ module Mutation
       return default_action unless @alive && process_alive?
       
       begin
+        start_time = Time.now
+        
         # Send world state to agent
         input_data = build_input_data(world_state)
         json_data = JSON.generate(input_data)
+        
+        input_sent_time = Time.now
+        
+        # Log input to agent
+        log_agent_interaction("INPUT", json_data)
         
         @stdin.puts(json_data)
         @stdin.flush
@@ -48,6 +55,13 @@ module Mutation
         Timeout.timeout(timeout_seconds) do
           response_line = @stdout.gets
           response = JSON.parse(response_line) if response_line
+          
+          response_time = Time.now
+          total_time_ms = ((response_time - start_time) * 1000).round(2)
+          think_time_ms = ((response_time - input_sent_time) * 1000).round(2)
+          
+          # Log output from agent with timing
+          log_agent_interaction("OUTPUT", "#{response_line} [TIMING: #{total_time_ms}ms total, #{think_time_ms}ms think]") if response_line
         end
         
         action = parse_action(response)
@@ -55,12 +69,21 @@ module Mutation
         action
         
       rescue Timeout::Error
+        timeout_time = Time.now
+        total_time_ms = ((timeout_time - start_time) * 1000).round(2)
+        log_agent_interaction("TIMEOUT", "Agent timed out after #{total_time_ms}ms")
         Mutation.logger.warn("Agent #{@agent_id} timed out, using default action")
         default_action
       rescue JSON::ParserError => e
+        error_time = Time.now
+        total_time_ms = ((error_time - start_time) * 1000).round(2)
+        log_agent_interaction("ERROR", "JSON parse error after #{total_time_ms}ms: #{e.message}")
         Mutation.logger.warn("Agent #{@agent_id} sent invalid JSON: #{e.message}")
         default_action
       rescue => e
+        error_time = Time.now
+        total_time_ms = ((error_time - start_time) * 1000).round(2)
+        log_agent_interaction("ERROR", "Exception after #{total_time_ms}ms: #{e.message}")
         Mutation.logger.error("Agent #{@agent_id} error: #{e.message}")
         kill_process
         default_action
@@ -102,7 +125,8 @@ module Mutation
 
     def die!
       @alive = false
-      request_graceful_death
+      # Defer graceful death to avoid blocking simulation
+      # The agent cleanup will be handled by the cleanup queue
     end
 
     def request_graceful_death
@@ -173,8 +197,22 @@ module Mutation
         @stdin, @stdout, @stderr, @process_thread = Open3.popen3(@executable_path)
         @pid = @process_thread.pid
         
+        # Give the process a moment to start
+        sleep(0.01)
+        
         unless process_alive?
-          Mutation.logger.error("Agent #{@agent_id} process died immediately after spawn")
+          # Try to get error output
+          error_output = ""
+          begin
+            @stderr.each_line do |line|
+              error_output += line
+              break if error_output.length > 500 # Limit error output
+            end
+          rescue
+            # Ignore stderr read errors
+          end
+          
+          Mutation.logger.error("Agent #{@agent_id} process died immediately after spawn. Error: #{error_output}")
           @alive = false
         end
       rescue => e
@@ -213,6 +251,7 @@ module Mutation
         energy: world_state[:energy],  # World-controlled energy, not agent's
         world_size: world_state[:world_size],
         neighbors: format_neighbors(world_state[:neighbors]),
+        vision: world_state[:vision] || {},  # Pass vision data to agent
         generation: world_state[:generation],
         timeout_ms: world_state[:timeout_ms] || Mutation.configuration.default_timeout_ms,
         memory: @memory # Pass agent's memory to the process
@@ -296,6 +335,23 @@ module Mutation
 
     def default_action
       { type: :rest }
+    end
+
+    def log_agent_interaction(direction, data)
+      # Create logs directory if it doesn't exist
+      logs_dir = 'logs'
+      Dir.mkdir(logs_dir) unless Dir.exist?(logs_dir)
+      
+      # Create individual log file for this agent
+      log_file = File.join(logs_dir, "agent_#{@agent_id}.log")
+      
+      timestamp = Time.now.strftime("%H:%M:%S.%3N")
+      File.open(log_file, 'a') do |f|
+        f.puts "[#{timestamp}] #{direction}: #{data}"
+      end
+    rescue => e
+      # Don't let logging errors break the simulation
+      Mutation.logger.debug("Failed to log agent interaction: #{e.message}")
     end
   end
 end
