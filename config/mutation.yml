@@ -122,10 +122,10 @@ mutation_rate: 0.5          # Probability of mutating each line
 mutation_probability: 0.05  # Probability of logging mutations
 
 # Simulation settings
-simulation_delay: 0.2       # Delay between ticks (seconds)
+simulation_delay: 0.05      # Delay between ticks (seconds)
 max_ticks: null            # Maximum ticks to run (null = unlimited)
 auto_reset: true           # Auto-reset after extinction
-safe_mode: true            # Enable safe code execution
+safe_mode: true             # Enable safe code execution
 
 # Parallel processing (True parallelism with process-based agents)
 parallel_agents: true      # Enable parallel agent processing
@@ -133,10 +133,10 @@ processor_count: null      # Number of processors to use (null = all available)
 
 # Agent settings
 agent_timeout_ms: 1000     # Timeout for agent responses in milliseconds
-# default_agent_executable: examples/agents/ruby_agent.rb  # Default agent script (uncomment to set)
+default_agent_executable: simple_move_agent.rb  # Default agent script (uncomment to set)
 
 # Logging
-log_level: info            # debug, info, warn, error, fatal
+log_level: debug            # debug, info, warn, error, fatal
 
 # Display
 visual_mode: false         # Use curses display by default

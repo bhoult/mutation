@@ -108,10 +108,11 @@ Key configuration areas:
 
 ## Agent Behavior System
 
-All agents run as separate OS processes for enhanced isolation and true parallelism. Agents contain Ruby code that returns one of four actions:
+All agents run as separate OS processes for enhanced isolation and true parallelism. Agents contain Ruby code that returns one of five actions:
 - `:attack` - Attack neighbors for energy
 - `:rest` - Gain energy by resting
 - `:replicate` - Create mutated offspring
+- `:move` - Move to adjacent position (can eat dead agents for +10 energy)
 - `:die` - End existence
 
 ### Agent Architecture
@@ -253,7 +254,7 @@ The simulator includes a curses-based visual display that shows the simulation l
 ## Agent Command Reference
 
 ### Available Actions
-All agents can perform exactly four actions:
+All agents can perform exactly five actions:
 
 1. **attack** - Attack a neighboring agent
    - Must specify target direction (north, south, east, west, etc.)
@@ -268,7 +269,13 @@ All agents can perform exactly four actions:
    - Places mutated offspring in adjacent empty cell
    - Parent pays replication cost
    
-4. **die** - Voluntary termination
+4. **move** - Move to adjacent position
+   - Must specify target direction (north, south, east, west, etc.)
+   - Can move to empty spaces or eat dead agents
+   - Eating dead agents provides +10 energy
+   - Movement blocked by living agents
+   
+5. **die** - Voluntary termination
    - Immediately removes agent from world
    - No energy cost
 

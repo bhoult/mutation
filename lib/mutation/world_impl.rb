@@ -112,7 +112,10 @@ module Mutation
     end
 
     def step
+      step_start = Time.now
+      
       # Build individual world states for each agent including their neighbors
+      world_state_start = Time.now
       agent_world_states = {}
       
       @grid.each_with_index do |row, y|
@@ -135,11 +138,15 @@ module Mutation
           }
         end
       end
+      world_state_time = Time.now - world_state_start
 
       # Get all agent actions
+      actions_start = Time.now
       actions = @agent_manager.get_agent_actions_with_individual_states(agent_world_states)
+      actions_time = Time.now - actions_start
 
       # Apply actions sequentially to avoid race conditions
+      grid_setup_start = Time.now
       new_grid = Array.new(@height) { Array.new(@width) { nil } }
 
       # First, copy dead agents to preserve their locations
@@ -150,7 +157,9 @@ module Mutation
           end
         end
       end
+      grid_setup_time = Time.now - grid_setup_start
 
+      action_execution_start = Time.now
       @grid.each_with_index do |row, y|
         row.each_with_index do |agent, x|
           next unless agent&.alive?
@@ -159,6 +168,9 @@ module Mutation
           action = { type: action_response[:type], target: action_response[:target] }
           agent.memory = action_response[:memory] || {} # Update agent's memory
 
+          # Convert action type to symbol for consistency
+          action_type = action[:type].to_s.to_sym if action[:type]
+
           execute_action(agent, action, x, y, new_grid)
 
           # Apply additional energy decay (aging/metabolism)
@@ -166,31 +178,64 @@ module Mutation
           new_energy = current_energy - Mutation.configuration.energy_decay
           @agent_manager.update_agent_energy(agent.agent_id, new_energy)
 
-          # Keep agent if still alive after all energy deductions
-          if agent.alive && new_energy > 0
-            new_grid[y][x] = agent
+          # Keep agent if still alive after all energy deductions (fix floating point precision)
+          if agent.alive && new_energy > 0.001
+            # Only place agent at original position if it didn't move
+            # (Movement already places the agent in the new position)
+            unless action_type == :move
+              new_grid[y][x] = agent
+            end
           else
-            Mutation.logger.debug("Agent #{agent.agent_id} at (#{x},#{y}) dying (energy: #{new_energy})")
-            agent.die! if agent.alive
-            @agent_manager.remove_agent(agent.agent_id)
+            # Agent died - only remove if not already removed by execute_action
+            if agent.alive
+              Mutation.logger.debug("Agent #{agent.agent_id} at (#{x},#{y}) dying (energy: #{new_energy})")
+              agent.die!
+              @agent_manager.remove_agent(agent.agent_id)
+            end
             # Create dead agent marker
             dead_agent = DeadAgent.new(agent.agent_id, [x, y])
             new_grid[y][x] = dead_agent
           end
         end
       end
+      action_execution_time = Time.now - action_execution_start
 
       @grid = new_grid
       @tick += 1
 
       update_statistics
+      
+      total_step_time = Time.now - step_start
+      
+      # Log timing every 50 ticks for performance monitoring
+      if @tick % 50 == 0
+        Mutation.logger.debug("PROFILE T:#{@tick} | Total: #{(total_step_time * 1000).round(2)}ms | WorldState: #{(world_state_time * 1000).round(2)}ms | Actions: #{(actions_time * 1000).round(2)}ms | GridSetup: #{(grid_setup_time * 1000).round(2)}ms | Execution: #{(action_execution_time * 1000).round(2)}ms")
+      end
+      
+      # Optional: Debug agent tracking mismatch
+      # if @tick % 20 == 0
+      #   living = living_agents
+      #   grid_living = 0
+      #   @grid.each do |row|
+      #     row.each do |cell|
+      #       grid_living += 1 if cell&.respond_to?(:alive?) && cell.alive?
+      #     end
+      #   end
+      #   if living.count != grid_living
+      #     Mutation.logger.debug("MISMATCH T:#{@tick} | AgentManager: #{living.count} living | Grid: #{grid_living} living")
+      #   end
+      # end
     end
 
     def execute_action(agent, action, x, y, new_grid)
+      action_start = Time.now
+      
       # Calculate base action cost (all actions cost energy)
       base_action_cost = Mutation.configuration.base_action_cost
       
-      case action[:type]
+      action_type = action[:type].to_s.to_sym if action[:type]
+      
+      case action_type
       when :attack
         action_cost = base_action_cost + Mutation.configuration.attack_action_cost
         execute_attack(agent, action[:target], x, y)
@@ -200,10 +245,14 @@ module Mutation
       when :replicate
         action_cost = base_action_cost + Mutation.configuration.replication_cost
         execute_replicate(agent, x, y, new_grid)
+      when :move
+        action_cost = base_action_cost  # Moving costs base energy
+        execute_move(agent, action[:target], x, y, new_grid)
       when :die
         action_cost = 0  # Dying is free
         agent.die!
       else
+        Mutation.logger.debug("Agent #{agent.agent_id} unknown action #{action[:type]} (#{action_type}), defaulting to rest")
         action_cost = base_action_cost  # Default to rest cost
         execute_rest(agent)
       end
@@ -213,11 +262,17 @@ module Mutation
       new_energy = current_energy - action_cost
       @agent_manager.update_agent_energy(agent.agent_id, new_energy)
       
-      # Kill agent if energy depleted
-      if new_energy <= 0
+      # Kill agent if energy depleted (fix floating point precision)
+      if new_energy <= 0.001
         agent.die!
         @agent_manager.remove_agent(agent.agent_id)
       end
+      
+      # Optional: Log slow actions for debugging
+      # action_time = Time.now - action_start
+      # if action_time > 0.05 # Log if action takes > 50ms
+      #   Mutation.logger.debug("PROFILE SlowAction: #{action_type} for #{agent.agent_id} took #{(action_time * 1000).round(2)}ms")
+      # end
     end
 
     def execute_attack(agent, target_direction, x, y)
@@ -250,6 +305,38 @@ module Mutation
       energy_gain = Mutation.configuration.rest_energy_gain
       new_energy = agent.energy + energy_gain
       @agent_manager.update_agent_energy(agent.agent_id, new_energy)
+    end
+
+    def execute_move(agent, target_direction, x, y, new_grid)
+      target_x, target_y = get_target_position(x, y, target_direction)
+      unless valid_position?(target_x, target_y)
+        # Invalid move (out of bounds) - stay at original position
+        new_grid[y][x] = agent
+        return
+      end
+
+      # Check what's at the target position in the new grid
+      target_cell = new_grid[target_y][target_x]
+      
+      if target_cell.nil?
+        # Empty space - just move there
+        @agent_manager.move_agent(agent.agent_id, target_x, target_y)
+        new_grid[target_y][target_x] = agent
+        new_grid[y][x] = nil  # Clear old position
+        # Mutation.logger.debug("Agent #{agent.agent_id} moved from (#{x},#{y}) to (#{target_x},#{target_y})")
+      elsif target_cell.is_a?(DeadAgent)
+        # Dead agent - eat it and gain energy
+        dead_agent_energy_gain = 10  # Default energy gain from eating dead agents
+        new_energy = agent.energy + dead_agent_energy_gain
+        @agent_manager.update_agent_energy(agent.agent_id, new_energy)
+        @agent_manager.move_agent(agent.agent_id, target_x, target_y)
+        new_grid[target_y][target_x] = agent
+        new_grid[y][x] = nil  # Clear old position
+        # Mutation.logger.debug("Agent #{agent.agent_id} ate dead agent and gained #{dead_agent_energy_gain} energy")
+      else
+        # Position occupied by living agent - movement fails, stay at original position
+        new_grid[y][x] = agent
+      end
     end
 
     def execute_replicate(agent, x, y, new_grid)

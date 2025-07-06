@@ -58,6 +58,7 @@ module Mutation
     end
 
     def get_agent_actions_with_individual_states(agent_world_states)
+      method_start = Time.now
       actions = {}
       
       # Use parallel processing for better performance with many agents
@@ -94,6 +95,11 @@ module Mutation
         end
       end
       
+      method_time = Time.now - method_start
+      if @agents.size > 0 && method_time > 0.01 # Log if > 10ms
+        Mutation.logger.debug("PROFILE AgentActions: #{(@agents.size)} agents, #{(method_time * 1000).round(2)}ms")
+      end
+      
       actions
     end
 
@@ -111,7 +117,7 @@ module Mutation
         cleanup_agent_files(agent_id)
         Mutation.logger.debug("Successfully removed agent #{agent_id}. Remaining agents: #{@agents.size}")
       else
-        Mutation.logger.warn("Agent #{agent_id} not found for removal.")
+        Mutation.logger.debug("Agent #{agent_id} not found for removal (already removed).")
       end
     end
 

@@ -230,12 +230,14 @@ module Mutation
           if neighbor && neighbor.respond_to?(:energy)
             result[direction] = {
               energy: neighbor.energy,
-              agent_id: neighbor.agent_id
+              agent_id: neighbor.agent_id,
+              alive: neighbor.respond_to?(:alive?) ? neighbor.alive? : true
             }
           else
             result[direction] = {
               energy: 0,
-              agent_id: nil
+              agent_id: nil,
+              alive: false
             }
           end
         end
@@ -246,12 +248,14 @@ module Mutation
           if neighbor && neighbor.respond_to?(:energy)
             result[direction] = {
               energy: neighbor.energy,
-              agent_id: neighbor.agent_id
+              agent_id: neighbor.agent_id,
+              alive: neighbor.respond_to?(:alive?) ? neighbor.alive? : true
             }
           else
             result[direction] = {
               energy: 0,
-              agent_id: nil
+              agent_id: nil,
+              alive: false
             }
           end
         end
@@ -275,6 +279,10 @@ module Mutation
         { type: :rest }
       when :replicate
         { type: :replicate }
+      when :move
+        target = response['target']
+        return default_action unless valid_direction?(target)
+        { type: :move, target: target.to_sym }
       when :die
         { type: :die }
       else
