@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'fileutils'
-require_relative 'process_mutation_engine'
+require_relative 'mutation_engine'
 
 module Mutation
   class AgentManager
@@ -19,7 +19,7 @@ module Mutation
       agent_id = generate_agent_id
       
       begin
-        agent = AgentProcess.new(agent_id, executable_path, x, y, energy, generation, memory)
+        agent = Agent.new(agent_id, executable_path, x, y, energy, generation, memory)
         if agent.alive?
           @agents[agent_id] = agent
           agent
@@ -168,7 +168,7 @@ module Mutation
       offspring_generation = parent_agent.generation + 1
       
       # Create mutated script for offspring
-      if mutation_engine.is_a?(ProcessMutationEngine)
+      if mutation_engine.is_a?(MutationEngine)
         # Use process-based mutation
         offspring_script_path = mutation_engine.create_mutated_agent_script(parent_agent)
         

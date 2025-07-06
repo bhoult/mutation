@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Mutation
-  class ProcessWorld
+  class WorldImpl
     attr_accessor :grid, :tick, :last_survivor_code, :generation, :statistics
     attr_reader :agent_manager
 
@@ -29,7 +29,7 @@ module Mutation
       @last_survivor_code = seed_code
       @agent_manager = AgentManager.new
       @agent_executables = agent_executables || []
-      @mutation_engine = ProcessMutationEngine.new
+      @mutation_engine = MutationEngine.new
       @statistics = {
         total_agents_created: 0,
         total_generations: 0,

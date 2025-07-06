@@ -18,20 +18,14 @@ This is a Ruby-based evolutionary simulation called "Mutation Simulator" where a
 - **Logger**: Specialized logging with colorized output
 
 ### Key Components
-
-#### In-Memory Agent System (Traditional)
-- **lib/mutation/agent.rb**: Agent behavior, code compilation, and safety validation
-- **lib/mutation/simulator.rb**: Main simulation loop and lifecycle management
-- **lib/mutation/world.rb**: 2D grid environment and agent interactions
-- **lib/mutation/mutation_engine.rb**: Code mutation algorithms
-- **lib/mutation/configuration.rb**: Configuration loading and validation
-
-#### Process-Based Agent System (Advanced)
 - **lib/mutation/agent_process.rb**: Manages individual agent OS processes with stdin/stdout IPC
-- **lib/mutation/process_world.rb**: 2D grid environment for process-based agents
+- **lib/mutation/process_world.rb**: 2D grid environment where agents interact
+- **lib/mutation/world.rb**: Thin wrapper around ProcessWorld for backward compatibility
 - **lib/mutation/agent_manager.rb**: Orchestrates collection of agent processes
 - **lib/mutation/process_mutation_engine.rb**: Mutates agent scripts and manages genetic pool
 - **lib/mutation/genetic_pool.rb**: Persistent storage of evolved agent scripts
+- **lib/mutation/simulator.rb**: Main simulation loop and lifecycle management
+- **lib/mutation/configuration.rb**: Configuration loading and validation
 
 ## Common Development Commands
 
@@ -114,22 +108,13 @@ Key configuration areas:
 
 ## Agent Behavior System
 
-Agents contain Ruby code that returns one of four actions:
+All agents run as separate OS processes for enhanced isolation and true parallelism. Agents contain Ruby code that returns one of four actions:
 - `:attack` - Attack neighbors for energy
 - `:rest` - Gain energy by resting
 - `:replicate` - Create mutated offspring
 - `:die` - End existence
 
-### In-Memory Agent System
-Traditional agents run within the main Ruby process:
-- **Code compilation**: Agent code is compiled and executed in a sandboxed context
-- **Safe mode**: Restricts dangerous operations (system calls, file access)
-- **Code validation**: Prevents malicious patterns
-- **Fallback behavior**: Agents get default behavior if compilation fails
-- **Error handling**: Graceful degradation for invalid mutations
-
-### Process-Based Agent System
-Process-based agents run as separate OS processes for enhanced isolation:
+### Agent Architecture
 - **Process Spawning**: Each agent runs as an independent Ruby process using `Open3.popen3`
 - **IPC Protocol**: JSON-based communication over stdin/stdout pipes
 - **Process Management**: 
@@ -139,18 +124,10 @@ Process-based agents run as separate OS processes for enhanced isolation:
 - **Agent Scripts**: Standalone Ruby executables that implement the agent protocol
 - **Memory Persistence**: Agents can maintain state across turns via `/tmp/agents/{agent_id}/` directories
 - **Timeout Handling**: Each agent action has a configurable timeout (default 500ms)
-- **Parallel Processing**: Optional parallel execution using threads (bypasses Ruby's GIL)
+- **Parallel Processing**: True parallelism using separate OS processes (bypasses Ruby's GIL)
 
 ## Mutation System
 
-### In-Memory Mutation Engine
-The MutationEngine modifies agent code through:
-- Numeric mutations (threshold values)
-- Probability mutations (randomness factors)
-- Operator mutations (comparison operators)
-- Threshold mutations (decision boundaries)
-
-### Process-Based Mutation Engine
 The ProcessMutationEngine handles script-based mutations:
 - **Script Mutation**: Reads parent agent scripts and applies mutations to create offspring
 - **Genetic Pool**: Maintains a persistent collection of evolved agent scripts in `/tmp/genetic_pool/`
@@ -164,8 +141,8 @@ The ProcessMutationEngine handles script-based mutations:
 
 ## Parallel Processing
 
-The simulator supports experimental parallel processing for agent decisions:
-- **Important**: Due to Ruby's GIL, CPU-bound operations may not benefit
+The simulator supports true parallel processing for agent decisions:
+- **True parallelism**: Each agent runs in a separate OS process, bypassing Ruby's GIL
 - **Safe execution**: Actions applied sequentially to prevent race conditions
 - **Configurable**: Control processor count and enable/disable parallel processing
 
@@ -275,11 +252,10 @@ The simulator includes a curses-based visual display that shows the simulation l
 ## Agent Command Reference
 
 ### Available Actions
-All agents (both in-memory and process-based) can perform exactly four actions:
+All agents can perform exactly four actions:
 
 1. **attack** - Attack a neighboring agent
-   - In-memory: Automatically targets highest energy neighbor
-   - Process-based: Must specify target direction
+   - Must specify target direction (north, south, east, west, etc.)
    - Energy dynamics: Attacker gains energy, target loses energy
    
 2. **rest** - Restore energy
@@ -302,14 +278,14 @@ Valid target directions for attacks (Moore neighborhood):
 
 ### Action Validation
 - Invalid actions default to `rest`
-- Attack actions require valid direction (process agents)
+- Attack actions require valid direction
 - Replicate requires sufficient energy and empty adjacent space
 - All actions validated before execution
 
 ## Development Notes
 
 - The project uses Ruby ~> 3.0
-- All agent code execution is sandboxed for safety
+- All agents run as separate OS processes for enhanced safety and isolation
 - Simulation state is tracked through comprehensive statistics
 - The world operates on a tick-based system with configurable delays
 - Agents can observe all 8 neighboring positions (Moore neighborhood) in the 2D grid
@@ -320,4 +296,4 @@ Valid target directions for attacks (Moore neighborhood):
 - Visual mode requires a curses-compatible terminal
 - Initial world coverage is configurable (default 10%) for realistic population dynamics
 - Curses display includes stability improvements for long-running simulations
-- Process-based agents bypass Ruby's GIL for true parallelism
+- Process-based agents provide true parallelism bypassing Ruby's GIL

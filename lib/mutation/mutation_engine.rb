@@ -1,34 +1,52 @@
 # frozen_string_literal: true
 
+require 'fileutils'
+require 'digest'
+require_relative 'genetic_pool'
+
 module Mutation
   class MutationEngine
-    MUTATION_TYPES = %i[numeric probability threshold operator].freeze
+    MUTATION_TYPES = %i[numeric probability threshold operator personality].freeze
 
-    def initialize(agent_code_pool)
-      @agent_code_pool = agent_code_pool
+    def initialize
       @mutation_strategies = {
         numeric: method(:mutate_numeric),
         probability: method(:mutate_probability),
         threshold: method(:mutate_threshold),
-        operator: method(:mutate_operator)
+        operator: method(:mutate_operator),
+        personality: method(:mutate_personality)
       }
+      @genetic_pool = GeneticPool.new
     end
 
-    def mutate(agent)
-      base_code = @agent_code_pool.random_code
-      mutated_code = mutate_code(base_code)
-
-      Mutation.logger.mutation("Mutation from #{agent.id} (based on random pool agent):\n#{mutated_code}") if should_log_mutation?
-
-      new_agent = Agent.new(
-        code_str: mutated_code,
-        generation: agent.generation + 1,
-        parent_id: agent.id
-      )
-
-      new_agent.mutations_count = agent.mutations_count + 1
-      new_agent
+    def create_mutated_agent_script(parent_agent)
+      # Read the parent agent script
+      parent_script_path = parent_agent.executable_path
+      parent_code = read_agent_code(parent_script_path)
+      
+      # Get parent fingerprint for lineage tracking
+      parent_fingerprint = extract_fingerprint(parent_script_path)
+      
+      # Apply mutations to the code
+      mutated_code = mutate_code(parent_code)
+      
+      # Add mutated agent to genetic pool
+      offspring_script_path = @genetic_pool.add_agent(mutated_code, parent_fingerprint)
+      
+      Mutation.logger.debug("Created mutated agent: #{File.basename(offspring_script_path)}") if should_log_mutation?
+      
+      offspring_script_path
     end
+
+    def random_agent_from_pool
+      @genetic_pool.random_agent_path
+    end
+
+    def genetic_pool_statistics
+      @genetic_pool.statistics
+    end
+
+    private
 
     def mutate_code(code)
       lines = code.lines.map do |line|
@@ -41,8 +59,6 @@ module Mutation
 
       lines.join
     end
-
-    private
 
     def should_mutate_line?
       rand < Mutation.configuration.mutation_rate
@@ -61,57 +77,135 @@ module Mutation
 
     def detect_mutation_type(line)
       case line
-      when /< \d+/, /> \d+/, /== \d+/, /!= \d+/
-        :threshold
-      when /rand < 0\.\d+/, /rand > 0\.\d+/
-        :probability
-      when /\d+/
+      when /rand\(\d+\.\.\d+\)/, /rand\(\d+\)/
         :numeric
-      when /</
+      when /rand < \d+\.\d+/, /rand > \d+\.\d+/
+        :probability  
+      when /energy.*[<>]=?\s*\d+/, /my_energy.*[<>]=?\s*\d+/
+        :threshold
+      when /[<>]=?/
         :operator
+      when /'aggression'.*rand/, /'greed'.*rand/, /'cooperation'.*rand/, /'death_threshold'.*rand/
+        :personality
       end
     end
 
     def mutate_numeric(line)
       line.gsub(/\d+/) do |match|
         old_value = match.to_i
-        variation = [old_value * 0.2, 1].max.to_i
-        new_value = old_value + rand(-variation..variation)
-        [new_value, 1].max.to_s
+        if old_value < 5
+          # For small numbers (thresholds), vary by ±1-2
+          variation = rand(1..2)
+          new_value = old_value + rand(-variation..variation)
+          [new_value, 1].max.to_s
+        else
+          # For larger numbers, vary by 20%
+          variation = [old_value * 0.2, 1].max.to_i
+          new_value = old_value + rand(-variation..variation)
+          [new_value, 1].max.to_s
+        end
       end
     end
 
     def mutate_probability(line)
-      line.gsub(/rand [<>] 0\.\d+/) do |match|
+      line.gsub(/rand < \d+\.\d+|rand > \d+\.\d+/) do |match|
         operator = match.include?('<') ? '<' : '>'
-        new_prob = rand(0.1..0.9).round(1)
-        "rand #{operator} #{new_prob}"
+        old_prob = match.match(/\d+\.\d+/)[0].to_f
+        
+        # Mutate probability by ±0.1-0.3
+        variation = rand(0.1..0.3)
+        new_prob = old_prob + rand(-variation..variation)
+        new_prob = [[new_prob, 0.1].max, 0.9].min # Keep between 0.1 and 0.9
+        
+        "rand #{operator} #{new_prob.round(1)}"
       end
     end
 
     def mutate_threshold(line)
-      line.gsub(/[<>]=? \d+/) do |match|
+      line.gsub(/[<>]=?\s*\d+/) do |match|
         operator = match.match(/[<>]=?/)[0]
-        new_threshold = rand(1..15)
+        old_threshold = match.match(/\d+/)[0].to_i
+        
+        # Mutate threshold by ±1-3
+        variation = rand(1..3)
+        new_threshold = old_threshold + rand(-variation..variation)
+        new_threshold = [new_threshold, 1].max # Keep positive
+        
         "#{operator} #{new_threshold}"
       end
     end
 
     def mutate_operator(line)
-      # Simple operator mutation
-      operators = ['<', '>', '<=', '>=', '==', '!=']
-
-      line.gsub(/[<>]=?/) do |_match|
-        operators.sample
+      # Occasionally change comparison operators
+      return line unless rand < 0.1 # Only 10% chance
+      
+      operators = ['<', '>', '<=', '>=']
+      line.gsub(/[<>]=?/) do |match|
+        current_operators = operators.dup
+        current_operators.delete(match) # Don't pick the same operator
+        current_operators.sample
       end
     end
 
-    def add_mutation_strategy(type, strategy)
-      @mutation_strategies[type] = strategy
+    def mutate_personality(line)
+      # Mutate personality trait ranges and fixed values
+      line.gsub(/rand\((\d+\.\d+)\.\.(\d+\.\d+)\)/) do |match|
+        min_val = $1.to_f
+        max_val = $2.to_f
+        
+        # Shift the range slightly
+        shift = rand(-0.2..0.2)
+        new_min = [min_val + shift, 0.1].max
+        new_max = [max_val + shift, new_min + 0.1].max
+        new_max = [new_max, 1.0].min
+        
+        "rand(#{new_min.round(1)}..#{new_max.round(1)})"
+      end.gsub(/rand\((\d+)\.\.(\d+)\)/) do |match|
+        # Mutate integer ranges (like death_threshold)
+        min_val = $1.to_i
+        max_val = $2.to_i
+        
+        # Shift range by ±1
+        shift = rand(-1..1)
+        new_min = [min_val + shift, 1].max
+        new_max = [max_val + shift, new_min + 1].max
+        new_max = [new_max, 5].min # Cap at reasonable value
+        
+        "rand(#{new_min}..#{new_max})"
+      end
     end
 
-    def remove_mutation_strategy(type)
-      @mutation_strategies.delete(type)
+    def read_agent_code(script_path)
+      content = File.read(script_path)
+      lines = content.lines
+      
+      # Find where metadata ends (look for non-comment line or shebang)
+      code_start = 0
+      lines.each_with_index do |line, i|
+        if line.start_with?('#!/usr/bin/env ruby')
+          code_start = i
+          break
+        elsif !line.strip.start_with?('#') && !line.strip.empty?
+          code_start = i
+          break
+        end
+      end
+      
+      # Return code from shebang/first code line onwards
+      lines[code_start..-1].join
+    end
+
+    def extract_fingerprint(script_path)
+      return nil unless File.exist?(script_path)
+      
+      content = File.read(script_path)
+      content.lines.each do |line|
+        if line =~ /^# Fingerprint: (.+)$/
+          return $1.strip
+        end
+      end
+      
+      nil
     end
   end
 end

@@ -11,14 +11,14 @@ This project implements a digital ecosystem where simple agents defined by execu
 - **Self-Modifying Code**: Agents are defined by Ruby code that can mutate and evolve
 - **Natural Selection**: Agents compete for survival based on energy and fitness
 - **Generational Evolution**: Successful traits propagate through generations
-- **Process-Based Agents**: Each agent runs as a separate OS process for true isolation
+- **Process-Based Agents**: Each agent runs as a separate OS process for true isolation and parallelism
 - **Configurable Environment**: Highly customizable simulation parameters
-- **Safe Execution**: Built-in safety measures for code execution
+- **Enhanced Safety**: Process isolation provides robust security
 - **Rich Logging**: Detailed logging with colorized output
 - **CLI Interface**: Command-line tools for running simulations
 - **Interactive Mode**: Step-by-step simulation control
 - **Visual Mode**: Curses-based real-time visualization
-- **Parallel Processing**: Multi-processor agent processing for better performance
+- **True Parallel Processing**: Multi-processor agent processing bypassing Ruby's GIL
 
 ## Quick Start
 
@@ -60,8 +60,8 @@ chmod +x bin/mutation
 # Visual mode with custom size
 ./bin/mutation visual --width 20 --height 10 --delay 0.05
 
-# Process-based agents (each agent runs in separate OS process)
-./bin/mutation process --width 20 --height 20
+# Custom agent scripts
+./bin/mutation start --agents path/to/agent1.rb path/to/agent2.rb
 
 # Show configuration
 ./bin/mutation config
@@ -90,19 +90,17 @@ mutation/
 ├── lib/
 │   ├── mutation.rb              # Main module
 │   └── mutation/
-│       ├── agent.rb             # In-memory agent class
-│       ├── agent_process.rb     # Process-based agent class
-│       ├── agent_manager.rb     # Process agent orchestrator
+│       ├── agent_process.rb     # Agent process management
+│       ├── agent_manager.rb     # Agent orchestrator
 │       ├── cli.rb               # Command-line interface
 │       ├── configuration.rb     # Configuration management
 │       ├── genetic_pool.rb      # Persistent agent script storage
 │       ├── logger.rb            # Logging system
-│       ├── mutation_engine.rb   # In-memory mutation logic
-│       ├── process_mutation_engine.rb # Process-based mutations
-│       ├── process_world.rb     # Process-based world
+│       ├── process_mutation_engine.rb # Code mutation logic
+│       ├── process_world.rb     # 2D grid world environment
 │       ├── simulator.rb         # Simulation orchestrator
 │       ├── version.rb           # Version information
-│       └── world.rb             # In-memory world/environment
+│       └── world.rb             # World wrapper
 ├── spec/                        # Test files
 ├── config/                      # Configuration files
 ├── bin/                         # Executable files
@@ -115,32 +113,24 @@ mutation/
 
 ## How It Works
 
-### Agent Systems
+### Agent Architecture
 
-The simulator supports two agent execution models:
-
-#### In-Memory Agents (Traditional)
-- Agents run within the main Ruby process
-- Code compiled and executed in sandboxed context
-- Fast execution with lower overhead
-- Limited by Ruby's GIL for parallelism
-
-#### Process-Based Agents (Advanced)
-- Each agent runs as a separate OS process
+All agents run as separate OS processes:
+- Each agent runs as an independent Ruby process
 - True parallelism bypassing Ruby's GIL
 - Enhanced isolation and security
 - Communication via JSON over stdin/stdout pipes
 - Persistent memory storage in `/tmp/agents/`
-- Higher overhead but better for complex behaviors
+- Robust error handling and timeout protection
 
 ### Agent Behavior
 
 Each agent contains:
 - **Energy**: Life force that decreases over time
-- **Code**: Ruby code defining behavior (or executable path for process agents)
-- **Behavior**: Compiled Proc (in-memory) or external process (process-based)
+- **Code**: Ruby script defining behavior
+- **Process**: External Ruby process executing agent logic
 - **Generation**: Evolutionary lineage
-- **Memory**: Persistent state between turns (process-based agents)
+- **Memory**: Persistent state between turns
 
 Agents can perform these actions:
 - `:attack` - Attack neighbors for energy
@@ -345,20 +335,6 @@ Agents can perform exactly four actions:
 
 ### Input Format (World → Agent)
 
-#### In-Memory Agents
-Agents receive an environment hash:
-
-```ruby
-{
-  neighbor_energy: 12,              # Maximum energy among neighbors
-  neighbors: [0, 5, 3, 0, 0, 8, 2, 0],  # Array of 8 neighbor energies
-  position: [5, 10],               # Current [x, y] position
-  world_size: [20, 20],            # World [width, height]
-  tick: 42                         # Current simulation tick
-}
-```
-
-#### Process-Based Agents
 Agents receive a JSON object via stdin:
 
 ```json
@@ -389,17 +365,6 @@ Agents receive a JSON object via stdin:
 
 ### Output Format (Agent → World)
 
-#### In-Memory Agents
-Return a symbol:
-
-```ruby
-:attack    # Attack highest energy neighbor
-:rest      # Rest to gain energy
-:replicate # Create offspring
-:die       # End existence
-```
-
-#### Process-Based Agents
 Return JSON via stdout:
 
 ```json
@@ -533,12 +498,12 @@ The simulator includes experimental parallel processing support for agent decisi
 
 ### Performance Notes
 
-**Important**: Due to Ruby's Global Interpreter Lock (GIL), parallel processing may not provide performance benefits for CPU-bound agent computations. However, it may be useful for:
+**Advantage**: Process-based agents provide true parallelism by running each agent in a separate OS process, completely bypassing Ruby's Global Interpreter Lock (GIL). This enables:
 
-- **I/O-bound operations**: File logging, network operations
-- **Process-based agents**: True parallelism when using separate OS processes
-- **Future extensions**: External computation libraries
-- **Experimentation**: Testing different parallelization strategies
+- **True CPU parallelism**: Each agent process can utilize separate CPU cores
+- **Enhanced isolation**: Process crashes don't affect other agents or the simulator
+- **Better resource utilization**: Full utilization of multi-core systems
+- **Scalable performance**: Performance scales linearly with available CPU cores
 
 ### Usage
 
