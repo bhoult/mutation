@@ -1,6 +1,24 @@
 # frozen_string_literal: true
 
 module Mutation
+  # Simple class to represent dead agents on the grid for display purposes
+  class DeadAgent
+    attr_reader :agent_id, :position
+    
+    def initialize(agent_id, position)
+      @agent_id = agent_id
+      @position = position
+    end
+    
+    def alive?
+      false
+    end
+    
+    def energy
+      0
+    end
+  end
+
   class WorldImpl
     attr_accessor :grid, :tick, :last_survivor_code, :generation, :statistics
     attr_reader :agent_manager
@@ -99,7 +117,7 @@ module Mutation
       
       @grid.each_with_index do |row, y|
         row.each_with_index do |agent, x|
-          next unless agent&.alive
+          next unless agent&.alive?
 
           # Get neighbors for this specific agent
           neighbors = get_neighbors(x, y)
@@ -124,9 +142,18 @@ module Mutation
       # Apply actions sequentially to avoid race conditions
       new_grid = Array.new(@height) { Array.new(@width) { nil } }
 
+      # First, copy dead agents to preserve their locations
       @grid.each_with_index do |row, y|
         row.each_with_index do |agent, x|
-          next unless agent&.alive
+          if agent && !agent.alive?
+            new_grid[y][x] = agent  # Keep dead agents
+          end
+        end
+      end
+
+      @grid.each_with_index do |row, y|
+        row.each_with_index do |agent, x|
+          next unless agent&.alive?
 
           action_response = actions[agent.agent_id] || { type: :rest }
           action = { type: action_response[:type], target: action_response[:target] }
@@ -146,6 +173,9 @@ module Mutation
             Mutation.logger.debug("Agent #{agent.agent_id} at (#{x},#{y}) dying (energy: #{new_energy})")
             agent.die! if agent.alive
             @agent_manager.remove_agent(agent.agent_id)
+            # Create dead agent marker
+            dead_agent = DeadAgent.new(agent.agent_id, [x, y])
+            new_grid[y][x] = dead_agent
           end
         end
       end
@@ -208,8 +238,10 @@ module Mutation
       @agent_manager.update_agent_energy(agent.agent_id, new_attacker_energy)
 
       if new_target_energy <= 0
+        # Create dead agent marker before removing from manager
+        dead_agent = DeadAgent.new(target_agent.agent_id, [target_x, target_y])
         @agent_manager.remove_agent(target_agent.agent_id)
-        @grid[target_y][target_x] = nil
+        @grid[target_y][target_x] = dead_agent
       end
     end
 
@@ -227,8 +259,8 @@ module Mutation
       # Population cap to prevent excessive spawning
       return if agent_count >= @size # Don't exceed grid capacity
 
-      # Find empty adjacent position
-      empty_positions = get_empty_adjacent_positions(x, y)
+      # Find empty adjacent position (check new_grid to avoid conflicts)
+      empty_positions = get_empty_adjacent_positions(x, y, new_grid)
       return if empty_positions.empty?
 
       offspring_x, offspring_y = empty_positions.sample
@@ -257,7 +289,8 @@ module Mutation
       end
     end
 
-    def get_empty_adjacent_positions(x, y)
+    def get_empty_adjacent_positions(x, y, grid = nil)
+      grid ||= @grid  # Default to current grid if not specified
       positions = []
       (-1..1).each do |dx|
         (-1..1).each do |dy|
@@ -265,7 +298,7 @@ module Mutation
           
           new_x, new_y = x + dx, y + dy
           next unless valid_position?(new_x, new_y)
-          next if @grid[new_y][new_x] # Position occupied
+          next if grid[new_y][new_x] # Position occupied (including dead agents)
           
           positions << [new_x, new_y]
         end

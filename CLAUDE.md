@@ -176,11 +176,12 @@ The simulator includes a curses-based visual display that shows the simulation l
 - **Stability improvements**: Robust display handling with bounds checking and error recovery
 
 ### Visual Legend
-- `@` - Very high energy (15+)
-- `#` - High energy (10-14) 
-- `o` - Medium energy (5-9)
-- `·` - Low energy (1-4)
-- `.` - Empty space
+- `*` - Living agents (color changes based on energy level)
+  - Green: High energy (8+)
+  - Yellow: Medium energy (4-7)
+  - Red: Low energy (1-3)
+- `x` - Dead agents (red)
+- ` ` - Empty space (blank)
 
 ### Controls
 - **WASD**: Move camera around large worlds

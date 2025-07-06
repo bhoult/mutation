@@ -4,10 +4,9 @@
 # Disable network access
 net none
 
-# Create a private /tmp directory with only agent workspace
+# Disable all access to /tmp directory
 private-tmp
-whitelist /tmp/agents
-read-only /tmp/agents
+blacklist /tmp
 
 # Disable access to user home directory
 private-home

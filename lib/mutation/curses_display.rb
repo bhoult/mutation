@@ -358,8 +358,12 @@ module Mutation
           # Determine character and color based on energy level
           if agent&.alive?
             char, color = agent_display(agent)
+          elsif agent
+            # Dead agent - show red 'x'
+            char = 'x'
+            color = 3 # Red for dead
           else
-            char = '.'
+            char = ' '  # Blank space for empty
             color = 4 # White for empty
           end
 
@@ -387,14 +391,8 @@ module Mutation
     def agent_display(agent)
       energy = agent.energy
 
-      # Choose character based on energy level
-      char = case energy
-             when 15..Float::INFINITY then '@'  # Very high energy
-             when 10..14 then '#'               # High energy
-             when 5..9 then 'o'                 # Medium energy
-             when 1..4 then '·'                 # Low energy
-             else '.'                           # Dead/empty
-             end
+      # All agents display as '*' character
+      char = '*'
 
       # Choose color based on energy level
       color = case energy
