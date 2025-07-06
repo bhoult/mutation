@@ -104,13 +104,27 @@ begin
   memory = load_memory
   
   while input = $stdin.gets
-    world_state = JSON.parse(input.strip)
+    message = JSON.parse(input.strip)
     
+    # Handle death command from world
+    if message['command'] == 'die'
+      # Save final memory state before exiting
+      save_memory(memory)
+      exit(0)
+    end
+    
+    # Regular world state processing
+    world_state = message
     action, updated_memory = choose_action(world_state, memory)
     save_memory(updated_memory)
     
     puts JSON.generate(action)
     $stdout.flush
+    
+    # Exit gracefully if we decided to die
+    if action[:action] == 'die'
+      exit(0)
+    end
     
     memory = updated_memory
   end

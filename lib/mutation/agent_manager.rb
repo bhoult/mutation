@@ -14,7 +14,7 @@ module Mutation
 
     def spawn_agent(executable_path, x, y, energy = nil, generation = 1, memory = {})
       # Safety check to prevent too many agents
-      return nil if @agents.size >= 100
+      return nil if @agents.size >= Mutation.configuration.max_agent_count
       
       agent_id = generate_agent_id
       
@@ -61,13 +61,13 @@ module Mutation
       actions = {}
       
       # Use parallel processing for better performance with many agents
-      if @agents.size > 5 && Mutation.configuration.parallel_agents
+      if @agents.size > Mutation.configuration.parallel_processing_threshold && Mutation.configuration.parallel_agents
         require 'parallel'
         
         # Process agents in parallel using threads
         agent_pairs = @agents.select { |agent_id, agent| agent.alive && agent_world_states[agent_id] }
         
-        results = Parallel.map(agent_pairs, in_threads: [agent_pairs.size, 8].min) do |agent_id, agent|
+        results = Parallel.map(agent_pairs, in_threads: [agent_pairs.size, Mutation.configuration.max_parallel_threads].min) do |agent_id, agent|
           begin
             action = agent.act(agent_world_states[agent_id].merge(agent_id: agent_id))
             [agent_id, action]
@@ -101,7 +101,13 @@ module Mutation
       Mutation.logger.debug("Attempting to remove agent #{agent_id}")
       agent = @agents.delete(agent_id)
       if agent
-        agent.kill_process
+        # Only try to kill if process is still alive
+        if agent.send(:process_alive?)
+          agent.kill_process
+        else
+          # Process already exited, just clean up
+          agent.send(:cleanup_process)
+        end
         cleanup_agent_files(agent_id)
         Mutation.logger.debug("Successfully removed agent #{agent_id}. Remaining agents: #{@agents.size}")
       else
@@ -164,7 +170,7 @@ module Mutation
     def create_offspring(parent_agent, x, y, mutation_engine, parent_memory = {})
       return nil unless parent_agent&.alive
       
-      offspring_energy = Mutation.configuration.initial_energy
+      offspring_energy = Mutation.configuration.random_initial_energy
       offspring_generation = parent_agent.generation + 1
       
       # Create mutated script for offspring
@@ -212,10 +218,17 @@ module Mutation
       "agent_#{@agent_counter}_#{Time.now.to_i}"
     end
 
-    
-
-    
-
-    
+    def cleanup_agent_files(agent_id)
+      # Clean up agent memory files
+      agent_dir = File.join(Mutation.configuration.agent_memory_base_path, agent_id)
+      if Dir.exist?(agent_dir)
+        begin
+          FileUtils.rm_rf(agent_dir)
+          Mutation.logger.debug("Cleaned up agent directory: #{agent_dir}")
+        rescue => e
+          Mutation.logger.warn("Failed to clean up agent directory #{agent_dir}: #{e.message}")
+        end
+      end
+    end
   end
 end

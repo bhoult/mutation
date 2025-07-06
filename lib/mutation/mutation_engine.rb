@@ -94,13 +94,13 @@ module Mutation
       line.gsub(/\d+/) do |match|
         old_value = match.to_i
         if old_value < 5
-          # For small numbers (thresholds), vary by ±1-2
-          variation = rand(1..2)
+          # For small numbers (thresholds), vary by configured range
+          variation = rand(Mutation.configuration.mutation_small_variation_min..Mutation.configuration.mutation_small_variation_max)
           new_value = old_value + rand(-variation..variation)
           [new_value, 1].max.to_s
         else
-          # For larger numbers, vary by 20%
-          variation = [old_value * 0.2, 1].max.to_i
+          # For larger numbers, vary by configured percentage
+          variation = [old_value * Mutation.configuration.mutation_large_variation_percent, 1].max.to_i
           new_value = old_value + rand(-variation..variation)
           [new_value, 1].max.to_s
         end
@@ -112,10 +112,10 @@ module Mutation
         operator = match.include?('<') ? '<' : '>'
         old_prob = match.match(/\d+\.\d+/)[0].to_f
         
-        # Mutate probability by ±0.1-0.3
-        variation = rand(0.1..0.3)
+        # Mutate probability by configured range
+        variation = rand(Mutation.configuration.mutation_probability_variation_min..Mutation.configuration.mutation_probability_variation_max)
         new_prob = old_prob + rand(-variation..variation)
-        new_prob = [[new_prob, 0.1].max, 0.9].min # Keep between 0.1 and 0.9
+        new_prob = [[new_prob, Mutation.configuration.mutation_probability_min_bound].max, Mutation.configuration.mutation_probability_max_bound].min
         
         "rand #{operator} #{new_prob.round(1)}"
       end
@@ -126,8 +126,8 @@ module Mutation
         operator = match.match(/[<>]=?/)[0]
         old_threshold = match.match(/\d+/)[0].to_i
         
-        # Mutate threshold by ±1-3
-        variation = rand(1..3)
+        # Mutate threshold by configured range
+        variation = rand(Mutation.configuration.mutation_threshold_variation_min..Mutation.configuration.mutation_threshold_variation_max)
         new_threshold = old_threshold + rand(-variation..variation)
         new_threshold = [new_threshold, 1].max # Keep positive
         
@@ -137,7 +137,7 @@ module Mutation
 
     def mutate_operator(line)
       # Occasionally change comparison operators
-      return line unless rand < 0.1 # Only 10% chance
+      return line unless rand < Mutation.configuration.mutation_operator_probability
       
       operators = ['<', '>', '<=', '>=']
       line.gsub(/[<>]=?/) do |match|
@@ -154,10 +154,10 @@ module Mutation
         max_val = $2.to_f
         
         # Shift the range slightly
-        shift = rand(-0.2..0.2)
-        new_min = [min_val + shift, 0.1].max
+        shift = rand(Mutation.configuration.mutation_personality_shift_min..Mutation.configuration.mutation_personality_shift_max)
+        new_min = [min_val + shift, Mutation.configuration.mutation_personality_min_bound].max
         new_max = [max_val + shift, new_min + 0.1].max
-        new_max = [new_max, 1.0].min
+        new_max = [new_max, Mutation.configuration.mutation_personality_max_bound].min
         
         "rand(#{new_min.round(1)}..#{new_max.round(1)})"
       end.gsub(/rand\((\d+)\.\.(\d+)\)/) do |match|
@@ -165,11 +165,11 @@ module Mutation
         min_val = $1.to_i
         max_val = $2.to_i
         
-        # Shift range by ±1
-        shift = rand(-1..1)
+        # Shift range by configured amount
+        shift = rand(Mutation.configuration.mutation_personality_int_shift_min..Mutation.configuration.mutation_personality_int_shift_max)
         new_min = [min_val + shift, 1].max
         new_max = [max_val + shift, new_min + 1].max
-        new_max = [new_max, 5].min # Cap at reasonable value
+        new_max = [new_max, Mutation.configuration.mutation_personality_int_max_bound].min
         
         "rand(#{new_min}..#{new_max})"
       end

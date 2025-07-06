@@ -16,7 +16,7 @@ module Mutation
       @agent_id = agent_id
       @executable_path = executable_path
       @position = [x, y]
-      @energy = energy || Mutation.configuration.initial_energy
+      @energy = energy || Mutation.configuration.random_initial_energy
       @generation = generation
       @alive = true
       @pid = nil
@@ -43,7 +43,7 @@ module Mutation
         
         # Wait for response with timeout
         response = nil
-        timeout_seconds = 0.5 # Reduced timeout to prevent hanging
+        timeout_seconds = Mutation.configuration.agent_response_timeout
         
         Timeout.timeout(timeout_seconds) do
           response_line = @stdout.gets
@@ -75,18 +75,18 @@ module Mutation
         @stdin&.close rescue nil
         
         # Give process a chance to exit gracefully
-        sleep(0.1)
+        sleep(Mutation.configuration.process_cleanup_delay)
         
         # Check if process is still alive
         if process_alive?
           # Try graceful termination first
           Process.kill('TERM', @pid)
-          sleep(0.1)
+          sleep(Mutation.configuration.process_cleanup_delay)
           
           # Force kill if still alive
           if process_alive?
             Process.kill('KILL', @pid)
-            sleep(0.1)
+            sleep(Mutation.configuration.process_cleanup_delay)
           end
         end
         
@@ -102,7 +102,38 @@ module Mutation
 
     def die!
       @alive = false
-      kill_process
+      request_graceful_death
+    end
+
+    def request_graceful_death
+      return unless process_alive?
+      
+      begin
+        # Send death instruction to agent
+        death_instruction = JSON.generate({
+          command: 'die',
+          message: 'Agent termination requested'
+        })
+        
+        @stdin.puts(death_instruction)
+        @stdin.flush
+        
+        # Give the agent time to exit gracefully
+        sleep(Mutation.configuration.graceful_death_timeout)
+        
+        # If still alive, fall back to manual killing
+        if process_alive?
+          Mutation.logger.debug("Agent #{@agent_id} did not exit gracefully, forcing termination")
+          kill_process
+        else
+          Mutation.logger.debug("Agent #{@agent_id} exited gracefully")
+          cleanup_process
+        end
+        
+      rescue => e
+        Mutation.logger.warn("Failed to request graceful death for agent #{@agent_id}: #{e.message}")
+        kill_process
+      end
     end
 
     def alive?
@@ -115,7 +146,7 @@ module Mutation
 
     def fitness
       # Simple fitness calculation based on survival time and energy
-      (@energy * 10) + (@generation * 5)
+      (@energy * Mutation.configuration.fitness_energy_multiplier) + (@generation * Mutation.configuration.fitness_generation_multiplier)
     end
 
     def id
@@ -183,7 +214,7 @@ module Mutation
         world_size: world_state[:world_size],
         neighbors: format_neighbors(world_state[:neighbors]),
         generation: world_state[:generation],
-        timeout_ms: world_state[:timeout_ms] || 1000,
+        timeout_ms: world_state[:timeout_ms] || Mutation.configuration.default_timeout_ms,
         memory: @memory # Pass agent's memory to the process
       }
     end

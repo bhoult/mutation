@@ -57,7 +57,8 @@ module Mutation
       Mutation.logger.debug("Removed agent from genetic pool: #{File.basename(filepath)}")
     end
     
-    def cleanup_extinct_lineages(survival_threshold = 100)
+    def cleanup_extinct_lineages(survival_threshold = nil)
+      survival_threshold ||= Mutation.configuration.genetic_survival_threshold
       # Remove agents that haven't been selected for a long time
       # This can be implemented later with usage tracking
     end
@@ -81,7 +82,7 @@ module Mutation
       {
         total_agents: size,
         directory: AGENTS_DIR,
-        sample_agents: agent_files.first(5).map { |f| File.basename(f) }
+        sample_agents: agent_files.first(Mutation.configuration.genetic_sample_size).map { |f| File.basename(f) }
       }
     end
     
@@ -110,7 +111,7 @@ module Mutation
     def generate_fingerprint(code)
       # Remove comments and whitespace for fingerprinting
       normalized_code = code.gsub(/^#.*$/, '').gsub(/\s+/, ' ').strip
-      Digest::SHA256.hexdigest(normalized_code)[0..15]  # 16 character fingerprint
+      Digest::SHA256.hexdigest(normalized_code)[0..(Mutation.configuration.genetic_fingerprint_length - 1)]
     end
     
     def build_metadata(fingerprint, parent_fingerprint)

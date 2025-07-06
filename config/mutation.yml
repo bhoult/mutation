@@ -5,7 +5,7 @@
 world_size: 20              # Number of agent slots in the world (used for square grid if width/height not specified)
 world_width: null           # World width (optional, use with world_height for rectangular grid)
 world_height: null          # World height (optional, use with world_width for rectangular grid)
-initial_energy: 10          # Starting energy for new agents
+initial_energy: 10          # Starting energy for new agents (deprecated, use initial_energy_min/max)
 initial_coverage: 0.1       # Percentage of world to populate with agents initially (0.1 = 10%)
 
 # Energy system
@@ -14,6 +14,108 @@ attack_damage: 3            # Damage dealt when attacking
 attack_energy_gain: 1       # Energy gained when attacking
 rest_energy_gain: 1         # Energy gained when resting
 replication_cost: 5         # Energy cost to replicate
+
+# Initial energy for new agents
+initial_energy_min: 8       # Minimum starting energy for new agents
+initial_energy_max: 12      # Maximum starting energy for new agents
+
+# Action costs (process-based agents)
+base_action_cost: 0.2       # Base energy cost for any action
+attack_action_cost: 1.0     # Additional cost for attacking
+additional_replication_cost: 0.5  # Additional cost beyond base replication cost
+
+# Agent management
+max_agent_count: 100        # Maximum number of concurrent agents
+parallel_processing_threshold: 5  # Minimum agents before using parallel processing
+max_parallel_threads: 8     # Maximum threads for parallel processing
+
+# Process management
+agent_response_timeout: 0.5 # Timeout for agent responses (seconds)
+process_cleanup_delay: 0.1  # Delay during process cleanup (seconds)
+graceful_death_timeout: 0.5 # Time to wait for graceful agent termination (seconds)
+default_timeout_ms: 1000    # Default timeout for agent responses (milliseconds)
+
+# Fitness calculation
+fitness_energy_multiplier: 10    # Multiplier for energy in fitness calculation
+fitness_generation_multiplier: 5 # Multiplier for generation in fitness calculation
+
+# Mutation engine parameters
+mutation_small_variation_min: 1  # Minimum variation for small numbers
+mutation_small_variation_max: 2  # Maximum variation for small numbers
+mutation_large_variation_percent: 0.2  # Variation percentage for large numbers
+mutation_probability_variation_min: 0.1  # Minimum probability variation
+mutation_probability_variation_max: 0.3  # Maximum probability variation
+mutation_probability_min_bound: 0.1      # Minimum probability bound
+mutation_probability_max_bound: 0.9      # Maximum probability bound
+mutation_threshold_variation_min: 1      # Minimum threshold variation
+mutation_threshold_variation_max: 3      # Maximum threshold variation
+mutation_operator_probability: 0.1       # Probability of operator mutation
+mutation_personality_shift_min: -0.2     # Minimum personality shift
+mutation_personality_shift_max: 0.2      # Maximum personality shift
+mutation_personality_min_bound: 0.1      # Minimum personality bound
+mutation_personality_max_bound: 1.0      # Maximum personality bound
+mutation_personality_int_shift_min: -1   # Minimum integer personality shift
+mutation_personality_int_shift_max: 1    # Maximum integer personality shift
+mutation_personality_int_max_bound: 5    # Maximum integer personality bound
+
+# Genetic pool settings
+genetic_fingerprint_length: 16   # Length of genetic fingerprint
+genetic_survival_threshold: 100  # Survival threshold for lineage cleanup
+genetic_sample_size: 5           # Sample size for genetic statistics
+
+# Display settings (curses mode)
+display_bottom_panel_height: 5   # Height of bottom status panel
+display_help_lines: 1            # Number of help lines
+display_border_size: 3           # Border size around panels
+display_fps: 30                  # Target frames per second
+display_status_panel_width_ratio: 0.25  # Status panel width as ratio of screen
+display_energy_very_high_threshold: 15  # Energy threshold for '@' character
+display_energy_high_threshold: 10       # Energy threshold for '#' character
+display_energy_medium_threshold: 5      # Energy threshold for 'o' character
+display_energy_low_threshold: 1         # Energy threshold for '·' character
+display_color_high_threshold: 8         # Energy threshold for high color
+display_color_medium_threshold: 4       # Energy threshold for medium color
+display_color_low_threshold: 1          # Energy threshold for low color
+
+# Simulation flow control
+simulator_fallback_width: 80     # Fallback width if auto-sizing fails
+simulator_fallback_height: 24    # Fallback height if auto-sizing fails
+simulator_status_log_frequency: 10     # Log status every N ticks
+simulator_status_log_early_threshold: 5  # Always log status for first N ticks
+simulator_loop_sleep_interval: 0.01    # Sleep interval in simulation loop
+
+# Benchmark defaults
+benchmark_default_size: 20       # Default world size for benchmarks
+benchmark_default_generations: 10  # Default generations for benchmarks
+benchmark_default_runs: 3        # Default number of benchmark runs
+
+# Survivor logging
+survivor_log_max_count: 3        # Maximum survivors to log
+
+# Agent behavior defaults
+agent_personality_aggression_min: 0.3    # Minimum aggression value
+agent_personality_aggression_max: 0.9    # Maximum aggression value
+agent_personality_greed_min: 0.2         # Minimum greed value
+agent_personality_greed_max: 0.8         # Maximum greed value
+agent_personality_cooperation_min: 0.1   # Minimum cooperation value
+agent_personality_cooperation_max: 0.6   # Maximum cooperation value
+agent_personality_death_threshold_min: 1 # Minimum death threshold
+agent_personality_death_threshold_max: 3 # Maximum death threshold
+agent_death_history_check_length: 3      # Length of energy history to check for death
+agent_replication_energy_base: 6         # Base energy for replication calculation
+agent_replication_energy_greed_multiplier: 4  # Greed multiplier for replication
+agent_attack_min_energy: 3               # Minimum energy to attack
+agent_rest_energy_base: 4                # Base energy for rest calculation
+agent_rest_energy_greed_multiplier: 3    # Greed multiplier for rest
+agent_weak_attack_min_energy: 2          # Minimum energy for weak attacks
+agent_weak_attack_min_self_energy: 4     # Minimum self energy for weak attacks
+agent_max_replications: 2                # Maximum replications per agent
+agent_min_replication_interval: 3        # Minimum turns between replications
+
+# File system paths
+agents_directory: agents          # Directory for agent files
+base_agent_path: examples/agents/ruby_agent.rb  # Path to base agent script
+agent_memory_base_path: /tmp/agents  # Base path for agent memory storage
 
 # Mutation settings
 mutation_rate: 0.5          # Probability of mutating each line

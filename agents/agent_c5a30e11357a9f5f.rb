@@ -91,16 +91,36 @@ end
 # Main agent loop
 begin
   while input = $stdin.gets
-    world_state = JSON.parse(input.strip)
+    message = JSON.parse(input.strip)
+    
+    # Handle death command from world
+    if message['command'] == 'die'
+      # No persistent memory to save for this agent type
+      exit(0)
+    end
+    
+    # Regular world state processing
+    world_state = message
     memory = world_state['memory'] || {}
     
     action, updated_memory = choose_action(world_state, memory)
     
-    puts JSON.generate(action.merge(memory: updated_memory))
+    response = action.merge(memory: updated_memory)
+    puts JSON.generate(response)
     $stdout.flush
+    
+    # Exit gracefully if we decided to die
+    if action[:action] == 'die'
+      exit(0)
+    end
   end
 rescue => e
   # Fallback to rest if anything goes wrong
-  puts JSON.generate({ action: 'rest', message: "Error: #{e.message}" })
+  error_response = { 
+    action: 'rest', 
+    message: "Error: #{e.message}",
+    memory: {}
+  }
+  puts JSON.generate(error_response)
   $stdout.flush
 end

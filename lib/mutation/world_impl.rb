@@ -76,7 +76,7 @@ module Mutation
         
         agent = @agent_manager.spawn_agent(
           executable, x, y, 
-          Mutation.configuration.initial_energy, 
+          Mutation.configuration.random_initial_energy, 
           @generation + 1,
           {} # Initial empty memory
         )
@@ -158,11 +158,11 @@ module Mutation
 
     def execute_action(agent, action, x, y, new_grid)
       # Calculate base action cost (all actions cost energy)
-      base_action_cost = 0.2  # Reduced action cost
+      base_action_cost = Mutation.configuration.base_action_cost
       
       case action[:type]
       when :attack
-        action_cost = base_action_cost + 1.0  # Attacking costs extra energy
+        action_cost = base_action_cost + Mutation.configuration.attack_action_cost
         execute_attack(agent, action[:target], x, y)
       when :rest
         action_cost = base_action_cost  # Resting still costs some energy
@@ -221,7 +221,7 @@ module Mutation
     end
 
     def execute_replicate(agent, x, y, new_grid)
-      total_replication_cost = 0.5 + Mutation.configuration.replication_cost
+      total_replication_cost = Mutation.configuration.additional_replication_cost + Mutation.configuration.replication_cost
       return if agent.energy < total_replication_cost
 
       # Population cap to prevent excessive spawning
