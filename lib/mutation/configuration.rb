@@ -200,7 +200,8 @@ module Mutation
         instance_variable_set("@#{key}", value) if respond_to?("#{key}=")
       end
     rescue StandardError => e
-      puts "Warning: Could not load config file: #{e.message}"
+      # Use warn instead of puts so it can be suppressed during curses mode
+      warn "Warning: Could not load config file: #{e.message}"
     end
 
     def config_file_exists?

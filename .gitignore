@@ -1,0 +1,32 @@
+# Debug and log files
+logs/
+*.log
+
+# Ruby
+*.gem
+*.rbc
+/.config
+/coverage/
+/InstalledFiles
+/pkg/
+/spec/reports/
+/spec/examples.txt
+/test/tmp/
+/test/version_tmp/
+/tmp/
+
+# Bundler
+/vendor/bundle
+/.bundle/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Agent workspaces
+/tmp/agents/
+/tmp/genetic_pool/

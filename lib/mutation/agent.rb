@@ -103,28 +103,36 @@ module Mutation
         # Check if process is still alive
         if process_alive?
           # Try graceful termination first
+          Mutation.logger.warn("⚠️  Agent #{@agent_id} process still alive, sending TERM signal")
           Process.kill('TERM', @pid)
           sleep(Mutation.configuration.process_cleanup_delay)
           
           # Force kill if still alive
           if process_alive?
+            Mutation.logger.warn("💀 Agent #{@agent_id} process unresponsive, force killing with KILL signal")
             Process.kill('KILL', @pid)
             sleep(Mutation.configuration.process_cleanup_delay)
+          else
+            Mutation.logger.info("✅ Agent #{@agent_id} process terminated gracefully with TERM signal")
           end
+        else
+          Mutation.logger.info("✅ Agent #{@agent_id} process already exited")
         end
         
         cleanup_process
       rescue Errno::ESRCH
         # Process already dead
+        Mutation.logger.info("✅ Agent #{@agent_id} process already dead (ESRCH)")
         cleanup_process
       rescue => e
-        Mutation.logger.error("Failed to kill agent process #{@pid}: #{e.message}")
+        Mutation.logger.error("❌ Failed to kill agent process #{@pid}: #{e.message}")
         cleanup_process
       end
     end
 
     def die!
       @alive = false
+      Mutation.logger.info("🏴 Agent #{@agent_id} died naturally (energy: #{@energy})")
       # Defer graceful death to avoid blocking simulation
       # The agent cleanup will be handled by the cleanup queue
     end
@@ -142,21 +150,31 @@ module Mutation
         @stdin.puts(death_instruction)
         @stdin.flush
         
-        # Give the agent time to exit gracefully
-        sleep(Mutation.configuration.graceful_death_timeout)
-        
-        # If still alive, fall back to manual killing
-        if process_alive?
-          Mutation.logger.debug("Agent #{@agent_id} did not exit gracefully, forcing termination")
-          kill_process
-        else
-          Mutation.logger.debug("Agent #{@agent_id} exited gracefully")
-          cleanup_process
+        # Schedule cleanup in background thread to avoid blocking simulation
+        Thread.new do
+          begin
+            Mutation.logger.info("💌 Sent graceful death message to agent #{@agent_id}")
+            # Give the agent time to exit gracefully
+            sleep(Mutation.configuration.graceful_death_timeout)
+            
+            # If still alive, fall back to manual killing
+            if process_alive?
+              Mutation.logger.warn("⏰ Agent #{@agent_id} did not exit gracefully after #{Mutation.configuration.graceful_death_timeout}s, forcing termination")
+              kill_process
+            else
+              Mutation.logger.info("😇 Agent #{@agent_id} exited gracefully after die message")
+              cleanup_process
+            end
+          rescue => e
+            Mutation.logger.warn("Failed to cleanup agent #{@agent_id}: #{e.message}")
+            kill_process
+          end
         end
         
       rescue => e
         Mutation.logger.warn("Failed to request graceful death for agent #{@agent_id}: #{e.message}")
-        kill_process
+        # Even if we can't send the die message, schedule cleanup
+        Thread.new { kill_process }
       end
     end
 

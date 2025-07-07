@@ -61,7 +61,11 @@ module Mutation
 
     def reset_grid
       # Kill all existing agents
+      cleanup_start = Time.now
+      puts "PERF: Starting agent cleanup for reset..."
       @agent_manager.kill_all_agents
+      cleanup_time = Time.now - cleanup_start
+      puts "PERF: Agent cleanup completed in #{(cleanup_time * 1000).round(2)}ms"
 
       # Create empty grid
       @grid = Array.new(@height) { Array.new(@width) { nil } }
@@ -547,7 +551,11 @@ module Mutation
       end
       
       # Clean up current agents
+      prepare_cleanup_start = Time.now
+      puts "PERF: Starting agent cleanup for prepare_for_reset..."
       @agent_manager.kill_all_agents
+      prepare_cleanup_time = Time.now - prepare_cleanup_start
+      puts "PERF: prepare_for_reset cleanup completed in #{(prepare_cleanup_time * 1000).round(2)}ms"
     end
     
     def cleanup

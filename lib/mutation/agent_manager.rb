@@ -121,6 +121,16 @@ module Mutation
     def process_cleanup_queue
       return unless @cleanup_queue&.any?
       
+      # Separate alive and dead processes to avoid unnecessary work
+      alive_agents = @cleanup_queue.select { |agent| agent.send(:process_alive?) }
+      dead_agents = @cleanup_queue.reject { |agent| agent.send(:process_alive?) }
+      
+      if alive_agents.any?
+        Mutation.logger.debug("Cleanup queue: #{alive_agents.size} alive processes need killing, #{dead_agents.size} already dead")
+      else
+        Mutation.logger.debug("Cleanup queue: All #{@cleanup_queue.size} processes already exited")
+      end
+      
       # Process cleanup asynchronously to avoid blocking the simulation
       cleanup_thread = Thread.new do
         @cleanup_queue.each do |agent|
@@ -147,20 +157,50 @@ module Mutation
     end
 
     def kill_all_agents
+      method_start = Time.now
+      
       if @agents.empty?
-        Mutation.logger.info("AgentManager: No active agents to kill. No workspace cleanup needed.")
+        puts "PERF: AgentManager: No active agents to kill. No workspace cleanup needed."
       else
-        Mutation.logger.info("AgentManager: Performing final sweep, killing #{@agents.size} remaining agents...")
-        @agents.each do |agent_id, agent|
-          begin
-            agent.kill_process
-          rescue => e
-            Mutation.logger.error("Failed to kill agent #{agent_id}: #{e.message}")
+        # Check which agents actually need killing
+        check_start = Time.now
+        agents_to_kill = @agents.select do |agent_id, agent|
+          agent.send(:process_alive?)
+        end
+        check_time = Time.now - check_start
+        puts "PERF: Process alive check took #{(check_time * 1000).round(2)}ms for #{@agents.size} agents"
+        
+        if agents_to_kill.empty?
+          puts "PERF: AgentManager: All #{@agents.size} agent processes already exited. No kills needed."
+        else
+          puts "PERF: AgentManager: Performing final sweep, killing #{agents_to_kill.size} of #{@agents.size} remaining agents..."
+          kill_start = Time.now
+          
+          # Kill agents in parallel to avoid blocking
+          threads = agents_to_kill.map do |agent_id, agent|
+            Thread.new do
+              begin
+                agent_kill_start = Time.now
+                agent.kill_process
+                agent_kill_time = Time.now - agent_kill_start
+                puts "PERF: Killed agent #{agent_id} in #{(agent_kill_time * 1000).round(2)}ms"
+              rescue => e
+                Mutation.logger.error("Failed to kill agent #{agent_id}: #{e.message}")
+              end
+            end
           end
+          
+          # Wait for all kills to complete with a reasonable timeout
+          threads.each { |t| t.join(1.0) } # 1 second timeout per thread
+          
+          kill_time = Time.now - kill_start
+          puts "PERF: All agent kills completed in #{(kill_time * 1000).round(2)}ms"
         end
       end
       @agents.clear
-      Mutation.logger.info("AgentManager: Final sweep complete.")
+      
+      method_time = Time.now - method_start
+      puts "PERF: kill_all_agents total time: #{(method_time * 1000).round(2)}ms"
     end
 
     def living_agents

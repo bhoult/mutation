@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'fileutils'
+
 module Mutation
   class Simulator
     attr_reader :world, :running, :statistics
@@ -280,17 +282,49 @@ module Mutation
     end
 
     def start_curses_mode
-      @curses_display = CursesDisplay.new(@world, self)
+      # Suppress console output during curses mode to prevent display interference
+      Mutation.logger.suppress_output = true
+      
+      # Redirect stdout and stderr to log file instead of /dev/null to capture debug info
+      original_stdout = $stdout
+      original_stderr = $stderr
+      debug_log_path = 'logs/curses_debug.log'
+      
+      begin
+        # Ensure logs directory exists
+        FileUtils.mkdir_p('logs')
+        
+        # Redirect output to debug log file
+        debug_log = File.open(debug_log_path, 'a')
+        debug_log.puts "\n=== CURSES SESSION STARTED: #{Time.now} ==="
+        debug_log.flush
+        
+        $stdout = debug_log
+        $stderr = debug_log
+        
+        @curses_display = CursesDisplay.new(@world, self)
 
-      # Start the display (blocks until user quits)
-      # Display will handle simulation stepping internally
-      @curses_display.start
+        # Start the display (blocks until user quits)
+        # Display will handle simulation stepping internally
+        @curses_display.start
 
-      # Clean up
-      @running = false
-
-      # Re-enable logging and show final results
-      Mutation.logger.suppress_output = false
+        # Clean up
+        @running = false
+        
+        # Log session end
+        debug_log.puts "=== CURSES SESSION ENDED: #{Time.now} ==="
+        debug_log.flush
+      ensure
+        # Restore original streams
+        $stdout.close if $stdout != original_stdout && !$stdout.closed?
+        $stderr.close if $stderr != original_stderr && !$stderr.closed?
+        $stdout = original_stdout
+        $stderr = original_stderr
+        
+        # Re-enable logging for final results display
+        Mutation.logger.suppress_output = false
+      end
+      
       show_final_results
     end
 
@@ -329,6 +363,9 @@ module Mutation
     end
 
     def show_final_results
+      # Only show results if logging is not suppressed (i.e., not in curses mode)
+      return if Mutation.logger.suppress_output
+
       puts "\n#{'=' * 60}"
       puts 'SIMULATION COMPLETED'
       puts '=' * 60
