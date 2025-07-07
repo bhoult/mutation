@@ -138,35 +138,63 @@ module Mutation
 
     # Helper method to spawn agent from mutation data
     def spawn_agent_from_data(agent_data, x, y)
-      # Create a temporary file for the agent code
-      temp_dir = "/tmp/mutation_agents"
-      FileUtils.mkdir_p(temp_dir)
+      executable_path = agent_data[:path]
       
-      # Create unique filename
-      timestamp = Time.now.strftime('%Y%m%d_%H%M%S_%N')
-      temp_filename = "temp_agent_#{timestamp}.rb"
-      temp_filepath = File.join(temp_dir, temp_filename)
+      # If no path (in-memory mutation), create a temporary file
+      if executable_path.nil?
+        executable_path = create_temp_agent_file(agent_data[:code])
+        temp_file_created = true
+      else
+        temp_file_created = false
+      end
       
-      # Write the agent code to temporary file
-      File.write(temp_filepath, agent_data[:code])
-      File.chmod(0755, temp_filepath) # Make executable
+      # Validate executable path
+      unless executable_path && File.exist?(executable_path)
+        Mutation.logger.error("Invalid agent path: #{executable_path.inspect} for agent #{agent_data[:name]}")
+        return nil
+      end
       
-      # Spawn the agent
+      # Spawn the agent using the file
       agent = @agent_manager.spawn_agent(
-        temp_filepath, x, y,
+        executable_path, x, y,
         Mutation.configuration.random_initial_energy,
         @generation + 1,
         { 
           is_mutation: agent_data[:is_mutation],
           original_agent: agent_data[:original_agent],
-          agent_code: agent_data[:code] # Store the code for later retrieval
+          agent_code: agent_data[:code], # Store the code for later retrieval
+          temp_file_path: temp_file_created ? executable_path : nil # Track temp files for cleanup
         }
       )
       
-      # Clean up temporary file after agent is spawned
-      File.delete(temp_filepath) if File.exist?(temp_filepath)
-      
       agent
+    end
+
+    # Create a temporary file for agent code that persists during simulation
+    def create_temp_agent_file(code)
+      temp_dir = "/tmp/mutation_agents"
+      FileUtils.mkdir_p(temp_dir)
+      
+      # Create unique filename with generation info
+      timestamp = Time.now.strftime('%Y%m%d_%H%M%S_%N')
+      temp_filename = "temp_agent_gen#{@generation}_#{timestamp}.rb"
+      temp_filepath = File.join(temp_dir, temp_filename)
+      
+      # Write the agent code to temporary file
+      File.write(temp_filepath, code)
+      File.chmod(0755, temp_filepath) # Make executable
+      
+      temp_filepath
+    end
+
+    # Helper to find agent file path
+    def find_agent_file(agent_name)
+      # Look for the agent file in the agents directory
+      agent_file = File.join('agents', "#{agent_name}.rb")
+      return agent_file if File.exist?(agent_file)
+      
+      # Fallback to default executable
+      default_executable
     end
 
     def step

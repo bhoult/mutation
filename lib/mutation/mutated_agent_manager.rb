@@ -29,7 +29,8 @@ module Mutation
         mutations << {
           code: mutated_code,
           original_agent: File.basename(original_agent, '.rb'),
-          is_mutation: true
+          is_mutation: true,
+          path: nil # No path for in-memory mutations
         }
       end
       
@@ -121,7 +122,8 @@ module Mutation
         code: File.read(selected[:path]),
         name: selected[:name],
         is_mutation: selected[:is_mutation],
-        original_agent: selected[:original_agent]
+        original_agent: selected[:original_agent],
+        path: selected[:path]
       }
     end
 

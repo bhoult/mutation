@@ -1,333 +1,810 @@
-=== WORLD EVENTS LOG - Started at 2025-07-07 08:59:24 -0500 ===
-[T:0 08:59:24.545] REST: Agent agent_2_1751896764 at (3,0)
-[T:0 08:59:24.545] REST: Agent agent_1_1751896764 at (3,3)
-[T:1 08:59:24.555] REST: Agent agent_2_1751896764 at (3,0)
-[T:1 08:59:24.555] REST: Agent agent_1_1751896764 at (3,3)
-[T:2 08:59:24.566] REST: Agent agent_2_1751896764 at (3,0)
-[T:2 08:59:24.566] REST: Agent agent_1_1751896764 at (3,3)
-[T:3 08:59:24.576] REST: Agent agent_2_1751896764 at (3,0)
-[T:3 08:59:24.576] REST: Agent agent_1_1751896764 at (3,3)
-[T:4 08:59:24.586] REST: Agent agent_2_1751896764 at (3,0)
-[T:4 08:59:24.586] REST: Agent agent_1_1751896764 at (3,3)
-[T:5 08:59:24.597] REST: Agent agent_2_1751896764 at (3,0)
-[T:5 08:59:24.597] REST: Agent agent_1_1751896764 at (3,3)
-[T:6 08:59:24.607] REST: Agent agent_2_1751896764 at (3,0)
-[T:6 08:59:24.607] REST: Agent agent_1_1751896764 at (3,3)
-[T:7 08:59:24.617] REST: Agent agent_2_1751896764 at (3,0)
-[T:7 08:59:24.618] REST: Agent agent_1_1751896764 at (3,3)
-[T:8 08:59:24.628] REST: Agent agent_2_1751896764 at (3,0)
-[T:8 08:59:24.628] REST: Agent agent_1_1751896764 at (3,3)
-[T:9 08:59:24.638] REST: Agent agent_2_1751896764 at (3,0)
-[T:9 08:59:24.638] REST: Agent agent_1_1751896764 at (3,3)
-[T:10 08:59:24.649] REST: Agent agent_2_1751896764 at (3,0)
-[T:10 08:59:24.649] REST: Agent agent_1_1751896764 at (3,3)
-[T:11 08:59:24.659] REST: Agent agent_2_1751896764 at (3,0)
-[T:11 08:59:24.659] REST: Agent agent_1_1751896764 at (3,3)
-[T:12 08:59:24.670] REST: Agent agent_2_1751896764 at (3,0)
-[T:12 08:59:24.670] REST: Agent agent_1_1751896764 at (3,3)
-[T:13 08:59:24.680] REST: Agent agent_2_1751896764 at (3,0)
-[T:13 08:59:24.680] REST: Agent agent_1_1751896764 at (3,3)
-[T:14 08:59:24.690] REST: Agent agent_2_1751896764 at (3,0)
-[T:14 08:59:24.690] REST: Agent agent_1_1751896764 at (3,3)
-[T:15 08:59:24.701] REST: Agent agent_2_1751896764 at (3,0)
-[T:15 08:59:24.701] REST: Agent agent_1_1751896764 at (3,3)
-[T:16 08:59:24.711] REST: Agent agent_2_1751896764 at (3,0)
-[T:16 08:59:24.711] REST: Agent agent_1_1751896764 at (3,3)
-[T:17 08:59:24.722] REST: Agent agent_2_1751896764 at (3,0)
-[T:17 08:59:24.722] REST: Agent agent_1_1751896764 at (3,3)
-[T:18 08:59:24.732] REST: Agent agent_2_1751896764 at (3,0)
-[T:18 08:59:24.732] REST: Agent agent_1_1751896764 at (3,3)
-[T:19 08:59:24.743] REST: Agent agent_2_1751896764 at (3,0)
-[T:19 08:59:24.743] REST: Agent agent_1_1751896764 at (3,3)
-[T:20 08:59:24.753] REST: Agent agent_2_1751896764 at (3,0)
-[T:20 08:59:24.753] REST: Agent agent_1_1751896764 at (3,3)
-[T:21 08:59:24.764] REST: Agent agent_2_1751896764 at (3,0)
-[T:21 08:59:24.764] REST: Agent agent_1_1751896764 at (3,3)
-[T:22 08:59:24.774] REST: Agent agent_2_1751896764 at (3,0)
-[T:22 08:59:24.774] REST: Agent agent_1_1751896764 at (3,3)
-[T:23 08:59:24.784] REST: Agent agent_2_1751896764 at (3,0)
-[T:23 08:59:24.784] REST: Agent agent_1_1751896764 at (3,3)
-[T:24 08:59:24.795] REST: Agent agent_2_1751896764 at (3,0)
-[T:24 08:59:24.795] REST: Agent agent_1_1751896764 at (3,3)
-[T:25 08:59:24.805] REST: Agent agent_2_1751896764 at (3,0)
-[T:25 08:59:24.805] REST: Agent agent_1_1751896764 at (3,3)
-[T:26 08:59:24.816] REST: Agent agent_2_1751896764 at (3,0)
-[T:26 08:59:24.816] REST: Agent agent_1_1751896764 at (3,3)
-[T:27 08:59:24.826] REST: Agent agent_2_1751896764 at (3,0)
-[T:27 08:59:24.826] REST: Agent agent_1_1751896764 at (3,3)
-[T:28 08:59:24.838] REST: Agent agent_2_1751896764 at (3,0)
-[T:28 08:59:24.839] REST: Agent agent_1_1751896764 at (3,3)
-[T:29 08:59:24.849] REST: Agent agent_2_1751896764 at (3,0)
-[T:29 08:59:24.849] REST: Agent agent_1_1751896764 at (3,3)
-[T:30 08:59:24.859] REST: Agent agent_2_1751896764 at (3,0)
-[T:30 08:59:24.860] REST: Agent agent_1_1751896764 at (3,3)
-[T:31 08:59:24.870] REST: Agent agent_2_1751896764 at (3,0)
-[T:31 08:59:24.870] REST: Agent agent_1_1751896764 at (3,3)
-[T:32 08:59:24.881] REST: Agent agent_2_1751896764 at (3,0)
-[T:32 08:59:24.881] REST: Agent agent_1_1751896764 at (3,3)
-[T:33 08:59:24.891] REST: Agent agent_2_1751896764 at (3,0)
-[T:33 08:59:24.891] REST: Agent agent_1_1751896764 at (3,3)
-[T:34 08:59:24.902] REST: Agent agent_2_1751896764 at (3,0)
-[T:34 08:59:24.902] REST: Agent agent_1_1751896764 at (3,3)
-[T:35 08:59:24.912] REST: Agent agent_2_1751896764 at (3,0)
-[T:35 08:59:24.912] REST: Agent agent_1_1751896764 at (3,3)
-[T:36 08:59:24.922] REST: Agent agent_2_1751896764 at (3,0)
-[T:36 08:59:24.923] REST: Agent agent_1_1751896764 at (3,3)
-[T:37 08:59:24.933] REST: Agent agent_2_1751896764 at (3,0)
-[T:37 08:59:24.933] REST: Agent agent_1_1751896764 at (3,3)
-[T:38 08:59:24.943] REST: Agent agent_2_1751896764 at (3,0)
-[T:38 08:59:24.944] REST: Agent agent_1_1751896764 at (3,3)
-[T:39 08:59:24.954] REST: Agent agent_2_1751896764 at (3,0)
-[T:39 08:59:24.954] REST: Agent agent_1_1751896764 at (3,3)
-[T:40 08:59:24.965] REST: Agent agent_2_1751896764 at (3,0)
-[T:40 08:59:24.965] REST: Agent agent_1_1751896764 at (3,3)
-[T:41 08:59:24.975] REST: Agent agent_2_1751896764 at (3,0)
-[T:41 08:59:24.975] REST: Agent agent_1_1751896764 at (3,3)
-[T:42 08:59:24.985] REST: Agent agent_2_1751896764 at (3,0)
-[T:42 08:59:24.985] REST: Agent agent_1_1751896764 at (3,3)
-[T:43 08:59:24.996] REST: Agent agent_2_1751896764 at (3,0)
-[T:43 08:59:24.996] REST: Agent agent_1_1751896764 at (3,3)
-[T:44 08:59:25.006] REST: Agent agent_2_1751896764 at (3,0)
-[T:44 08:59:25.007] REST: Agent agent_1_1751896764 at (3,3)
-[T:45 08:59:25.017] REST: Agent agent_2_1751896764 at (3,0)
-[T:45 08:59:25.017] REST: Agent agent_1_1751896764 at (3,3)
-[T:46 08:59:25.027] REST: Agent agent_2_1751896764 at (3,0)
-[T:46 08:59:25.027] REST: Agent agent_1_1751896764 at (3,3)
-[T:47 08:59:25.038] REST: Agent agent_2_1751896764 at (3,0)
-[T:47 08:59:25.038] REST: Agent agent_1_1751896764 at (3,3)
-[T:48 08:59:25.048] REST: Agent agent_2_1751896764 at (3,0)
-[T:48 08:59:25.048] REST: Agent agent_1_1751896764 at (3,3)
-[T:49 08:59:25.059] REST: Agent agent_2_1751896764 at (3,0)
-[T:49 08:59:25.059] REST: Agent agent_1_1751896764 at (3,3)
-[T:50 08:59:25.069] REST: Agent agent_2_1751896764 at (3,0)
-[T:50 08:59:25.069] REST: Agent agent_1_1751896764 at (3,3)
-[T:51 08:59:25.080] REST: Agent agent_2_1751896764 at (3,0)
-[T:51 08:59:25.080] REST: Agent agent_1_1751896764 at (3,3)
-[T:52 08:59:25.090] REST: Agent agent_2_1751896764 at (3,0)
-[T:52 08:59:25.090] REST: Agent agent_1_1751896764 at (3,3)
-[T:53 08:59:25.101] REST: Agent agent_2_1751896764 at (3,0)
-[T:53 08:59:25.101] REST: Agent agent_1_1751896764 at (3,3)
-[T:54 08:59:25.112] REST: Agent agent_2_1751896764 at (3,0)
-[T:54 08:59:25.112] REST: Agent agent_1_1751896764 at (3,3)
-[T:55 08:59:25.122] REST: Agent agent_2_1751896764 at (3,0)
-[T:55 08:59:25.122] REST: Agent agent_1_1751896764 at (3,3)
-[T:56 08:59:25.132] REST: Agent agent_2_1751896764 at (3,0)
-[T:56 08:59:25.133] REST: Agent agent_1_1751896764 at (3,3)
-[T:57 08:59:25.143] REST: Agent agent_2_1751896764 at (3,0)
-[T:57 08:59:25.143] REST: Agent agent_1_1751896764 at (3,3)
-[T:58 08:59:25.154] REST: Agent agent_2_1751896764 at (3,0)
-[T:58 08:59:25.154] REST: Agent agent_1_1751896764 at (3,3)
-[T:59 08:59:25.166] REST: Agent agent_2_1751896764 at (3,0)
-[T:59 08:59:25.166] REST: Agent agent_1_1751896764 at (3,3)
-[T:60 08:59:25.176] REST: Agent agent_2_1751896764 at (3,0)
-[T:60 08:59:25.176] REST: Agent agent_1_1751896764 at (3,3)
-[T:61 08:59:25.187] REST: Agent agent_2_1751896764 at (3,0)
-[T:61 08:59:25.187] REST: Agent agent_1_1751896764 at (3,3)
-[T:62 08:59:25.198] REST: Agent agent_2_1751896764 at (3,0)
-[T:62 08:59:25.198] REST: Agent agent_1_1751896764 at (3,3)
-[T:63 08:59:25.208] REST: Agent agent_2_1751896764 at (3,0)
-[T:63 08:59:25.209] REST: Agent agent_1_1751896764 at (3,3)
-[T:64 08:59:25.219] REST: Agent agent_2_1751896764 at (3,0)
-[T:64 08:59:25.220] REST: Agent agent_1_1751896764 at (3,3)
-[T:65 08:59:25.230] REST: Agent agent_2_1751896764 at (3,0)
-[T:65 08:59:25.230] REST: Agent agent_1_1751896764 at (3,3)
-[T:66 08:59:25.240] REST: Agent agent_2_1751896764 at (3,0)
-[T:66 08:59:25.240] REST: Agent agent_1_1751896764 at (3,3)
-[T:67 08:59:25.251] REST: Agent agent_2_1751896764 at (3,0)
-[T:67 08:59:25.251] REST: Agent agent_1_1751896764 at (3,3)
-[T:68 08:59:25.261] REST: Agent agent_2_1751896764 at (3,0)
-[T:68 08:59:25.261] REST: Agent agent_1_1751896764 at (3,3)
-[T:69 08:59:25.272] REST: Agent agent_2_1751896764 at (3,0)
-[T:69 08:59:25.272] REST: Agent agent_1_1751896764 at (3,3)
-[T:70 08:59:25.283] REST: Agent agent_2_1751896764 at (3,0)
-[T:70 08:59:25.283] REST: Agent agent_1_1751896764 at (3,3)
-[T:71 08:59:25.294] REST: Agent agent_2_1751896764 at (3,0)
-[T:71 08:59:25.294] REST: Agent agent_1_1751896764 at (3,3)
-[T:72 08:59:25.305] REST: Agent agent_2_1751896764 at (3,0)
-[T:72 08:59:25.305] REST: Agent agent_1_1751896764 at (3,3)
-[T:73 08:59:25.315] REST: Agent agent_2_1751896764 at (3,0)
-[T:73 08:59:25.315] REST: Agent agent_1_1751896764 at (3,3)
-[T:74 08:59:25.326] REST: Agent agent_2_1751896764 at (3,0)
-[T:74 08:59:25.326] REST: Agent agent_1_1751896764 at (3,3)
-[T:75 08:59:25.336] REST: Agent agent_2_1751896764 at (3,0)
-[T:75 08:59:25.336] REST: Agent agent_1_1751896764 at (3,3)
-[T:76 08:59:25.346] REST: Agent agent_2_1751896764 at (3,0)
-[T:76 08:59:25.347] REST: Agent agent_1_1751896764 at (3,3)
-[T:77 08:59:25.357] REST: Agent agent_2_1751896764 at (3,0)
-[T:77 08:59:25.357] REST: Agent agent_1_1751896764 at (3,3)
-[T:78 08:59:25.367] REST: Agent agent_2_1751896764 at (3,0)
-[T:78 08:59:25.367] REST: Agent agent_1_1751896764 at (3,3)
-[T:79 08:59:25.378] REST: Agent agent_2_1751896764 at (3,0)
-[T:79 08:59:25.378] REST: Agent agent_1_1751896764 at (3,3)
-[T:80 08:59:25.389] REST: Agent agent_2_1751896764 at (3,0)
-[T:80 08:59:25.389] REST: Agent agent_1_1751896764 at (3,3)
-[T:81 08:59:25.400] REST: Agent agent_2_1751896764 at (3,0)
-[T:81 08:59:25.401] REST: Agent agent_1_1751896764 at (3,3)
-[T:82 08:59:25.411] REST: Agent agent_2_1751896764 at (3,0)
-[T:82 08:59:25.412] REST: Agent agent_1_1751896764 at (3,3)
-[T:83 08:59:25.422] REST: Agent agent_2_1751896764 at (3,0)
-[T:83 08:59:25.422] REST: Agent agent_1_1751896764 at (3,3)
-[T:84 08:59:25.433] REST: Agent agent_2_1751896764 at (3,0)
-[T:84 08:59:25.433] REST: Agent agent_1_1751896764 at (3,3)
-[T:85 08:59:25.444] REST: Agent agent_2_1751896764 at (3,0)
-[T:85 08:59:25.444] REST: Agent agent_1_1751896764 at (3,3)
-[T:86 08:59:25.455] REST: Agent agent_2_1751896764 at (3,0)
-[T:86 08:59:25.455] REST: Agent agent_1_1751896764 at (3,3)
-[T:87 08:59:25.466] REST: Agent agent_2_1751896764 at (3,0)
-[T:87 08:59:25.466] REST: Agent agent_1_1751896764 at (3,3)
-[T:88 08:59:25.477] REST: Agent agent_2_1751896764 at (3,0)
-[T:88 08:59:25.477] REST: Agent agent_1_1751896764 at (3,3)
-[T:89 08:59:25.489] REST: Agent agent_2_1751896764 at (3,0)
-[T:89 08:59:25.489] REST: Agent agent_1_1751896764 at (3,3)
-[T:90 08:59:25.499] REST: Agent agent_2_1751896764 at (3,0)
-[T:90 08:59:25.499] REST: Agent agent_1_1751896764 at (3,3)
-[T:91 08:59:25.510] REST: Agent agent_2_1751896764 at (3,0)
-[T:91 08:59:25.510] REST: Agent agent_1_1751896764 at (3,3)
-[T:92 08:59:25.521] REST: Agent agent_2_1751896764 at (3,0)
-[T:92 08:59:25.521] REST: Agent agent_1_1751896764 at (3,3)
-[T:93 08:59:25.532] REST: Agent agent_2_1751896764 at (3,0)
-[T:93 08:59:25.532] REST: Agent agent_1_1751896764 at (3,3)
-[T:94 08:59:25.543] REST: Agent agent_2_1751896764 at (3,0)
-[T:94 08:59:25.543] REST: Agent agent_1_1751896764 at (3,3)
-[T:95 08:59:25.553] REST: Agent agent_2_1751896764 at (3,0)
-[T:95 08:59:25.554] REST: Agent agent_1_1751896764 at (3,3)
-[T:96 08:59:25.564] REST: Agent agent_2_1751896764 at (3,0)
-[T:96 08:59:25.564] REST: Agent agent_1_1751896764 at (3,3)
-[T:97 08:59:25.574] REST: Agent agent_2_1751896764 at (3,0)
-[T:97 08:59:25.574] REST: Agent agent_1_1751896764 at (3,3)
-[T:98 08:59:25.585] REST: Agent agent_2_1751896764 at (3,0)
-[T:98 08:59:25.585] REST: Agent agent_1_1751896764 at (3,3)
-[T:99 08:59:25.595] REST: Agent agent_2_1751896764 at (3,0)
-[T:99 08:59:25.595] REST: Agent agent_1_1751896764 at (3,3)
-[T:100 08:59:25.606] REST: Agent agent_2_1751896764 at (3,0)
-[T:100 08:59:25.606] REST: Agent agent_1_1751896764 at (3,3)
-[T:101 08:59:25.616] REST: Agent agent_2_1751896764 at (3,0)
-[T:101 08:59:25.616] REST: Agent agent_1_1751896764 at (3,3)
-[T:102 08:59:25.626] REST: Agent agent_2_1751896764 at (3,0)
-[T:102 08:59:25.626] REST: Agent agent_1_1751896764 at (3,3)
-[T:103 08:59:25.637] REST: Agent agent_2_1751896764 at (3,0)
-[T:103 08:59:25.637] REST: Agent agent_1_1751896764 at (3,3)
-[T:104 08:59:25.647] REST: Agent agent_2_1751896764 at (3,0)
-[T:104 08:59:25.647] REST: Agent agent_1_1751896764 at (3,3)
-[T:105 08:59:25.658] REST: Agent agent_2_1751896764 at (3,0)
-[T:105 08:59:25.658] REST: Agent agent_1_1751896764 at (3,3)
-[T:106 08:59:25.668] REST: Agent agent_2_1751896764 at (3,0)
-[T:106 08:59:25.668] REST: Agent agent_1_1751896764 at (3,3)
-[T:107 08:59:25.679] REST: Agent agent_2_1751896764 at (3,0)
-[T:107 08:59:25.679] REST: Agent agent_1_1751896764 at (3,3)
-[T:108 08:59:25.689] REST: Agent agent_2_1751896764 at (3,0)
-[T:108 08:59:25.689] REST: Agent agent_1_1751896764 at (3,3)
-[T:109 08:59:25.699] REST: Agent agent_2_1751896764 at (3,0)
-[T:109 08:59:25.699] REST: Agent agent_1_1751896764 at (3,3)
-[T:110 08:59:25.710] REST: Agent agent_2_1751896764 at (3,0)
-[T:110 08:59:25.710] REST: Agent agent_1_1751896764 at (3,3)
-[T:111 08:59:25.721] REST: Agent agent_2_1751896764 at (3,0)
-[T:111 08:59:25.721] REST: Agent agent_1_1751896764 at (3,3)
-[T:112 08:59:25.731] REST: Agent agent_2_1751896764 at (3,0)
-[T:112 08:59:25.731] REST: Agent agent_1_1751896764 at (3,3)
-[T:113 08:59:25.742] REST: Agent agent_2_1751896764 at (3,0)
-[T:113 08:59:25.742] REST: Agent agent_1_1751896764 at (3,3)
-[T:114 08:59:25.753] REST: Agent agent_2_1751896764 at (3,0)
-[T:114 08:59:25.753] REST: Agent agent_1_1751896764 at (3,3)
-[T:115 08:59:25.763] REST: Agent agent_2_1751896764 at (3,0)
-[T:115 08:59:25.763] REST: Agent agent_1_1751896764 at (3,3)
-[T:116 08:59:25.774] REST: Agent agent_2_1751896764 at (3,0)
-[T:116 08:59:25.774] REST: Agent agent_1_1751896764 at (3,3)
-[T:117 08:59:25.785] REST: Agent agent_2_1751896764 at (3,0)
-[T:117 08:59:25.785] REST: Agent agent_1_1751896764 at (3,3)
-[T:118 08:59:25.796] REST: Agent agent_2_1751896764 at (3,0)
-[T:118 08:59:25.796] REST: Agent agent_1_1751896764 at (3,3)
-[T:119 08:59:25.807] REST: Agent agent_2_1751896764 at (3,0)
-[T:119 08:59:25.807] REST: Agent agent_1_1751896764 at (3,3)
-[T:120 08:59:25.819] REST: Agent agent_2_1751896764 at (3,0)
-[T:120 08:59:25.819] REST: Agent agent_1_1751896764 at (3,3)
-[T:121 08:59:25.830] REST: Agent agent_2_1751896764 at (3,0)
-[T:121 08:59:25.830] REST: Agent agent_1_1751896764 at (3,3)
-[T:122 08:59:25.840] REST: Agent agent_2_1751896764 at (3,0)
-[T:122 08:59:25.841] REST: Agent agent_1_1751896764 at (3,3)
-[T:123 08:59:25.851] REST: Agent agent_2_1751896764 at (3,0)
-[T:123 08:59:25.851] REST: Agent agent_1_1751896764 at (3,3)
-[T:124 08:59:25.862] REST: Agent agent_2_1751896764 at (3,0)
-[T:124 08:59:25.862] REST: Agent agent_1_1751896764 at (3,3)
-[T:125 08:59:25.872] REST: Agent agent_2_1751896764 at (3,0)
-[T:125 08:59:25.872] REST: Agent agent_1_1751896764 at (3,3)
-[T:126 08:59:25.883] REST: Agent agent_2_1751896764 at (3,0)
-[T:126 08:59:25.883] REST: Agent agent_1_1751896764 at (3,3)
-[T:127 08:59:25.894] REST: Agent agent_2_1751896764 at (3,0)
-[T:127 08:59:25.894] REST: Agent agent_1_1751896764 at (3,3)
-[T:128 08:59:25.904] REST: Agent agent_2_1751896764 at (3,0)
-[T:128 08:59:25.905] REST: Agent agent_1_1751896764 at (3,3)
-[T:129 08:59:25.915] REST: Agent agent_2_1751896764 at (3,0)
-[T:129 08:59:25.915] REST: Agent agent_1_1751896764 at (3,3)
-[T:130 08:59:25.926] REST: Agent agent_2_1751896764 at (3,0)
-[T:130 08:59:25.926] REST: Agent agent_1_1751896764 at (3,3)
-[T:131 08:59:25.937] REST: Agent agent_2_1751896764 at (3,0)
-[T:131 08:59:25.937] REST: Agent agent_1_1751896764 at (3,3)
-[T:132 08:59:25.948] REST: Agent agent_2_1751896764 at (3,0)
-[T:132 08:59:25.948] REST: Agent agent_1_1751896764 at (3,3)
-[T:133 08:59:25.958] REST: Agent agent_2_1751896764 at (3,0)
-[T:133 08:59:25.959] REST: Agent agent_1_1751896764 at (3,3)
-[T:134 08:59:25.969] REST: Agent agent_2_1751896764 at (3,0)
-[T:134 08:59:25.969] REST: Agent agent_1_1751896764 at (3,3)
-[T:135 08:59:25.979] REST: Agent agent_2_1751896764 at (3,0)
-[T:135 08:59:25.979] REST: Agent agent_1_1751896764 at (3,3)
-[T:136 08:59:25.990] REST: Agent agent_2_1751896764 at (3,0)
-[T:136 08:59:25.990] REST: Agent agent_1_1751896764 at (3,3)
-[T:137 08:59:26.001] REST: Agent agent_2_1751896764 at (3,0)
-[T:137 08:59:26.001] REST: Agent agent_1_1751896764 at (3,3)
-[T:138 08:59:26.011] REST: Agent agent_2_1751896764 at (3,0)
-[T:138 08:59:26.011] REST: Agent agent_1_1751896764 at (3,3)
-[T:139 08:59:26.022] REST: Agent agent_2_1751896764 at (3,0)
-[T:139 08:59:26.022] REST: Agent agent_1_1751896764 at (3,3)
-[T:140 08:59:26.033] REST: Agent agent_2_1751896764 at (3,0)
-[T:140 08:59:26.033] REST: Agent agent_1_1751896764 at (3,3)
-[T:141 08:59:26.043] REST: Agent agent_2_1751896764 at (3,0)
-[T:141 08:59:26.043] REST: Agent agent_1_1751896764 at (3,3)
-[T:142 08:59:26.054] REST: Agent agent_2_1751896764 at (3,0)
-[T:142 08:59:26.054] REST: Agent agent_1_1751896764 at (3,3)
-[T:143 08:59:26.064] REST: Agent agent_2_1751896764 at (3,0)
-[T:143 08:59:26.064] REST: Agent agent_1_1751896764 at (3,3)
-[T:144 08:59:26.075] REST: Agent agent_2_1751896764 at (3,0)
-[T:144 08:59:26.075] REST: Agent agent_1_1751896764 at (3,3)
-[T:145 08:59:26.085] REST: Agent agent_2_1751896764 at (3,0)
-[T:145 08:59:26.085] REST: Agent agent_1_1751896764 at (3,3)
-[T:146 08:59:26.096] REST: Agent agent_2_1751896764 at (3,0)
-[T:146 08:59:26.096] REST: Agent agent_1_1751896764 at (3,3)
-[T:147 08:59:26.106] REST: Agent agent_2_1751896764 at (3,0)
-[T:147 08:59:26.106] REST: Agent agent_1_1751896764 at (3,3)
-[T:148 08:59:26.116] REST: Agent agent_2_1751896764 at (3,0)
-[T:148 08:59:26.116] REST: Agent agent_1_1751896764 at (3,3)
-[T:149 08:59:26.127] REST: Agent agent_2_1751896764 at (3,0)
-[T:149 08:59:26.127] REST: Agent agent_1_1751896764 at (3,3)
-[T:149 08:59:26.127] DEATH_ENERGY: Agent agent_1_1751896764 at (3,3) - {energy: 7.66053886991358e-14}
-[T:150 08:59:26.138] REST: Agent agent_2_1751896764 at (3,0)
-[T:151 08:59:26.149] REST: Agent agent_2_1751896764 at (3,0)
-[T:152 08:59:26.159] REST: Agent agent_2_1751896764 at (3,0)
-[T:153 08:59:26.170] REST: Agent agent_2_1751896764 at (3,0)
-[T:154 08:59:26.180] REST: Agent agent_2_1751896764 at (3,0)
-[T:155 08:59:26.191] REST: Agent agent_2_1751896764 at (3,0)
-[T:156 08:59:26.201] REST: Agent agent_2_1751896764 at (3,0)
-[T:157 08:59:26.211] REST: Agent agent_2_1751896764 at (3,0)
-[T:158 08:59:26.222] REST: Agent agent_2_1751896764 at (3,0)
-[T:159 08:59:26.232] REST: Agent agent_2_1751896764 at (3,0)
-[T:160 08:59:26.242] REST: Agent agent_2_1751896764 at (3,0)
-[T:161 08:59:26.253] REST: Agent agent_2_1751896764 at (3,0)
-[T:162 08:59:26.263] REST: Agent agent_2_1751896764 at (3,0)
-[T:163 08:59:26.274] REST: Agent agent_2_1751896764 at (3,0)
-[T:164 08:59:26.285] REST: Agent agent_2_1751896764 at (3,0)
-[T:165 08:59:26.295] REST: Agent agent_2_1751896764 at (3,0)
-[T:166 08:59:26.306] REST: Agent agent_2_1751896764 at (3,0)
-[T:167 08:59:26.316] REST: Agent agent_2_1751896764 at (3,0)
-[T:168 08:59:26.327] REST: Agent agent_2_1751896764 at (3,0)
-[T:169 08:59:26.337] REST: Agent agent_2_1751896764 at (3,0)
-[T:170 08:59:26.348] REST: Agent agent_2_1751896764 at (3,0)
-[T:171 08:59:26.358] REST: Agent agent_2_1751896764 at (3,0)
-[T:172 08:59:26.369] REST: Agent agent_2_1751896764 at (3,0)
-[T:173 08:59:26.379] REST: Agent agent_2_1751896764 at (3,0)
-[T:174 08:59:26.390] REST: Agent agent_2_1751896764 at (3,0)
-[T:175 08:59:26.400] REST: Agent agent_2_1751896764 at (3,0)
-[T:176 08:59:26.411] REST: Agent agent_2_1751896764 at (3,0)
-[T:177 08:59:26.422] REST: Agent agent_2_1751896764 at (3,0)
-[T:178 08:59:26.432] REST: Agent agent_2_1751896764 at (3,0)
-[T:179 08:59:26.443] REST: Agent agent_2_1751896764 at (3,0)
-[T:179 08:59:26.443] DEATH_ENERGY: Agent agent_2_1751896764 at (3,0) - {energy: 1.2656542480726785e-14}
+=== WORLD EVENTS LOG - Started at 2025-07-07 09:05:58 -0500 ===
+[T:0 09:05:58.102] REPLICATE_START: Agent agent_1_1751897158 at (1,1)
+[T:0 09:05:58.113] REPLICATE_SUCCESS: Agent agent_1_1751897158 at (1,1) - {offspring: "agent_2_1751897158", at: [0, 2]}
+[T:1 09:05:58.215] MOVE_START: Agent agent_1_1751897158 at (1,1) - {target: :north_east}
+[T:1 09:05:58.215] MOVE_SUCCESS: Agent agent_1_1751897158 at (2,0) - {from: [1, 1]}
+[T:1 09:05:58.215] MOVE_START: Agent agent_2_1751897158 at (0,2) - {target: :east}
+[T:1 09:05:58.215] MOVE_SUCCESS: Agent agent_2_1751897158 at (1,2) - {from: [0, 2]}
+[T:2 09:05:58.317] REST: Agent agent_1_1751897158 at (2,0)
+[T:2 09:05:58.317] MOVE_START: Agent agent_2_1751897158 at (1,2) - {target: :north}
+[T:2 09:05:58.317] MOVE_SUCCESS: Agent agent_2_1751897158 at (1,1) - {from: [1, 2]}
+[T:3 09:05:58.419] MOVE_START: Agent agent_1_1751897158 at (2,0) - {target: :west}
+[T:3 09:05:58.419] MOVE_SUCCESS: Agent agent_1_1751897158 at (1,0) - {from: [2, 0]}
+[T:3 09:05:58.419] MOVE_START: Agent agent_2_1751897158 at (1,1) - {target: :north_west}
+[T:3 09:05:58.419] MOVE_SUCCESS: Agent agent_2_1751897158 at (0,0) - {from: [1, 1]}
+[T:4 09:05:58.520] MOVE_START: Agent agent_2_1751897158 at (0,0) - {target: :south}
+[T:4 09:05:58.520] MOVE_SUCCESS: Agent agent_2_1751897158 at (0,1) - {from: [0, 0]}
+[T:4 09:05:58.520] MOVE_START: Agent agent_1_1751897158 at (1,0) - {target: :south_west}
+[T:4 09:05:58.520] MOVE_BLOCKED: Agent agent_1_1751897158 at (1,0) - {target: [0, 1]}
+[T:5 09:05:58.622] MOVE_START: Agent agent_1_1751897158 at (1,0) - {target: :south_east}
+[T:5 09:05:58.622] MOVE_SUCCESS: Agent agent_1_1751897158 at (2,1) - {from: [1, 0]}
+[T:5 09:05:58.622] REST: Agent agent_2_1751897158 at (0,1)
+[T:6 09:05:58.724] MOVE_START: Agent agent_2_1751897158 at (0,1) - {target: :east}
+[T:6 09:05:58.724] MOVE_SUCCESS: Agent agent_2_1751897158 at (1,1) - {from: [0, 1]}
+[T:6 09:05:58.724] MOVE_START: Agent agent_1_1751897158 at (2,1) - {target: :south}
+[T:6 09:05:58.724] MOVE_SUCCESS: Agent agent_1_1751897158 at (2,2) - {from: [2, 1]}
+[T:7 09:05:58.826] MOVE_START: Agent agent_2_1751897158 at (1,1) - {target: :west}
+[T:7 09:05:58.826] MOVE_SUCCESS: Agent agent_2_1751897158 at (0,1) - {from: [1, 1]}
+[T:7 09:05:58.826] MOVE_START: Agent agent_1_1751897158 at (2,2) - {target: :west}
+[T:7 09:05:58.826] MOVE_SUCCESS: Agent agent_1_1751897158 at (1,2) - {from: [2, 2]}
+[T:8 09:05:58.927] MOVE_START: Agent agent_2_1751897158 at (0,1) - {target: :east}
+[T:8 09:05:58.927] MOVE_SUCCESS: Agent agent_2_1751897158 at (1,1) - {from: [0, 1]}
+[T:8 09:05:58.927] MOVE_START: Agent agent_1_1751897158 at (1,2) - {target: :north}
+[T:8 09:05:58.927] MOVE_BLOCKED: Agent agent_1_1751897158 at (1,2) - {target: [1, 1]}
+[T:9 09:05:59.029] MOVE_START: Agent agent_2_1751897158 at (1,1) - {target: :west}
+[T:9 09:05:59.029] MOVE_SUCCESS: Agent agent_2_1751897158 at (0,1) - {from: [1, 1]}
+[T:9 09:05:59.029] REST: Agent agent_1_1751897158 at (1,2)
+[T:10 09:05:59.131] MOVE_START: Agent agent_2_1751897158 at (0,1) - {target: :east}
+[T:10 09:05:59.131] MOVE_SUCCESS: Agent agent_2_1751897158 at (1,1) - {from: [0, 1]}
+[T:10 09:05:59.131] MOVE_START: Agent agent_1_1751897158 at (1,2) - {target: :north}
+[T:10 09:05:59.131] MOVE_BLOCKED: Agent agent_1_1751897158 at (1,2) - {target: [1, 1]}
+[T:11 09:05:59.233] MOVE_START: Agent agent_2_1751897158 at (1,1) - {target: :east}
+[T:11 09:05:59.233] MOVE_SUCCESS: Agent agent_2_1751897158 at (2,1) - {from: [1, 1]}
+[T:11 09:05:59.233] MOVE_START: Agent agent_1_1751897158 at (1,2) - {target: :north_west}
+[T:11 09:05:59.233] MOVE_SUCCESS: Agent agent_1_1751897158 at (0,1) - {from: [1, 2]}
+[T:12 09:05:59.335] REST: Agent agent_1_1751897158 at (0,1)
+[T:12 09:05:59.335] REST: Agent agent_2_1751897158 at (2,1)
+[T:13 09:05:59.437] MOVE_START: Agent agent_1_1751897158 at (0,1) - {target: :south_east}
+[T:13 09:05:59.437] MOVE_SUCCESS: Agent agent_1_1751897158 at (1,2) - {from: [0, 1]}
+[T:13 09:05:59.437] REPLICATE_START: Agent agent_2_1751897158 at (2,1)
+[T:13 09:05:59.449] REPLICATE_SUCCESS: Agent agent_2_1751897158 at (2,1) - {offspring: "agent_3_1751897159", at: [1, 0]}
+[T:14 09:05:59.551] MOVE_START: Agent agent_3_1751897159 at (1,0) - {target: :south_west}
+[T:14 09:05:59.551] MOVE_SUCCESS: Agent agent_3_1751897159 at (0,1) - {from: [1, 0]}
+[T:14 09:05:59.551] REST: Agent agent_2_1751897158 at (2,1)
+[T:14 09:05:59.551] MOVE_START: Agent agent_1_1751897158 at (1,2) - {target: :east}
+[T:14 09:05:59.551] MOVE_SUCCESS: Agent agent_1_1751897158 at (2,2) - {from: [1, 2]}
+[T:15 09:05:59.654] REPLICATE_START: Agent agent_3_1751897159 at (0,1)
+[T:15 09:05:59.665] REPLICATE_SUCCESS: Agent agent_3_1751897159 at (0,1) - {offspring: "agent_4_1751897159", at: [0, 2]}
+[T:15 09:05:59.665] MOVE_START: Agent agent_2_1751897158 at (2,1) - {target: :north}
+[T:15 09:05:59.665] MOVE_SUCCESS: Agent agent_2_1751897158 at (2,0) - {from: [2, 1]}
+[T:15 09:05:59.665] MOVE_START: Agent agent_1_1751897158 at (2,2) - {target: :west}
+[T:15 09:05:59.665] MOVE_SUCCESS: Agent agent_1_1751897158 at (1,2) - {from: [2, 2]}
+[T:16 09:05:59.768] MOVE_START: Agent agent_2_1751897158 at (2,0) - {target: :south}
+[T:16 09:05:59.768] MOVE_SUCCESS: Agent agent_2_1751897158 at (2,1) - {from: [2, 0]}
+[T:16 09:05:59.768] MOVE_START: Agent agent_3_1751897159 at (0,1) - {target: :east}
+[T:16 09:05:59.768] MOVE_SUCCESS: Agent agent_3_1751897159 at (1,1) - {from: [0, 1]}
+[T:16 09:05:59.768] MOVE_START: Agent agent_4_1751897159 at (0,2) - {target: :north_east}
+[T:16 09:05:59.768] MOVE_BLOCKED: Agent agent_4_1751897159 at (0,2) - {target: [1, 1]}
+[T:16 09:05:59.768] MOVE_START: Agent agent_1_1751897158 at (1,2) - {target: :north_east}
+[T:16 09:05:59.768] MOVE_BLOCKED: Agent agent_1_1751897158 at (1,2) - {target: [2, 1]}
+[T:17 09:05:59.870] REST: Agent agent_3_1751897159 at (1,1)
+[T:17 09:05:59.870] MOVE_START: Agent agent_2_1751897158 at (2,1) - {target: :north}
+[T:17 09:05:59.870] MOVE_SUCCESS: Agent agent_2_1751897158 at (2,0) - {from: [2, 1]}
+[T:17 09:05:59.870] MOVE_START: Agent agent_4_1751897159 at (0,2) - {target: :north}
+[T:17 09:05:59.870] MOVE_SUCCESS: Agent agent_4_1751897159 at (0,1) - {from: [0, 2]}
+[T:17 09:05:59.870] REPLICATE_START: Agent agent_1_1751897158 at (1,2)
+[T:17 09:05:59.881] REPLICATE_SUCCESS: Agent agent_1_1751897158 at (1,2) - {offspring: "agent_5_1751897159", at: [2, 2]}
+[T:18 09:05:59.985] REST: Agent agent_2_1751897158 at (2,0)
+[T:18 09:05:59.985] MOVE_START: Agent agent_4_1751897159 at (0,1) - {target: :south}
+[T:18 09:05:59.985] MOVE_SUCCESS: Agent agent_4_1751897159 at (0,2) - {from: [0, 1]}
+[T:18 09:05:59.985] MOVE_START: Agent agent_3_1751897159 at (1,1) - {target: :south_west}
+[T:18 09:05:59.985] MOVE_BLOCKED: Agent agent_3_1751897159 at (1,1) - {target: [0, 2]}
+[T:18 09:05:59.985] MOVE_START: Agent agent_1_1751897158 at (1,2) - {target: :west}
+[T:18 09:05:59.985] MOVE_BLOCKED: Agent agent_1_1751897158 at (1,2) - {target: [0, 2]}
+[T:18 09:05:59.985] MOVE_START: Agent agent_5_1751897159 at (2,2) - {target: :north}
+[T:18 09:05:59.985] MOVE_SUCCESS: Agent agent_5_1751897159 at (2,1) - {from: [2, 2]}
+[T:19 09:06:00.092] REST: Agent agent_2_1751897158 at (2,0)
+[T:19 09:06:00.092] REST: Agent agent_3_1751897159 at (1,1)
+[T:19 09:06:00.092] REPLICATE_START: Agent agent_5_1751897159 at (2,1)
+[T:19 09:06:00.103] REPLICATE_SUCCESS: Agent agent_5_1751897159 at (2,1) - {offspring: "agent_6_1751897160", at: [1, 0]}
+[T:19 09:06:00.103] MOVE_START: Agent agent_4_1751897159 at (0,2) - {target: :north}
+[T:19 09:06:00.103] MOVE_SUCCESS: Agent agent_4_1751897159 at (0,1) - {from: [0, 2]}
+[T:19 09:06:00.103] MOVE_START: Agent agent_1_1751897158 at (1,2) - {target: :north_west}
+[T:19 09:06:00.103] MOVE_BLOCKED: Agent agent_1_1751897158 at (1,2) - {target: [0, 1]}
+[T:20 09:06:00.208] MOVE_START: Agent agent_6_1751897160 at (1,0) - {target: :west}
+[T:20 09:06:00.208] MOVE_SUCCESS: Agent agent_6_1751897160 at (0,0) - {from: [1, 0]}
+[T:20 09:06:00.208] REST: Agent agent_2_1751897158 at (2,0)
+[T:20 09:06:00.208] MOVE_START: Agent agent_4_1751897159 at (0,1) - {target: :south}
+[T:20 09:06:00.208] MOVE_SUCCESS: Agent agent_4_1751897159 at (0,2) - {from: [0, 1]}
+[T:20 09:06:00.208] MOVE_START: Agent agent_3_1751897159 at (1,1) - {target: :south_west}
+[T:20 09:06:00.208] MOVE_BLOCKED: Agent agent_3_1751897159 at (1,1) - {target: [0, 2]}
+[T:20 09:06:00.208] REST: Agent agent_5_1751897159 at (2,1)
+[T:20 09:06:00.208] MOVE_START: Agent agent_1_1751897158 at (1,2) - {target: :east}
+[T:20 09:06:00.208] MOVE_SUCCESS: Agent agent_1_1751897158 at (2,2) - {from: [1, 2]}
+[T:21 09:06:00.311] MOVE_START: Agent agent_6_1751897160 at (0,0) - {target: :south}
+[T:21 09:06:00.311] MOVE_SUCCESS: Agent agent_6_1751897160 at (0,1) - {from: [0, 0]}
+[T:21 09:06:00.311] MOVE_START: Agent agent_2_1751897158 at (2,0) - {target: :west}
+[T:21 09:06:00.311] MOVE_SUCCESS: Agent agent_2_1751897158 at (1,0) - {from: [2, 0]}
+[T:21 09:06:00.311] MOVE_START: Agent agent_3_1751897159 at (1,1) - {target: :west}
+[T:21 09:06:00.311] MOVE_BLOCKED: Agent agent_3_1751897159 at (1,1) - {target: [0, 1]}
+[T:21 09:06:00.311] MOVE_START: Agent agent_5_1751897159 at (2,1) - {target: :north_west}
+[T:21 09:06:00.311] MOVE_BLOCKED: Agent agent_5_1751897159 at (2,1) - {target: [1, 0]}
+[T:21 09:06:00.311] MOVE_START: Agent agent_4_1751897159 at (0,2) - {target: :north}
+[T:21 09:06:00.311] MOVE_BLOCKED: Agent agent_4_1751897159 at (0,2) - {target: [0, 1]}
+[T:21 09:06:00.311] REST: Agent agent_1_1751897158 at (2,2)
+[T:22 09:06:00.416] MOVE_START: Agent agent_2_1751897158 at (1,0) - {target: :east}
+[T:22 09:06:00.416] MOVE_SUCCESS: Agent agent_2_1751897158 at (2,0) - {from: [1, 0]}
+[T:22 09:06:00.416] MOVE_START: Agent agent_6_1751897160 at (0,1) - {target: :north}
+[T:22 09:06:00.416] MOVE_SUCCESS: Agent agent_6_1751897160 at (0,0) - {from: [0, 1]}
+[T:22 09:06:00.416] MOVE_START: Agent agent_3_1751897159 at (1,1) - {target: :north_east}
+[T:22 09:06:00.416] MOVE_BLOCKED: Agent agent_3_1751897159 at (1,1) - {target: [2, 0]}
+[T:22 09:06:00.416] MOVE_START: Agent agent_5_1751897159 at (2,1) - {target: :north}
+[T:22 09:06:00.416] MOVE_BLOCKED: Agent agent_5_1751897159 at (2,1) - {target: [2, 0]}
+[T:22 09:06:00.416] MOVE_START: Agent agent_4_1751897159 at (0,2) - {target: :east}
+[T:22 09:06:00.416] MOVE_SUCCESS: Agent agent_4_1751897159 at (1,2) - {from: [0, 2]}
+[T:22 09:06:00.416] MOVE_START: Agent agent_1_1751897158 at (2,2) - {target: :west}
+[T:22 09:06:00.416] MOVE_BLOCKED: Agent agent_1_1751897158 at (2,2) - {target: [1, 2]}
+[T:23 09:06:00.521] MOVE_START: Agent agent_6_1751897160 at (0,0) - {target: :south}
+[T:23 09:06:00.521] MOVE_SUCCESS: Agent agent_6_1751897160 at (0,1) - {from: [0, 0]}
+[T:23 09:06:00.521] MOVE_START: Agent agent_2_1751897158 at (2,0) - {target: :west}
+[T:23 09:06:00.521] MOVE_SUCCESS: Agent agent_2_1751897158 at (1,0) - {from: [2, 0]}
+[T:23 09:06:00.521] MOVE_START: Agent agent_3_1751897159 at (1,1) - {target: :north}
+[T:23 09:06:00.521] MOVE_BLOCKED: Agent agent_3_1751897159 at (1,1) - {target: [1, 0]}
+[T:23 09:06:00.521] MOVE_START: Agent agent_5_1751897159 at (2,1) - {target: :north_west}
+[T:23 09:06:00.521] MOVE_BLOCKED: Agent agent_5_1751897159 at (2,1) - {target: [1, 0]}
+[T:23 09:06:00.521] REPLICATE_START: Agent agent_4_1751897159 at (1,2)
+[T:23 09:06:00.532] REPLICATE_SUCCESS: Agent agent_4_1751897159 at (1,2) - {offspring: "agent_7_1751897160", at: [0, 2]}
+[T:23 09:06:00.532] REST: Agent agent_1_1751897158 at (2,2)
+[T:24 09:06:00.638] MOVE_START: Agent agent_2_1751897158 at (1,0) - {target: :west}
+[T:24 09:06:00.638] MOVE_SUCCESS: Agent agent_2_1751897158 at (0,0) - {from: [1, 0]}
+[T:24 09:06:00.638] MOVE_START: Agent agent_6_1751897160 at (0,1) - {target: :north}
+[T:24 09:06:00.638] MOVE_BLOCKED: Agent agent_6_1751897160 at (0,1) - {target: [0, 0]}
+[T:24 09:06:00.638] REST: Agent agent_3_1751897159 at (1,1)
+[T:24 09:06:00.638] MOVE_START: Agent agent_5_1751897159 at (2,1) - {target: :north}
+[T:24 09:06:00.638] MOVE_SUCCESS: Agent agent_5_1751897159 at (2,0) - {from: [2, 1]}
+[T:24 09:06:00.638] REST: Agent agent_7_1751897160 at (0,2)
+[T:24 09:06:00.638] REST: Agent agent_4_1751897159 at (1,2)
+[T:24 09:06:00.639] REST: Agent agent_1_1751897158 at (2,2)
+[T:25 09:06:00.744] REST: Agent agent_2_1751897158 at (0,0)
+[T:25 09:06:00.744] REPLICATE_START: Agent agent_5_1751897159 at (2,0)
+[T:25 09:06:00.755] REPLICATE_SUCCESS: Agent agent_5_1751897159 at (2,0) - {offspring: "agent_8_1751897160", at: [2, 1]}
+[T:25 09:06:00.755] MOVE_START: Agent agent_6_1751897160 at (0,1) - {target: :north_east}
+[T:25 09:06:00.755] MOVE_SUCCESS: Agent agent_6_1751897160 at (1,0) - {from: [0, 1]}
+[T:25 09:06:00.755] MOVE_START: Agent agent_3_1751897159 at (1,1) - {target: :north}
+[T:25 09:06:00.755] MOVE_BLOCKED: Agent agent_3_1751897159 at (1,1) - {target: [1, 0]}
+[T:25 09:06:00.755] REST: Agent agent_7_1751897160 at (0,2)
+[T:25 09:06:00.755] REST: Agent agent_4_1751897159 at (1,2)
+[T:25 09:06:00.755] MOVE_START: Agent agent_1_1751897158 at (2,2) - {target: :north}
+[T:25 09:06:00.755] MOVE_BLOCKED: Agent agent_1_1751897158 at (2,2) - {target: [2, 1]}
+[T:26 09:06:00.859] MOVE_START: Agent agent_2_1751897158 at (0,0) - {target: :south}
+[T:26 09:06:00.859] MOVE_SUCCESS: Agent agent_2_1751897158 at (0,1) - {from: [0, 0]}
+[T:26 09:06:00.859] REST: Agent agent_6_1751897160 at (1,0)
+[T:26 09:06:00.859] REST: Agent agent_5_1751897159 at (2,0)
+[T:26 09:06:00.859] MOVE_START: Agent agent_3_1751897159 at (1,1) - {target: :west}
+[T:26 09:06:00.859] MOVE_BLOCKED: Agent agent_3_1751897159 at (1,1) - {target: [0, 1]}
+[T:26 09:06:00.859] REPLICATE_START: Agent agent_8_1751897160 at (2,1)
+[T:26 09:06:00.869] REPLICATE_SUCCESS: Agent agent_8_1751897160 at (2,1) - {offspring: "agent_9_1751897160", at: [2, 2]}
+[T:26 09:06:00.870] MOVE_START: Agent agent_7_1751897160 at (0,2) - {target: :north}
+[T:26 09:06:00.870] MOVE_BLOCKED: Agent agent_7_1751897160 at (0,2) - {target: [0, 1]}
+[T:26 09:06:00.870] REST: Agent agent_4_1751897159 at (1,2)
+[T:26 09:06:00.870] REST: Agent agent_1_1751897158 at (2,2)
+[T:27 09:06:00.977] MOVE_START: Agent agent_6_1751897160 at (1,0) - {target: :west}
+[T:27 09:06:00.978] MOVE_SUCCESS: Agent agent_6_1751897160 at (0,0) - {from: [1, 0]}
+[T:27 09:06:00.978] REST: Agent agent_5_1751897159 at (2,0)
+[T:27 09:06:00.978] REST: Agent agent_2_1751897158 at (0,1)
+[T:27 09:06:00.978] MOVE_START: Agent agent_3_1751897159 at (1,1) - {target: :north_west}
+[T:27 09:06:00.978] MOVE_BLOCKED: Agent agent_3_1751897159 at (1,1) - {target: [0, 0]}
+[T:27 09:06:00.978] REPLICATE_START: Agent agent_8_1751897160 at (2,1)
+[T:27 09:06:00.978] REST: Agent agent_7_1751897160 at (0,2)
+[T:27 09:06:00.978] REST: Agent agent_4_1751897159 at (1,2)
+[T:27 09:06:00.978] REST: Agent agent_1_1751897158 at (2,2)
+[T:28 09:06:01.083] MOVE_START: Agent agent_6_1751897160 at (0,0) - {target: :east}
+[T:28 09:06:01.083] MOVE_SUCCESS: Agent agent_6_1751897160 at (1,0) - {from: [0, 0]}
+[T:28 09:06:01.083] REST: Agent agent_5_1751897159 at (2,0)
+[T:28 09:06:01.083] REST: Agent agent_2_1751897158 at (0,1)
+[T:28 09:06:01.083] REST: Agent agent_3_1751897159 at (1,1)
+[T:28 09:06:01.083] MOVE_START: Agent agent_8_1751897160 at (2,1) - {target: :north_west}
+[T:28 09:06:01.083] MOVE_BLOCKED: Agent agent_8_1751897160 at (2,1) - {target: [1, 0]}
+[T:28 09:06:01.083] REPLICATE_START: Agent agent_7_1751897160 at (0,2)
+[T:28 09:06:01.083] REST: Agent agent_4_1751897159 at (1,2)
+[T:28 09:06:01.083] REST: Agent agent_1_1751897158 at (2,2)
+[T:29 09:06:01.190] MOVE_START: Agent agent_6_1751897160 at (1,0) - {target: :west}
+[T:29 09:06:01.190] MOVE_SUCCESS: Agent agent_6_1751897160 at (0,0) - {from: [1, 0]}
+[T:29 09:06:01.190] REST: Agent agent_5_1751897159 at (2,0)
+[T:29 09:06:01.190] REST: Agent agent_2_1751897158 at (0,1)
+[T:29 09:06:01.190] REPLICATE_START: Agent agent_3_1751897159 at (1,1)
+[T:29 09:06:01.190] REST: Agent agent_8_1751897160 at (2,1)
+[T:29 09:06:01.190] REPLICATE_START: Agent agent_7_1751897160 at (0,2)
+[T:29 09:06:01.190] REST: Agent agent_4_1751897159 at (1,2)
+[T:29 09:06:01.190] REST: Agent agent_1_1751897158 at (2,2)
+[T:30 09:06:01.297] MOVE_START: Agent agent_6_1751897160 at (0,0) - {target: :east}
+[T:30 09:06:01.297] MOVE_SUCCESS: Agent agent_6_1751897160 at (1,0) - {from: [0, 0]}
+[T:30 09:06:01.297] REST: Agent agent_5_1751897159 at (2,0)
+[T:30 09:06:01.297] REST: Agent agent_2_1751897158 at (0,1)
+[T:30 09:06:01.297] REST: Agent agent_3_1751897159 at (1,1)
+[T:30 09:06:01.297] MOVE_START: Agent agent_8_1751897160 at (2,1) - {target: :north_west}
+[T:30 09:06:01.297] MOVE_BLOCKED: Agent agent_8_1751897160 at (2,1) - {target: [1, 0]}
+[T:30 09:06:01.297] REST: Agent agent_7_1751897160 at (0,2)
+[T:30 09:06:01.297] REST: Agent agent_4_1751897159 at (1,2)
+[T:30 09:06:01.297] REST: Agent agent_1_1751897158 at (2,2)
+[T:31 09:06:01.404] REPLICATE_START: Agent agent_6_1751897160 at (1,0)
+[T:31 09:06:01.404] REST: Agent agent_5_1751897159 at (2,0)
+[T:31 09:06:01.404] REST: Agent agent_2_1751897158 at (0,1)
+[T:31 09:06:01.404] MOVE_START: Agent agent_3_1751897159 at (1,1) - {target: :north_west}
+[T:31 09:06:01.404] MOVE_SUCCESS: Agent agent_3_1751897159 at (0,0) - {from: [1, 1]}
+[T:31 09:06:01.404] REST: Agent agent_8_1751897160 at (2,1)
+[T:31 09:06:01.404] REPLICATE_START: Agent agent_7_1751897160 at (0,2)
+[T:31 09:06:01.404] REST: Agent agent_4_1751897159 at (1,2)
+[T:31 09:06:01.404] REST: Agent agent_1_1751897158 at (2,2)
+[T:32 09:06:01.510] MOVE_START: Agent agent_3_1751897159 at (0,0) - {target: :south_east}
+[T:32 09:06:01.510] MOVE_SUCCESS: Agent agent_3_1751897159 at (1,1) - {from: [0, 0]}
+[T:32 09:06:01.510] MOVE_START: Agent agent_6_1751897160 at (1,0) - {target: :south}
+[T:32 09:06:01.510] MOVE_BLOCKED: Agent agent_6_1751897160 at (1,0) - {target: [1, 1]}
+[T:32 09:06:01.510] REST: Agent agent_5_1751897159 at (2,0)
+[T:32 09:06:01.510] REST: Agent agent_2_1751897158 at (0,1)
+[T:32 09:06:01.510] REPLICATE_START: Agent agent_8_1751897160 at (2,1)
+[T:32 09:06:01.510] MOVE_START: Agent agent_7_1751897160 at (0,2) - {target: :north_east}
+[T:32 09:06:01.510] MOVE_BLOCKED: Agent agent_7_1751897160 at (0,2) - {target: [1, 1]}
+[T:32 09:06:01.510] MOVE_START: Agent agent_4_1751897159 at (1,2) - {target: :north}
+[T:32 09:06:01.510] MOVE_BLOCKED: Agent agent_4_1751897159 at (1,2) - {target: [1, 1]}
+[T:32 09:06:01.510] MOVE_START: Agent agent_1_1751897158 at (2,2) - {target: :north_west}
+[T:32 09:06:01.510] MOVE_BLOCKED: Agent agent_1_1751897158 at (2,2) - {target: [1, 1]}
+[T:33 09:06:01.616] MOVE_START: Agent agent_6_1751897160 at (1,0) - {target: :west}
+[T:33 09:06:01.616] MOVE_SUCCESS: Agent agent_6_1751897160 at (0,0) - {from: [1, 0]}
+[T:33 09:06:01.616] REST: Agent agent_5_1751897159 at (2,0)
+[T:33 09:06:01.616] REST: Agent agent_2_1751897158 at (0,1)
+[T:33 09:06:01.616] REST: Agent agent_3_1751897159 at (1,1)
+[T:33 09:06:01.616] REST: Agent agent_8_1751897160 at (2,1)
+[T:33 09:06:01.616] REST: Agent agent_7_1751897160 at (0,2)
+[T:33 09:06:01.616] REPLICATE_START: Agent agent_4_1751897159 at (1,2)
+[T:33 09:06:01.616] REST: Agent agent_1_1751897158 at (2,2)
+[T:34 09:06:01.723] MOVE_START: Agent agent_6_1751897160 at (0,0) - {target: :east}
+[T:34 09:06:01.723] MOVE_SUCCESS: Agent agent_6_1751897160 at (1,0) - {from: [0, 0]}
+[T:34 09:06:01.723] MOVE_START: Agent agent_5_1751897159 at (2,0) - {target: :west}
+[T:34 09:06:01.723] MOVE_BLOCKED: Agent agent_5_1751897159 at (2,0) - {target: [1, 0]}
+[T:34 09:06:01.723] REST: Agent agent_2_1751897158 at (0,1)
+[T:34 09:06:01.723] MOVE_START: Agent agent_3_1751897159 at (1,1) - {target: :north}
+[T:34 09:06:01.723] MOVE_BLOCKED: Agent agent_3_1751897159 at (1,1) - {target: [1, 0]}
+[T:34 09:06:01.723] REST: Agent agent_8_1751897160 at (2,1)
+[T:34 09:06:01.723] REST: Agent agent_7_1751897160 at (0,2)
+[T:34 09:06:01.723] REST: Agent agent_4_1751897159 at (1,2)
+[T:34 09:06:01.723] REST: Agent agent_1_1751897158 at (2,2)
+[T:35 09:06:01.828] MOVE_START: Agent agent_6_1751897160 at (1,0) - {target: :west}
+[T:35 09:06:01.828] MOVE_SUCCESS: Agent agent_6_1751897160 at (0,0) - {from: [1, 0]}
+[T:35 09:06:01.828] REST: Agent agent_5_1751897159 at (2,0)
+[T:35 09:06:01.828] REST: Agent agent_2_1751897158 at (0,1)
+[T:35 09:06:01.828] DEATH_ENERGY: Agent agent_2_1751897158 at (0,1) - {energy: 1.2656542480726785e-14}
+[T:35 09:06:01.828] MOVE_START: Agent agent_3_1751897159 at (1,1) - {target: :north_west}
+[T:35 09:06:01.828] MOVE_BLOCKED: Agent agent_3_1751897159 at (1,1) - {target: [0, 0]}
+[T:35 09:06:01.828] REST: Agent agent_8_1751897160 at (2,1)
+[T:35 09:06:01.828] REST: Agent agent_7_1751897160 at (0,2)
+[T:35 09:06:01.828] REST: Agent agent_4_1751897159 at (1,2)
+[T:35 09:06:01.828] REST: Agent agent_1_1751897158 at (2,2)
+[T:36 09:06:01.933] MOVE_START: Agent agent_6_1751897160 at (0,0) - {target: :south}
+[T:36 09:06:01.933] MOVE_EAT_DEAD: Agent agent_6_1751897160 at (0,1) - {from: [0, 0], energy_gained: 10}
+[T:36 09:06:01.933] MOVE_START: Agent agent_5_1751897159 at (2,0) - {target: :west}
+[T:36 09:06:01.933] MOVE_SUCCESS: Agent agent_5_1751897159 at (1,0) - {from: [2, 0]}
+[T:36 09:06:01.933] MOVE_START: Agent agent_3_1751897159 at (1,1) - {target: :west}
+[T:36 09:06:01.933] MOVE_BLOCKED: Agent agent_3_1751897159 at (1,1) - {target: [0, 1]}
+[T:36 09:06:01.933] MOVE_START: Agent agent_8_1751897160 at (2,1) - {target: :north_west}
+[T:36 09:06:01.933] MOVE_BLOCKED: Agent agent_8_1751897160 at (2,1) - {target: [1, 0]}
+[T:36 09:06:01.933] MOVE_START: Agent agent_7_1751897160 at (0,2) - {target: :north}
+[T:36 09:06:01.933] MOVE_BLOCKED: Agent agent_7_1751897160 at (0,2) - {target: [0, 1]}
+[T:36 09:06:01.933] MOVE_START: Agent agent_4_1751897159 at (1,2) - {target: :north_west}
+[T:36 09:06:01.933] MOVE_BLOCKED: Agent agent_4_1751897159 at (1,2) - {target: [0, 1]}
+[T:36 09:06:01.933] REST: Agent agent_1_1751897158 at (2,2)
+[T:37 09:06:02.039] REST: Agent agent_5_1751897159 at (1,0)
+[T:37 09:06:02.039] REST: Agent agent_6_1751897160 at (0,1)
+[T:37 09:06:02.039] MOVE_START: Agent agent_3_1751897159 at (1,1) - {target: :north_east}
+[T:37 09:06:02.039] MOVE_SUCCESS: Agent agent_3_1751897159 at (2,0) - {from: [1, 1]}
+[T:37 09:06:02.039] MOVE_START: Agent agent_8_1751897160 at (2,1) - {target: :north}
+[T:37 09:06:02.039] MOVE_BLOCKED: Agent agent_8_1751897160 at (2,1) - {target: [2, 0]}
+[T:37 09:06:02.039] REST: Agent agent_7_1751897160 at (0,2)
+[T:37 09:06:02.039] REST: Agent agent_4_1751897159 at (1,2)
+[T:37 09:06:02.039] REST: Agent agent_1_1751897158 at (2,2)
+[T:38 09:06:02.145] MOVE_START: Agent agent_5_1751897159 at (1,0) - {target: :west}
+[T:38 09:06:02.145] MOVE_SUCCESS: Agent agent_5_1751897159 at (0,0) - {from: [1, 0]}
+[T:38 09:06:02.145] MOVE_START: Agent agent_3_1751897159 at (2,0) - {target: :south_west}
+[T:38 09:06:02.145] MOVE_SUCCESS: Agent agent_3_1751897159 at (1,1) - {from: [2, 0]}
+[T:38 09:06:02.145] MOVE_START: Agent agent_6_1751897160 at (0,1) - {target: :east}
+[T:38 09:06:02.145] MOVE_BLOCKED: Agent agent_6_1751897160 at (0,1) - {target: [1, 1]}
+[T:38 09:06:02.145] MOVE_START: Agent agent_8_1751897160 at (2,1) - {target: :west}
+[T:38 09:06:02.145] MOVE_BLOCKED: Agent agent_8_1751897160 at (2,1) - {target: [1, 1]}
+[T:38 09:06:02.145] REST: Agent agent_7_1751897160 at (0,2)
+[T:38 09:06:02.145] MOVE_START: Agent agent_4_1751897159 at (1,2) - {target: :north}
+[T:38 09:06:02.145] MOVE_BLOCKED: Agent agent_4_1751897159 at (1,2) - {target: [1, 1]}
+[T:38 09:06:02.145] MOVE_START: Agent agent_1_1751897158 at (2,2) - {target: :north_west}
+[T:38 09:06:02.145] MOVE_BLOCKED: Agent agent_1_1751897158 at (2,2) - {target: [1, 1]}
+[T:39 09:06:02.252] MOVE_START: Agent agent_5_1751897159 at (0,0) - {target: :east}
+[T:39 09:06:02.252] MOVE_SUCCESS: Agent agent_5_1751897159 at (1,0) - {from: [0, 0]}
+[T:39 09:06:02.252] MOVE_START: Agent agent_6_1751897160 at (0,1) - {target: :north_east}
+[T:39 09:06:02.252] MOVE_BLOCKED: Agent agent_6_1751897160 at (0,1) - {target: [1, 0]}
+[T:39 09:06:02.252] REST: Agent agent_3_1751897159 at (1,1)
+[T:39 09:06:02.252] MOVE_START: Agent agent_8_1751897160 at (2,1) - {target: :north_west}
+[T:39 09:06:02.252] MOVE_BLOCKED: Agent agent_8_1751897160 at (2,1) - {target: [1, 0]}
+[T:39 09:06:02.252] REST: Agent agent_7_1751897160 at (0,2)
+[T:39 09:06:02.252] REST: Agent agent_4_1751897159 at (1,2)
+[T:39 09:06:02.252] REST: Agent agent_1_1751897158 at (2,2)
+[T:40 09:06:02.358] MOVE_START: Agent agent_5_1751897159 at (1,0) - {target: :west}
+[T:40 09:06:02.358] MOVE_SUCCESS: Agent agent_5_1751897159 at (0,0) - {from: [1, 0]}
+[T:40 09:06:02.358] MOVE_START: Agent agent_6_1751897160 at (0,1) - {target: :north}
+[T:40 09:06:02.358] MOVE_BLOCKED: Agent agent_6_1751897160 at (0,1) - {target: [0, 0]}
+[T:40 09:06:02.358] REST: Agent agent_3_1751897159 at (1,1)
+[T:40 09:06:02.358] MOVE_START: Agent agent_8_1751897160 at (2,1) - {target: :south}
+[T:40 09:06:02.358] MOVE_EAT_DEAD: Agent agent_8_1751897160 at (2,2) - {from: [2, 1], energy_gained: 10}
+[T:40 09:06:02.358] REST: Agent agent_7_1751897160 at (0,2)
+[T:40 09:06:02.358] MOVE_START: Agent agent_4_1751897159 at (1,2) - {target: :east}
+[T:40 09:06:02.358] MOVE_BLOCKED: Agent agent_4_1751897159 at (1,2) - {target: [2, 2]}
+[T:41 09:06:02.463] MOVE_START: Agent agent_5_1751897159 at (0,0) - {target: :east}
+[T:41 09:06:02.463] MOVE_SUCCESS: Agent agent_5_1751897159 at (1,0) - {from: [0, 0]}
+[T:41 09:06:02.463] MOVE_START: Agent agent_6_1751897160 at (0,1) - {target: :north_east}
+[T:41 09:06:02.463] MOVE_BLOCKED: Agent agent_6_1751897160 at (0,1) - {target: [1, 0]}
+[T:41 09:06:02.463] REST: Agent agent_3_1751897159 at (1,1)
+[T:41 09:06:02.463] REST: Agent agent_7_1751897160 at (0,2)
+[T:41 09:06:02.463] MOVE_START: Agent agent_4_1751897159 at (1,2) - {target: :north_east}
+[T:41 09:06:02.463] MOVE_SUCCESS: Agent agent_4_1751897159 at (2,1) - {from: [1, 2]}
+[T:41 09:06:02.463] REST: Agent agent_8_1751897160 at (2,2)
+[T:42 09:06:02.567] MOVE_START: Agent agent_5_1751897159 at (1,0) - {target: :east}
+[T:42 09:06:02.567] MOVE_SUCCESS: Agent agent_5_1751897159 at (2,0) - {from: [1, 0]}
+[T:42 09:06:02.567] MOVE_START: Agent agent_6_1751897160 at (0,1) - {target: :south_east}
+[T:42 09:06:02.567] MOVE_SUCCESS: Agent agent_6_1751897160 at (1,2) - {from: [0, 1]}
+[T:42 09:06:02.567] REST: Agent agent_3_1751897159 at (1,1)
+[T:42 09:06:02.567] MOVE_START: Agent agent_4_1751897159 at (2,1) - {target: :south_west}
+[T:42 09:06:02.567] MOVE_BLOCKED: Agent agent_4_1751897159 at (2,1) - {target: [1, 2]}
+[T:42 09:06:02.568] MOVE_START: Agent agent_7_1751897160 at (0,2) - {target: :east}
+[T:42 09:06:02.568] MOVE_BLOCKED: Agent agent_7_1751897160 at (0,2) - {target: [1, 2]}
+[T:42 09:06:02.568] MOVE_START: Agent agent_8_1751897160 at (2,2) - {target: :west}
+[T:42 09:06:02.568] MOVE_BLOCKED: Agent agent_8_1751897160 at (2,2) - {target: [1, 2]}
+[T:43 09:06:02.672] MOVE_START: Agent agent_5_1751897159 at (2,0) - {target: :west}
+[T:43 09:06:02.672] MOVE_SUCCESS: Agent agent_5_1751897159 at (1,0) - {from: [2, 0]}
+[T:43 09:06:02.672] REST: Agent agent_3_1751897159 at (1,1)
+[T:43 09:06:02.672] DEATH_ENERGY: Agent agent_3_1751897159 at (1,1) - {energy: 9.992007221626409e-15}
+[T:43 09:06:02.672] MOVE_START: Agent agent_4_1751897159 at (2,1) - {target: :north_west}
+[T:43 09:06:02.672] MOVE_BLOCKED: Agent agent_4_1751897159 at (2,1) - {target: [1, 0]}
+[T:43 09:06:02.673] MOVE_START: Agent agent_7_1751897160 at (0,2) - {target: :north}
+[T:43 09:06:02.673] MOVE_SUCCESS: Agent agent_7_1751897160 at (0,1) - {from: [0, 2]}
+[T:43 09:06:02.673] MOVE_START: Agent agent_6_1751897160 at (1,2) - {target: :north_west}
+[T:43 09:06:02.673] MOVE_BLOCKED: Agent agent_6_1751897160 at (1,2) - {target: [0, 1]}
+[T:43 09:06:02.673] REPLICATE_START: Agent agent_8_1751897160 at (2,2)
+[T:44 09:06:02.777] REST: Agent agent_5_1751897159 at (1,0)
+[T:44 09:06:02.777] MOVE_START: Agent agent_7_1751897160 at (0,1) - {target: :east}
+[T:44 09:06:02.777] MOVE_EAT_DEAD: Agent agent_7_1751897160 at (1,1) - {from: [0, 1], energy_gained: 10}
+[T:44 09:06:02.777] MOVE_START: Agent agent_4_1751897159 at (2,1) - {target: :west}
+[T:44 09:06:02.777] MOVE_BLOCKED: Agent agent_4_1751897159 at (2,1) - {target: [1, 1]}
+[T:44 09:06:02.777] MOVE_START: Agent agent_6_1751897160 at (1,2) - {target: :north}
+[T:44 09:06:02.777] MOVE_BLOCKED: Agent agent_6_1751897160 at (1,2) - {target: [1, 1]}
+[T:44 09:06:02.777] MOVE_START: Agent agent_8_1751897160 at (2,2) - {target: :north_west}
+[T:44 09:06:02.777] MOVE_BLOCKED: Agent agent_8_1751897160 at (2,2) - {target: [1, 1]}
+[T:45 09:06:02.881] REST: Agent agent_5_1751897159 at (1,0)
+[T:45 09:06:02.881] REPLICATE_START: Agent agent_7_1751897160 at (1,1)
+[T:45 09:06:02.893] REPLICATE_SUCCESS: Agent agent_7_1751897160 at (1,1) - {offspring: "agent_10_1751897162", at: [2, 1]}
+[T:45 09:06:02.893] REST: Agent agent_4_1751897159 at (2,1)
+[T:45 09:06:02.893] MOVE_START: Agent agent_6_1751897160 at (1,2) - {target: :west}
+[T:45 09:06:02.893] MOVE_SUCCESS: Agent agent_6_1751897160 at (0,2) - {from: [1, 2]}
+[T:45 09:06:02.893] REST: Agent agent_8_1751897160 at (2,2)
+[T:46 09:06:03.003] REST: Agent agent_5_1751897159 at (1,0)
+[T:46 09:06:03.003] MOVE_START: Agent agent_7_1751897160 at (1,1) - {target: :south}
+[T:46 09:06:03.003] MOVE_SUCCESS: Agent agent_7_1751897160 at (1,2) - {from: [1, 1]}
+[T:46 09:06:03.003] REST: Agent agent_4_1751897159 at (2,1)
+[T:46 09:06:03.003] MOVE_START: Agent agent_6_1751897160 at (0,2) - {target: :east}
+[T:46 09:06:03.003] MOVE_BLOCKED: Agent agent_6_1751897160 at (0,2) - {target: [1, 2]}
+[T:46 09:06:03.003] MOVE_START: Agent agent_8_1751897160 at (2,2) - {target: :west}
+[T:46 09:06:03.003] MOVE_BLOCKED: Agent agent_8_1751897160 at (2,2) - {target: [1, 2]}
+[T:47 09:06:03.108] REST: Agent agent_5_1751897159 at (1,0)
+[T:47 09:06:03.108] DEATH_ENERGY: Agent agent_5_1751897159 at (1,0) - {energy: 1.354472090042691e-14}
+[T:47 09:06:03.108] REST: Agent agent_4_1751897159 at (2,1)
+[T:47 09:06:03.108] MOVE_START: Agent agent_6_1751897160 at (0,2) - {target: :north_east}
+[T:47 09:06:03.108] MOVE_SUCCESS: Agent agent_6_1751897160 at (1,1) - {from: [0, 2]}
+[T:47 09:06:03.108] REST: Agent agent_7_1751897160 at (1,2)
+[T:47 09:06:03.108] REST: Agent agent_8_1751897160 at (2,2)
+[T:48 09:06:03.213] MOVE_START: Agent agent_6_1751897160 at (1,1) - {target: :north}
+[T:48 09:06:03.213] MOVE_EAT_DEAD: Agent agent_6_1751897160 at (1,0) - {from: [1, 1], energy_gained: 10}
+[T:48 09:06:03.213] REST: Agent agent_4_1751897159 at (2,1)
+[T:48 09:06:03.213] MOVE_START: Agent agent_7_1751897160 at (1,2) - {target: :west}
+[T:48 09:06:03.213] MOVE_SUCCESS: Agent agent_7_1751897160 at (0,2) - {from: [1, 2]}
+[T:48 09:06:03.213] REST: Agent agent_8_1751897160 at (2,2)
+[T:49 09:06:03.316] MOVE_START: Agent agent_6_1751897160 at (1,0) - {target: :south}
+[T:49 09:06:03.316] MOVE_SUCCESS: Agent agent_6_1751897160 at (1,1) - {from: [1, 0]}
+[T:49 09:06:03.316] REST: Agent agent_4_1751897159 at (2,1)
+[T:49 09:06:03.316] MOVE_START: Agent agent_7_1751897160 at (0,2) - {target: :north}
+[T:49 09:06:03.316] MOVE_SUCCESS: Agent agent_7_1751897160 at (0,1) - {from: [0, 2]}
+[T:49 09:06:03.316] MOVE_START: Agent agent_8_1751897160 at (2,2) - {target: :north_west}
+[T:49 09:06:03.316] MOVE_BLOCKED: Agent agent_8_1751897160 at (2,2) - {target: [1, 1]}
+[T:50 09:06:03.420] MOVE_START: Agent agent_7_1751897160 at (0,1) - {target: :north_east}
+[T:50 09:06:03.420] MOVE_SUCCESS: Agent agent_7_1751897160 at (1,0) - {from: [0, 1]}
+[T:50 09:06:03.420] MOVE_START: Agent agent_6_1751897160 at (1,1) - {target: :north_west}
+[T:50 09:06:03.420] MOVE_SUCCESS: Agent agent_6_1751897160 at (0,0) - {from: [1, 1]}
+[T:50 09:06:03.420] REST: Agent agent_4_1751897159 at (2,1)
+[T:50 09:06:03.420] DEATH_ENERGY: Agent agent_4_1751897159 at (2,1) - {energy: 9.103828801926284e-15}
+[T:50 09:06:03.420] REST: Agent agent_8_1751897160 at (2,2)
+[T:51 09:06:03.524] MOVE_START: Agent agent_6_1751897160 at (0,0) - {target: :south_east}
+[T:51 09:06:03.524] MOVE_SUCCESS: Agent agent_6_1751897160 at (1,1) - {from: [0, 0]}
+[T:51 09:06:03.524] MOVE_START: Agent agent_7_1751897160 at (1,0) - {target: :south_east}
+[T:51 09:06:03.524] MOVE_EAT_DEAD: Agent agent_7_1751897160 at (2,1) - {from: [1, 0], energy_gained: 10}
+[T:51 09:06:03.524] MOVE_START: Agent agent_8_1751897160 at (2,2) - {target: :north}
+[T:51 09:06:03.524] MOVE_BLOCKED: Agent agent_8_1751897160 at (2,2) - {target: [2, 1]}
+[T:52 09:06:03.627] REST: Agent agent_6_1751897160 at (1,1)
+[T:52 09:06:03.627] REST: Agent agent_7_1751897160 at (2,1)
+[T:52 09:06:03.627] MOVE_START: Agent agent_8_1751897160 at (2,2) - {target: :west}
+[T:52 09:06:03.627] MOVE_SUCCESS: Agent agent_8_1751897160 at (1,2) - {from: [2, 2]}
+[T:53 09:06:03.730] MOVE_START: Agent agent_6_1751897160 at (1,1) - {target: :north_west}
+[T:53 09:06:03.730] MOVE_SUCCESS: Agent agent_6_1751897160 at (0,0) - {from: [1, 1]}
+[T:53 09:06:03.730] MOVE_START: Agent agent_7_1751897160 at (2,1) - {target: :north_west}
+[T:53 09:06:03.730] MOVE_SUCCESS: Agent agent_7_1751897160 at (1,0) - {from: [2, 1]}
+[T:53 09:06:03.730] MOVE_START: Agent agent_8_1751897160 at (1,2) - {target: :north_west}
+[T:53 09:06:03.730] MOVE_SUCCESS: Agent agent_8_1751897160 at (0,1) - {from: [1, 2]}
+[T:54 09:06:03.832] MOVE_START: Agent agent_6_1751897160 at (0,0) - {target: :south_east}
+[T:54 09:06:03.832] MOVE_SUCCESS: Agent agent_6_1751897160 at (1,1) - {from: [0, 0]}
+[T:54 09:06:03.832] MOVE_START: Agent agent_7_1751897160 at (1,0) - {target: :east}
+[T:54 09:06:03.832] MOVE_SUCCESS: Agent agent_7_1751897160 at (2,0) - {from: [1, 0]}
+[T:54 09:06:03.832] REST: Agent agent_8_1751897160 at (0,1)
+[T:55 09:06:03.935] MOVE_START: Agent agent_7_1751897160 at (2,0) - {target: :west}
+[T:55 09:06:03.935] MOVE_SUCCESS: Agent agent_7_1751897160 at (1,0) - {from: [2, 0]}
+[T:55 09:06:03.935] MOVE_START: Agent agent_8_1751897160 at (0,1) - {target: :north}
+[T:55 09:06:03.935] MOVE_SUCCESS: Agent agent_8_1751897160 at (0,0) - {from: [0, 1]}
+[T:55 09:06:03.935] MOVE_START: Agent agent_6_1751897160 at (1,1) - {target: :south_west}
+[T:55 09:06:03.935] MOVE_SUCCESS: Agent agent_6_1751897160 at (0,2) - {from: [1, 1]}
+[T:56 09:06:04.037] MOVE_START: Agent agent_8_1751897160 at (0,0) - {target: :south_east}
+[T:56 09:06:04.037] MOVE_SUCCESS: Agent agent_8_1751897160 at (1,1) - {from: [0, 0]}
+[T:56 09:06:04.037] MOVE_START: Agent agent_7_1751897160 at (1,0) - {target: :south_west}
+[T:56 09:06:04.037] MOVE_SUCCESS: Agent agent_7_1751897160 at (0,1) - {from: [1, 0]}
+[T:56 09:06:04.037] MOVE_START: Agent agent_6_1751897160 at (0,2) - {target: :north}
+[T:56 09:06:04.037] MOVE_BLOCKED: Agent agent_6_1751897160 at (0,2) - {target: [0, 1]}
+[T:57 09:06:04.140] MOVE_START: Agent agent_7_1751897160 at (0,1) - {target: :north}
+[T:57 09:06:04.140] MOVE_SUCCESS: Agent agent_7_1751897160 at (0,0) - {from: [0, 1]}
+[T:57 09:06:04.140] MOVE_START: Agent agent_8_1751897160 at (1,1) - {target: :east}
+[T:57 09:06:04.140] MOVE_SUCCESS: Agent agent_8_1751897160 at (2,1) - {from: [1, 1]}
+[T:57 09:06:04.140] MOVE_START: Agent agent_6_1751897160 at (0,2) - {target: :east}
+[T:57 09:06:04.140] MOVE_SUCCESS: Agent agent_6_1751897160 at (1,2) - {from: [0, 2]}
+[T:58 09:06:04.243] REST: Agent agent_7_1751897160 at (0,0)
+[T:58 09:06:04.243] MOVE_START: Agent agent_8_1751897160 at (2,1) - {target: :north_west}
+[T:58 09:06:04.243] MOVE_SUCCESS: Agent agent_8_1751897160 at (1,0) - {from: [2, 1]}
+[T:58 09:06:04.243] MOVE_START: Agent agent_6_1751897160 at (1,2) - {target: :north_west}
+[T:58 09:06:04.243] MOVE_SUCCESS: Agent agent_6_1751897160 at (0,1) - {from: [1, 2]}
+[T:59 09:06:04.345] REST: Agent agent_7_1751897160 at (0,0)
+[T:59 09:06:04.345] REST: Agent agent_8_1751897160 at (1,0)
+[T:59 09:06:04.345] MOVE_START: Agent agent_6_1751897160 at (0,1) - {target: :south}
+[T:59 09:06:04.345] MOVE_SUCCESS: Agent agent_6_1751897160 at (0,2) - {from: [0, 1]}
+[T:60 09:06:04.448] MOVE_START: Agent agent_7_1751897160 at (0,0) - {target: :south}
+[T:60 09:06:04.448] MOVE_SUCCESS: Agent agent_7_1751897160 at (0,1) - {from: [0, 0]}
+[T:60 09:06:04.448] REST: Agent agent_8_1751897160 at (1,0)
+[T:60 09:06:04.448] MOVE_START: Agent agent_6_1751897160 at (0,2) - {target: :east}
+[T:60 09:06:04.448] MOVE_SUCCESS: Agent agent_6_1751897160 at (1,2) - {from: [0, 2]}
+[T:61 09:06:04.551] REST: Agent agent_8_1751897160 at (1,0)
+[T:61 09:06:04.552] MOVE_START: Agent agent_7_1751897160 at (0,1) - {target: :east}
+[T:61 09:06:04.552] MOVE_SUCCESS: Agent agent_7_1751897160 at (1,1) - {from: [0, 1]}
+[T:61 09:06:04.552] MOVE_START: Agent agent_6_1751897160 at (1,2) - {target: :north}
+[T:61 09:06:04.552] MOVE_BLOCKED: Agent agent_6_1751897160 at (1,2) - {target: [1, 1]}
+[T:62 09:06:04.654] REST: Agent agent_8_1751897160 at (1,0)
+[T:62 09:06:04.654] REST: Agent agent_7_1751897160 at (1,1)
+[T:62 09:06:04.654] REST: Agent agent_6_1751897160 at (1,2)
+[T:63 09:06:04.757] REST: Agent agent_8_1751897160 at (1,0)
+[T:63 09:06:04.757] REST: Agent agent_7_1751897160 at (1,1)
+[T:63 09:06:04.757] REST: Agent agent_6_1751897160 at (1,2)
+[T:64 09:06:04.860] REST: Agent agent_8_1751897160 at (1,0)
+[T:64 09:06:04.860] MOVE_START: Agent agent_7_1751897160 at (1,1) - {target: :north_east}
+[T:64 09:06:04.860] MOVE_SUCCESS: Agent agent_7_1751897160 at (2,0) - {from: [1, 1]}
+[T:64 09:06:04.860] REST: Agent agent_6_1751897160 at (1,2)
+[T:65 09:06:04.962] REST: Agent agent_8_1751897160 at (1,0)
+[T:65 09:06:04.962] DEATH_ENERGY: Agent agent_8_1751897160 at (1,0) - {energy: 1.4432899320127035e-14}
+[T:65 09:06:04.962] MOVE_START: Agent agent_7_1751897160 at (2,0) - {target: :south}
+[T:65 09:06:04.962] MOVE_SUCCESS: Agent agent_7_1751897160 at (2,1) - {from: [2, 0]}
+[T:65 09:06:04.962] REST: Agent agent_6_1751897160 at (1,2)
+[T:66 09:06:05.065] MOVE_START: Agent agent_7_1751897160 at (2,1) - {target: :north}
+[T:66 09:06:05.065] MOVE_SUCCESS: Agent agent_7_1751897160 at (2,0) - {from: [2, 1]}
+[T:66 09:06:05.065] REST: Agent agent_6_1751897160 at (1,2)
+[T:67 09:06:05.167] MOVE_START: Agent agent_7_1751897160 at (2,0) - {target: :west}
+[T:67 09:06:05.167] MOVE_EAT_DEAD: Agent agent_7_1751897160 at (1,0) - {from: [2, 0], energy_gained: 10}
+[T:67 09:06:05.167] REST: Agent agent_6_1751897160 at (1,2)
+[T:68 09:06:05.269] MOVE_START: Agent agent_7_1751897160 at (1,0) - {target: :east}
+[T:68 09:06:05.269] MOVE_SUCCESS: Agent agent_7_1751897160 at (2,0) - {from: [1, 0]}
+[T:68 09:06:05.269] REST: Agent agent_6_1751897160 at (1,2)
+[T:69 09:06:05.371] MOVE_START: Agent agent_7_1751897160 at (2,0) - {target: :south}
+[T:69 09:06:05.371] MOVE_SUCCESS: Agent agent_7_1751897160 at (2,1) - {from: [2, 0]}
+[T:69 09:06:05.371] REST: Agent agent_6_1751897160 at (1,2)
+[T:69 09:06:05.371] DEATH_ENERGY: Agent agent_6_1751897160 at (1,2) - {energy: 1.7985612998927536e-14}
+[T:70 09:06:05.474] MOVE_START: Agent agent_7_1751897160 at (2,1) - {target: :south_west}
+[T:70 09:06:05.474] MOVE_EAT_DEAD: Agent agent_7_1751897160 at (1,2) - {from: [2, 1], energy_gained: 10}
+[T:71 09:06:05.575] REST: Agent agent_7_1751897160 at (1,2)
+[T:72 09:06:05.676] MOVE_START: Agent agent_7_1751897160 at (1,2) - {target: :north_west}
+[T:72 09:06:05.676] MOVE_SUCCESS: Agent agent_7_1751897160 at (0,1) - {from: [1, 2]}
+[T:73 09:06:05.777] MOVE_START: Agent agent_7_1751897160 at (0,1) - {target: :north}
+[T:73 09:06:05.778] MOVE_SUCCESS: Agent agent_7_1751897160 at (0,0) - {from: [0, 1]}
+[T:74 09:06:05.879] REPLICATE_START: Agent agent_7_1751897160 at (0,0)
+[T:74 09:06:05.890] REPLICATE_SUCCESS: Agent agent_7_1751897160 at (0,0) - {offspring: "agent_11_1751897165", at: [1, 1]}
+[T:75 09:06:05.992] REST: Agent agent_7_1751897160 at (0,0)
+[T:75 09:06:05.992] MOVE_START: Agent agent_11_1751897165 at (1,1) - {target: :west}
+[T:75 09:06:05.992] MOVE_SUCCESS: Agent agent_11_1751897165 at (0,1) - {from: [1, 1]}
+[T:76 09:06:06.094] MOVE_START: Agent agent_7_1751897160 at (0,0) - {target: :east}
+[T:76 09:06:06.094] MOVE_SUCCESS: Agent agent_7_1751897160 at (1,0) - {from: [0, 0]}
+[T:76 09:06:06.094] MOVE_START: Agent agent_11_1751897165 at (0,1) - {target: :south_east}
+[T:76 09:06:06.094] MOVE_SUCCESS: Agent agent_11_1751897165 at (1,2) - {from: [0, 1]}
+[T:77 09:06:06.196] MOVE_START: Agent agent_7_1751897160 at (1,0) - {target: :south_west}
+[T:77 09:06:06.196] MOVE_SUCCESS: Agent agent_7_1751897160 at (0,1) - {from: [1, 0]}
+[T:77 09:06:06.196] REST: Agent agent_11_1751897165 at (1,2)
+[T:78 09:06:06.298] MOVE_START: Agent agent_7_1751897160 at (0,1) - {target: :north_east}
+[T:78 09:06:06.298] MOVE_SUCCESS: Agent agent_7_1751897160 at (1,0) - {from: [0, 1]}
+[T:78 09:06:06.298] MOVE_START: Agent agent_11_1751897165 at (1,2) - {target: :east}
+[T:78 09:06:06.298] MOVE_SUCCESS: Agent agent_11_1751897165 at (2,2) - {from: [1, 2]}
+[T:79 09:06:06.400] MOVE_START: Agent agent_7_1751897160 at (1,0) - {target: :south_west}
+[T:79 09:06:06.400] MOVE_SUCCESS: Agent agent_7_1751897160 at (0,1) - {from: [1, 0]}
+[T:79 09:06:06.400] MOVE_START: Agent agent_11_1751897165 at (2,2) - {target: :west}
+[T:79 09:06:06.400] MOVE_SUCCESS: Agent agent_11_1751897165 at (1,2) - {from: [2, 2]}
+[T:80 09:06:06.502] REST: Agent agent_7_1751897160 at (0,1)
+[T:80 09:06:06.502] MOVE_START: Agent agent_11_1751897165 at (1,2) - {target: :north_east}
+[T:80 09:06:06.502] MOVE_SUCCESS: Agent agent_11_1751897165 at (2,1) - {from: [1, 2]}
+[T:81 09:06:06.604] REST: Agent agent_7_1751897160 at (0,1)
+[T:81 09:06:06.604] MOVE_START: Agent agent_11_1751897165 at (2,1) - {target: :south_west}
+[T:81 09:06:06.604] MOVE_SUCCESS: Agent agent_11_1751897165 at (1,2) - {from: [2, 1]}
+[T:82 09:06:06.706] MOVE_START: Agent agent_7_1751897160 at (0,1) - {target: :east}
+[T:82 09:06:06.706] MOVE_SUCCESS: Agent agent_7_1751897160 at (1,1) - {from: [0, 1]}
+[T:82 09:06:06.706] MOVE_START: Agent agent_11_1751897165 at (1,2) - {target: :east}
+[T:82 09:06:06.706] MOVE_SUCCESS: Agent agent_11_1751897165 at (2,2) - {from: [1, 2]}
+[T:83 09:06:06.807] MOVE_START: Agent agent_7_1751897160 at (1,1) - {target: :north}
+[T:83 09:06:06.807] MOVE_SUCCESS: Agent agent_7_1751897160 at (1,0) - {from: [1, 1]}
+[T:83 09:06:06.807] MOVE_START: Agent agent_11_1751897165 at (2,2) - {target: :north}
+[T:83 09:06:06.807] MOVE_SUCCESS: Agent agent_11_1751897165 at (2,1) - {from: [2, 2]}
+[T:84 09:06:06.909] REST: Agent agent_7_1751897160 at (1,0)
+[T:84 09:06:06.909] MOVE_START: Agent agent_11_1751897165 at (2,1) - {target: :south}
+[T:84 09:06:06.910] MOVE_SUCCESS: Agent agent_11_1751897165 at (2,2) - {from: [2, 1]}
+[T:85 09:06:07.013] REST: Agent agent_7_1751897160 at (1,0)
+[T:85 09:06:07.013] MOVE_START: Agent agent_11_1751897165 at (2,2) - {target: :north_west}
+[T:85 09:06:07.013] MOVE_SUCCESS: Agent agent_11_1751897165 at (1,1) - {from: [2, 2]}
+[T:86 09:06:07.115] REST: Agent agent_7_1751897160 at (1,0)
+[T:86 09:06:07.115] MOVE_START: Agent agent_11_1751897165 at (1,1) - {target: :north_west}
+[T:86 09:06:07.115] MOVE_SUCCESS: Agent agent_11_1751897165 at (0,0) - {from: [1, 1]}
+[T:87 09:06:07.216] MOVE_START: Agent agent_11_1751897165 at (0,0) - {target: :south_east}
+[T:87 09:06:07.216] MOVE_SUCCESS: Agent agent_11_1751897165 at (1,1) - {from: [0, 0]}
+[T:87 09:06:07.216] REST: Agent agent_7_1751897160 at (1,0)
+[T:88 09:06:07.318] REST: Agent agent_7_1751897160 at (1,0)
+[T:88 09:06:07.319] DEATH_ENERGY: Agent agent_7_1751897160 at (1,0) - {energy: 1.532107773982716e-14}
+[T:88 09:06:07.319] MOVE_START: Agent agent_11_1751897165 at (1,1) - {target: :north_west}
+[T:88 09:06:07.319] MOVE_SUCCESS: Agent agent_11_1751897165 at (0,0) - {from: [1, 1]}
+[T:89 09:06:07.421] MOVE_START: Agent agent_11_1751897165 at (0,0) - {target: :east}
+[T:89 09:06:07.421] MOVE_EAT_DEAD: Agent agent_11_1751897165 at (1,0) - {from: [0, 0], energy_gained: 10}
+[T:90 09:06:07.522] MOVE_START: Agent agent_11_1751897165 at (1,0) - {target: :east}
+[T:90 09:06:07.522] MOVE_SUCCESS: Agent agent_11_1751897165 at (2,0) - {from: [1, 0]}
+[T:91 09:06:07.624] MOVE_START: Agent agent_11_1751897165 at (2,0) - {target: :south}
+[T:91 09:06:07.624] MOVE_SUCCESS: Agent agent_11_1751897165 at (2,1) - {from: [2, 0]}
+[T:92 09:06:07.725] REST: Agent agent_11_1751897165 at (2,1)
+[T:93 09:06:07.826] REST: Agent agent_11_1751897165 at (2,1)
+[T:94 09:06:07.928] REPLICATE_START: Agent agent_11_1751897165 at (2,1)
+[T:94 09:06:07.939] REPLICATE_SUCCESS: Agent agent_11_1751897165 at (2,1) - {offspring: "agent_12_1751897167", at: [2, 0]}
+[T:95 09:06:08.041] REPLICATE_START: Agent agent_12_1751897167 at (2,0)
+[T:95 09:06:08.052] REPLICATE_SUCCESS: Agent agent_12_1751897167 at (2,0) - {offspring: "agent_13_1751897168", at: [1, 0]}
+[T:95 09:06:08.052] MOVE_START: Agent agent_11_1751897165 at (2,1) - {target: :north_west}
+[T:95 09:06:08.052] MOVE_BLOCKED: Agent agent_11_1751897165 at (2,1) - {target: [1, 0]}
+[T:96 09:06:08.155] MOVE_START: Agent agent_13_1751897168 at (1,0) - {target: :south}
+[T:96 09:06:08.155] MOVE_SUCCESS: Agent agent_13_1751897168 at (1,1) - {from: [1, 0]}
+[T:96 09:06:08.155] MOVE_START: Agent agent_12_1751897167 at (2,0) - {target: :south_west}
+[T:96 09:06:08.155] MOVE_BLOCKED: Agent agent_12_1751897167 at (2,0) - {target: [1, 1]}
+[T:96 09:06:08.155] MOVE_START: Agent agent_11_1751897165 at (2,1) - {target: :west}
+[T:96 09:06:08.155] MOVE_BLOCKED: Agent agent_11_1751897165 at (2,1) - {target: [1, 1]}
+[T:97 09:06:08.258] MOVE_START: Agent agent_12_1751897167 at (2,0) - {target: :west}
+[T:97 09:06:08.258] MOVE_SUCCESS: Agent agent_12_1751897167 at (1,0) - {from: [2, 0]}
+[T:97 09:06:08.258] REPLICATE_START: Agent agent_13_1751897168 at (1,1)
+[T:97 09:06:08.269] REPLICATE_SUCCESS: Agent agent_13_1751897168 at (1,1) - {offspring: "agent_14_1751897168", at: [2, 1]}
+[T:97 09:06:08.269] MOVE_START: Agent agent_11_1751897165 at (2,1) - {target: :north_west}
+[T:97 09:06:08.269] MOVE_BLOCKED: Agent agent_11_1751897165 at (2,1) - {target: [1, 0]}
+[T:98 09:06:08.372] MOVE_START: Agent agent_12_1751897167 at (1,0) - {target: :west}
+[T:98 09:06:08.372] MOVE_SUCCESS: Agent agent_12_1751897167 at (0,0) - {from: [1, 0]}
+[T:98 09:06:08.372] MOVE_START: Agent agent_13_1751897168 at (1,1) - {target: :south_east}
+[T:98 09:06:08.372] MOVE_SUCCESS: Agent agent_13_1751897168 at (2,2) - {from: [1, 1]}
+[T:98 09:06:08.372] MOVE_START: Agent agent_11_1751897165 at (2,1) - {target: :south}
+[T:98 09:06:08.372] MOVE_BLOCKED: Agent agent_11_1751897165 at (2,1) - {target: [2, 2]}
+[T:99 09:06:08.475] REPLICATE_START: Agent agent_12_1751897167 at (0,0)
+[T:99 09:06:08.485] REPLICATE_SUCCESS: Agent agent_12_1751897167 at (0,0) - {offspring: "agent_15_1751897168", at: [1, 1]}
+[T:99 09:06:08.486] REST: Agent agent_11_1751897165 at (2,1)
+[T:99 09:06:08.486] MOVE_START: Agent agent_13_1751897168 at (2,2) - {target: :west}
+[T:99 09:06:08.486] MOVE_SUCCESS: Agent agent_13_1751897168 at (1,2) - {from: [2, 2]}
+[T:100 09:06:08.588] MOVE_START: Agent agent_12_1751897167 at (0,0) - {target: :south}
+[T:100 09:06:08.588] MOVE_SUCCESS: Agent agent_12_1751897167 at (0,1) - {from: [0, 0]}
+[T:100 09:06:08.588] MOVE_START: Agent agent_15_1751897168 at (1,1) - {target: :west}
+[T:100 09:06:08.588] MOVE_BLOCKED: Agent agent_15_1751897168 at (1,1) - {target: [0, 1]}
+[T:100 09:06:08.588] MOVE_START: Agent agent_11_1751897165 at (2,1) - {target: :north}
+[T:100 09:06:08.588] MOVE_SUCCESS: Agent agent_11_1751897165 at (2,0) - {from: [2, 1]}
+[T:100 09:06:08.588] REST: Agent agent_13_1751897168 at (1,2)
+[T:101 09:06:08.693] REST: Agent agent_11_1751897165 at (2,0)
+[T:101 09:06:08.693] REST: Agent agent_12_1751897167 at (0,1)
+[T:101 09:06:08.693] MOVE_START: Agent agent_15_1751897168 at (1,1) - {target: :north}
+[T:101 09:06:08.693] MOVE_SUCCESS: Agent agent_15_1751897168 at (1,0) - {from: [1, 1]}
+[T:101 09:06:08.693] MOVE_START: Agent agent_13_1751897168 at (1,2) - {target: :north_east}
+[T:101 09:06:08.693] MOVE_SUCCESS: Agent agent_13_1751897168 at (2,1) - {from: [1, 2]}
+[T:102 09:06:08.796] MOVE_START: Agent agent_15_1751897168 at (1,0) - {target: :south}
+[T:102 09:06:08.796] MOVE_SUCCESS: Agent agent_15_1751897168 at (1,1) - {from: [1, 0]}
+[T:102 09:06:08.796] MOVE_START: Agent agent_11_1751897165 at (2,0) - {target: :south_west}
+[T:102 09:06:08.796] MOVE_BLOCKED: Agent agent_11_1751897165 at (2,0) - {target: [1, 1]}
+[T:102 09:06:08.796] MOVE_START: Agent agent_12_1751897167 at (0,1) - {target: :south_east}
+[T:102 09:06:08.796] MOVE_SUCCESS: Agent agent_12_1751897167 at (1,2) - {from: [0, 1]}
+[T:102 09:06:08.796] MOVE_START: Agent agent_13_1751897168 at (2,1) - {target: :south}
+[T:102 09:06:08.796] MOVE_SUCCESS: Agent agent_13_1751897168 at (2,2) - {from: [2, 1]}
+[T:103 09:06:08.900] MOVE_START: Agent agent_11_1751897165 at (2,0) - {target: :west}
+[T:103 09:06:08.900] MOVE_SUCCESS: Agent agent_11_1751897165 at (1,0) - {from: [2, 0]}
+[T:103 09:06:08.900] REST: Agent agent_15_1751897168 at (1,1)
+[T:103 09:06:08.900] MOVE_START: Agent agent_12_1751897167 at (1,2) - {target: :north_east}
+[T:103 09:06:08.900] MOVE_SUCCESS: Agent agent_12_1751897167 at (2,1) - {from: [1, 2]}
+[T:103 09:06:08.900] MOVE_START: Agent agent_13_1751897168 at (2,2) - {target: :north}
+[T:103 09:06:08.900] MOVE_BLOCKED: Agent agent_13_1751897168 at (2,2) - {target: [2, 1]}
+[T:104 09:06:09.003] REST: Agent agent_11_1751897165 at (1,0)
+[T:104 09:06:09.003] REST: Agent agent_15_1751897168 at (1,1)
+[T:104 09:06:09.003] MOVE_START: Agent agent_12_1751897167 at (2,1) - {target: :north}
+[T:104 09:06:09.003] MOVE_SUCCESS: Agent agent_12_1751897167 at (2,0) - {from: [2, 1]}
+[T:104 09:06:09.003] MOVE_START: Agent agent_13_1751897168 at (2,2) - {target: :west}
+[T:104 09:06:09.003] MOVE_SUCCESS: Agent agent_13_1751897168 at (1,2) - {from: [2, 2]}
+[T:105 09:06:09.107] MOVE_START: Agent agent_11_1751897165 at (1,0) - {target: :south_west}
+[T:105 09:06:09.107] MOVE_SUCCESS: Agent agent_11_1751897165 at (0,1) - {from: [1, 0]}
+[T:105 09:06:09.107] REST: Agent agent_12_1751897167 at (2,0)
+[T:105 09:06:09.107] MOVE_START: Agent agent_15_1751897168 at (1,1) - {target: :south_east}
+[T:105 09:06:09.107] MOVE_SUCCESS: Agent agent_15_1751897168 at (2,2) - {from: [1, 1]}
+[T:105 09:06:09.107] REPLICATE_START: Agent agent_13_1751897168 at (1,2)
+[T:105 09:06:09.118] REPLICATE_SUCCESS: Agent agent_13_1751897168 at (1,2) - {offspring: "agent_16_1751897169", at: [0, 2]}
+[T:106 09:06:09.221] REST: Agent agent_12_1751897167 at (2,0)
+[T:106 09:06:09.221] MOVE_START: Agent agent_11_1751897165 at (0,1) - {target: :north}
+[T:106 09:06:09.221] MOVE_SUCCESS: Agent agent_11_1751897165 at (0,0) - {from: [0, 1]}
+[T:106 09:06:09.221] REST: Agent agent_16_1751897169 at (0,2)
+[T:106 09:06:09.221] MOVE_START: Agent agent_13_1751897168 at (1,2) - {target: :north_east}
+[T:106 09:06:09.221] MOVE_SUCCESS: Agent agent_13_1751897168 at (2,1) - {from: [1, 2]}
+[T:106 09:06:09.221] MOVE_START: Agent agent_15_1751897168 at (2,2) - {target: :north_west}
+[T:106 09:06:09.221] MOVE_SUCCESS: Agent agent_15_1751897168 at (1,1) - {from: [2, 2]}
+[T:107 09:06:09.325] MOVE_START: Agent agent_11_1751897165 at (0,0) - {target: :south}
+[T:107 09:06:09.325] MOVE_SUCCESS: Agent agent_11_1751897165 at (0,1) - {from: [0, 0]}
+[T:107 09:06:09.325] MOVE_START: Agent agent_12_1751897167 at (2,0) - {target: :west}
+[T:107 09:06:09.325] MOVE_SUCCESS: Agent agent_12_1751897167 at (1,0) - {from: [2, 0]}
+[T:107 09:06:09.325] MOVE_START: Agent agent_15_1751897168 at (1,1) - {target: :west}
+[T:107 09:06:09.326] MOVE_BLOCKED: Agent agent_15_1751897168 at (1,1) - {target: [0, 1]}
+[T:107 09:06:09.326] MOVE_START: Agent agent_13_1751897168 at (2,1) - {target: :south}
+[T:107 09:06:09.326] MOVE_SUCCESS: Agent agent_13_1751897168 at (2,2) - {from: [2, 1]}
+[T:107 09:06:09.326] MOVE_START: Agent agent_16_1751897169 at (0,2) - {target: :east}
+[T:107 09:06:09.326] MOVE_SUCCESS: Agent agent_16_1751897169 at (1,2) - {from: [0, 2]}
+[T:108 09:06:09.429] MOVE_START: Agent agent_12_1751897167 at (1,0) - {target: :west}
+[T:108 09:06:09.429] MOVE_SUCCESS: Agent agent_12_1751897167 at (0,0) - {from: [1, 0]}
+[T:108 09:06:09.429] REST: Agent agent_11_1751897165 at (0,1)
+[T:108 09:06:09.429] MOVE_START: Agent agent_15_1751897168 at (1,1) - {target: :south_west}
+[T:108 09:06:09.429] MOVE_SUCCESS: Agent agent_15_1751897168 at (0,2) - {from: [1, 1]}
+[T:108 09:06:09.429] MOVE_START: Agent agent_16_1751897169 at (1,2) - {target: :west}
+[T:108 09:06:09.429] MOVE_BLOCKED: Agent agent_16_1751897169 at (1,2) - {target: [0, 2]}
+[T:108 09:06:09.429] REST: Agent agent_13_1751897168 at (2,2)
+[T:109 09:06:09.534] MOVE_START: Agent agent_12_1751897167 at (0,0) - {target: :south_east}
+[T:109 09:06:09.534] MOVE_SUCCESS: Agent agent_12_1751897167 at (1,1) - {from: [0, 0]}
+[T:109 09:06:09.534] REST: Agent agent_11_1751897165 at (0,1)
+[T:109 09:06:09.534] MOVE_START: Agent agent_15_1751897168 at (0,2) - {target: :north_east}
+[T:109 09:06:09.534] MOVE_BLOCKED: Agent agent_15_1751897168 at (0,2) - {target: [1, 1]}
+[T:109 09:06:09.534] MOVE_START: Agent agent_16_1751897169 at (1,2) - {target: :north_east}
+[T:109 09:06:09.534] MOVE_SUCCESS: Agent agent_16_1751897169 at (2,1) - {from: [1, 2]}
+[T:109 09:06:09.534] MOVE_START: Agent agent_13_1751897168 at (2,2) - {target: :north}
+[T:109 09:06:09.534] MOVE_BLOCKED: Agent agent_13_1751897168 at (2,2) - {target: [2, 1]}
+[T:110 09:06:09.640] REST: Agent agent_11_1751897165 at (0,1)
+[T:110 09:06:09.640] MOVE_START: Agent agent_12_1751897167 at (1,1) - {target: :north}
+[T:110 09:06:09.640] MOVE_SUCCESS: Agent agent_12_1751897167 at (1,0) - {from: [1, 1]}
+[T:110 09:06:09.640] MOVE_START: Agent agent_16_1751897169 at (2,1) - {target: :north_west}
+[T:110 09:06:09.640] MOVE_BLOCKED: Agent agent_16_1751897169 at (2,1) - {target: [1, 0]}
+[T:110 09:06:09.640] MOVE_START: Agent agent_15_1751897168 at (0,2) - {target: :east}
+[T:110 09:06:09.640] MOVE_SUCCESS: Agent agent_15_1751897168 at (1,2) - {from: [0, 2]}
+[T:110 09:06:09.640] REST: Agent agent_13_1751897168 at (2,2)
+[T:111 09:06:09.743] REST: Agent agent_12_1751897167 at (1,0)
+[T:111 09:06:09.743] REST: Agent agent_11_1751897165 at (0,1)
+[T:111 09:06:09.743] MOVE_START: Agent agent_16_1751897169 at (2,1) - {target: :west}
+[T:111 09:06:09.743] MOVE_SUCCESS: Agent agent_16_1751897169 at (1,1) - {from: [2, 1]}
+[T:111 09:06:09.743] MOVE_START: Agent agent_15_1751897168 at (1,2) - {target: :north}
+[T:111 09:06:09.743] MOVE_BLOCKED: Agent agent_15_1751897168 at (1,2) - {target: [1, 1]}
+[T:111 09:06:09.743] MOVE_START: Agent agent_13_1751897168 at (2,2) - {target: :north_west}
+[T:111 09:06:09.743] MOVE_BLOCKED: Agent agent_13_1751897168 at (2,2) - {target: [1, 1]}
+[T:112 09:06:09.848] REST: Agent agent_12_1751897167 at (1,0)
+[T:112 09:06:09.848] REST: Agent agent_11_1751897165 at (0,1)
+[T:112 09:06:09.848] MOVE_START: Agent agent_16_1751897169 at (1,1) - {target: :north_west}
+[T:112 09:06:09.848] MOVE_SUCCESS: Agent agent_16_1751897169 at (0,0) - {from: [1, 1]}
+[T:112 09:06:09.848] MOVE_START: Agent agent_15_1751897168 at (1,2) - {target: :west}
+[T:112 09:06:09.848] MOVE_SUCCESS: Agent agent_15_1751897168 at (0,2) - {from: [1, 2]}
+[T:112 09:06:09.848] MOVE_START: Agent agent_13_1751897168 at (2,2) - {target: :north}
+[T:112 09:06:09.848] MOVE_SUCCESS: Agent agent_13_1751897168 at (2,1) - {from: [2, 2]}
+[T:113 09:06:09.954] MOVE_START: Agent agent_16_1751897169 at (0,0) - {target: :south_east}
+[T:113 09:06:09.954] MOVE_SUCCESS: Agent agent_16_1751897169 at (1,1) - {from: [0, 0]}
+[T:113 09:06:09.954] REST: Agent agent_12_1751897167 at (1,0)
+[T:113 09:06:09.954] REST: Agent agent_11_1751897165 at (0,1)
+[T:113 09:06:09.954] MOVE_START: Agent agent_13_1751897168 at (2,1) - {target: :north}
+[T:113 09:06:09.954] MOVE_SUCCESS: Agent agent_13_1751897168 at (2,0) - {from: [2, 1]}
+[T:113 09:06:09.954] MOVE_START: Agent agent_15_1751897168 at (0,2) - {target: :north_east}
+[T:113 09:06:09.954] MOVE_BLOCKED: Agent agent_15_1751897168 at (0,2) - {target: [1, 1]}
+[T:114 09:06:10.059] REST: Agent agent_12_1751897167 at (1,0)
+[T:114 09:06:10.059] REST: Agent agent_13_1751897168 at (2,0)
+[T:114 09:06:10.059] REST: Agent agent_11_1751897165 at (0,1)
+[T:114 09:06:10.059] DEATH_ENERGY: Agent agent_11_1751897165 at (0,1) - {energy: 1.7985612998927536e-14}
+[T:114 09:06:10.059] MOVE_START: Agent agent_16_1751897169 at (1,1) - {target: :south_east}
+[T:114 09:06:10.059] MOVE_SUCCESS: Agent agent_16_1751897169 at (2,2) - {from: [1, 1]}
+[T:114 09:06:10.059] MOVE_START: Agent agent_15_1751897168 at (0,2) - {target: :east}
+[T:114 09:06:10.059] MOVE_SUCCESS: Agent agent_15_1751897168 at (1,2) - {from: [0, 2]}
+[T:115 09:06:10.165] REST: Agent agent_12_1751897167 at (1,0)
+[T:115 09:06:10.165] REST: Agent agent_13_1751897168 at (2,0)
+[T:115 09:06:10.165] MOVE_START: Agent agent_15_1751897168 at (1,2) - {target: :north_west}
+[T:115 09:06:10.165] MOVE_EAT_DEAD: Agent agent_15_1751897168 at (0,1) - {from: [1, 2], energy_gained: 10}
+[T:115 09:06:10.165] MOVE_START: Agent agent_16_1751897169 at (2,2) - {target: :north_west}
+[T:115 09:06:10.165] MOVE_SUCCESS: Agent agent_16_1751897169 at (1,1) - {from: [2, 2]}
+[T:116 09:06:10.267] REST: Agent agent_12_1751897167 at (1,0)
+[T:116 09:06:10.267] REST: Agent agent_13_1751897168 at (2,0)
+[T:116 09:06:10.267] MOVE_START: Agent agent_15_1751897168 at (0,1) - {target: :south_east}
+[T:116 09:06:10.267] MOVE_SUCCESS: Agent agent_15_1751897168 at (1,2) - {from: [0, 1]}
+[T:116 09:06:10.267] MOVE_START: Agent agent_16_1751897169 at (1,1) - {target: :east}
+[T:116 09:06:10.267] MOVE_SUCCESS: Agent agent_16_1751897169 at (2,1) - {from: [1, 1]}
+[T:117 09:06:10.371] REST: Agent agent_12_1751897167 at (1,0)
+[T:117 09:06:10.371] REST: Agent agent_13_1751897168 at (2,0)
+[T:117 09:06:10.371] MOVE_START: Agent agent_16_1751897169 at (2,1) - {target: :south}
+[T:117 09:06:10.371] MOVE_SUCCESS: Agent agent_16_1751897169 at (2,2) - {from: [2, 1]}
+[T:117 09:06:10.371] MOVE_START: Agent agent_15_1751897168 at (1,2) - {target: :north}
+[T:117 09:06:10.371] MOVE_SUCCESS: Agent agent_15_1751897168 at (1,1) - {from: [1, 2]}
+[T:118 09:06:10.474] REST: Agent agent_12_1751897167 at (1,0)
+[T:118 09:06:10.474] REST: Agent agent_13_1751897168 at (2,0)
+[T:118 09:06:10.474] MOVE_START: Agent agent_15_1751897168 at (1,1) - {target: :south_west}
+[T:118 09:06:10.474] MOVE_SUCCESS: Agent agent_15_1751897168 at (0,2) - {from: [1, 1]}
+[T:118 09:06:10.474] MOVE_START: Agent agent_16_1751897169 at (2,2) - {target: :west}
+[T:118 09:06:10.474] MOVE_SUCCESS: Agent agent_16_1751897169 at (1,2) - {from: [2, 2]}
+[T:119 09:06:10.579] REST: Agent agent_12_1751897167 at (1,0)
+[T:119 09:06:10.579] DEATH_ENERGY: Agent agent_12_1751897167 at (1,0) - {energy: 5.551115123125783e-15}
+[T:119 09:06:10.579] REST: Agent agent_13_1751897168 at (2,0)
+[T:119 09:06:10.579] MOVE_START: Agent agent_15_1751897168 at (0,2) - {target: :north_east}
+[T:119 09:06:10.579] MOVE_SUCCESS: Agent agent_15_1751897168 at (1,1) - {from: [0, 2]}
+[T:119 09:06:10.579] MOVE_START: Agent agent_16_1751897169 at (1,2) - {target: :north}
+[T:119 09:06:10.579] MOVE_BLOCKED: Agent agent_16_1751897169 at (1,2) - {target: [1, 1]}
+[T:120 09:06:10.683] REST: Agent agent_13_1751897168 at (2,0)
+[T:120 09:06:10.684] DEATH_ENERGY: Agent agent_13_1751897168 at (2,0) - {energy: 6.439293542825908e-15}
+[T:120 09:06:10.684] MOVE_START: Agent agent_15_1751897168 at (1,1) - {target: :north}
+[T:120 09:06:10.684] MOVE_EAT_DEAD: Agent agent_15_1751897168 at (1,0) - {from: [1, 1], energy_gained: 10}
+[T:120 09:06:10.684] MOVE_START: Agent agent_16_1751897169 at (1,2) - {target: :east}
+[T:120 09:06:10.684] MOVE_SUCCESS: Agent agent_16_1751897169 at (2,2) - {from: [1, 2]}
+[T:121 09:06:10.788] MOVE_START: Agent agent_15_1751897168 at (1,0) - {target: :east}
+[T:121 09:06:10.788] MOVE_EAT_DEAD: Agent agent_15_1751897168 at (2,0) - {from: [1, 0], energy_gained: 10}
+[T:121 09:06:10.788] MOVE_START: Agent agent_16_1751897169 at (2,2) - {target: :north}
+[T:121 09:06:10.788] MOVE_SUCCESS: Agent agent_16_1751897169 at (2,1) - {from: [2, 2]}
+[T:122 09:06:10.890] REPLICATE_START: Agent agent_15_1751897168 at (2,0)
+[T:122 09:06:10.902] REPLICATE_SUCCESS: Agent agent_15_1751897168 at (2,0) - {offspring: "agent_17_1751897170", at: [2, 1]}
+[T:122 09:06:10.902] MOVE_START: Agent agent_16_1751897169 at (2,1) - {target: :north_west}
+[T:122 09:06:10.902] MOVE_SUCCESS: Agent agent_16_1751897169 at (1,0) - {from: [2, 1]}
+[T:123 09:06:11.004] REST: Agent agent_16_1751897169 at (1,0)
+[T:123 09:06:11.004] MOVE_START: Agent agent_15_1751897168 at (2,0) - {target: :south_west}
+[T:123 09:06:11.004] MOVE_SUCCESS: Agent agent_15_1751897168 at (1,1) - {from: [2, 0]}
+[T:124 09:06:11.106] MOVE_START: Agent agent_16_1751897169 at (1,0) - {target: :south_east}
+[T:124 09:06:11.107] MOVE_SUCCESS: Agent agent_16_1751897169 at (2,1) - {from: [1, 0]}
+[T:124 09:06:11.107] MOVE_START: Agent agent_15_1751897168 at (1,1) - {target: :north_west}
+[T:124 09:06:11.107] MOVE_SUCCESS: Agent agent_15_1751897168 at (0,0) - {from: [1, 1]}
+[T:125 09:06:11.209] MOVE_START: Agent agent_15_1751897168 at (0,0) - {target: :south}
+[T:125 09:06:11.209] MOVE_SUCCESS: Agent agent_15_1751897168 at (0,1) - {from: [0, 0]}
+[T:125 09:06:11.209] MOVE_START: Agent agent_16_1751897169 at (2,1) - {target: :west}
+[T:125 09:06:11.209] MOVE_SUCCESS: Agent agent_16_1751897169 at (1,1) - {from: [2, 1]}
+[T:126 09:06:11.311] MOVE_START: Agent agent_15_1751897168 at (0,1) - {target: :south_east}
+[T:126 09:06:11.311] MOVE_SUCCESS: Agent agent_15_1751897168 at (1,2) - {from: [0, 1]}
+[T:126 09:06:11.311] MOVE_START: Agent agent_16_1751897169 at (1,1) - {target: :east}
+[T:126 09:06:11.311] MOVE_SUCCESS: Agent agent_16_1751897169 at (2,1) - {from: [1, 1]}
+[T:127 09:06:11.413] MOVE_START: Agent agent_16_1751897169 at (2,1) - {target: :south}
+[T:127 09:06:11.413] MOVE_SUCCESS: Agent agent_16_1751897169 at (2,2) - {from: [2, 1]}
+[T:127 09:06:11.413] MOVE_START: Agent agent_15_1751897168 at (1,2) - {target: :east}
+[T:127 09:06:11.413] MOVE_BLOCKED: Agent agent_15_1751897168 at (1,2) - {target: [2, 2]}
+[T:128 09:06:11.516] REST: Agent agent_15_1751897168 at (1,2)
+[T:128 09:06:11.516] MOVE_START: Agent agent_16_1751897169 at (2,2) - {target: :north}
+[T:128 09:06:11.516] MOVE_SUCCESS: Agent agent_16_1751897169 at (2,1) - {from: [2, 2]}
+[T:129 09:06:11.619] REST: Agent agent_16_1751897169 at (2,1)
+[T:129 09:06:11.619] MOVE_START: Agent agent_15_1751897168 at (1,2) - {target: :west}
+[T:129 09:06:11.619] MOVE_SUCCESS: Agent agent_15_1751897168 at (0,2) - {from: [1, 2]}
+[T:130 09:06:11.721] REST: Agent agent_16_1751897169 at (2,1)
+[T:130 09:06:11.721] MOVE_START: Agent agent_15_1751897168 at (0,2) - {target: :north}
+[T:130 09:06:11.721] MOVE_SUCCESS: Agent agent_15_1751897168 at (0,1) - {from: [0, 2]}
+[T:131 09:06:11.823] MOVE_START: Agent agent_15_1751897168 at (0,1) - {target: :south_east}
+[T:131 09:06:11.824] MOVE_SUCCESS: Agent agent_15_1751897168 at (1,2) - {from: [0, 1]}
+[T:131 09:06:11.824] MOVE_START: Agent agent_16_1751897169 at (2,1) - {target: :north_west}
+[T:131 09:06:11.824] MOVE_SUCCESS: Agent agent_16_1751897169 at (1,0) - {from: [2, 1]}
+[T:132 09:06:11.925] MOVE_START: Agent agent_16_1751897169 at (1,0) - {target: :south}
+[T:132 09:06:11.925] MOVE_SUCCESS: Agent agent_16_1751897169 at (1,1) - {from: [1, 0]}
+[T:132 09:06:11.925] MOVE_START: Agent agent_15_1751897168 at (1,2) - {target: :east}
+[T:132 09:06:11.925] MOVE_SUCCESS: Agent agent_15_1751897168 at (2,2) - {from: [1, 2]}
+[T:133 09:06:12.026] REST: Agent agent_16_1751897169 at (1,1)
+[T:133 09:06:12.026] REST: Agent agent_15_1751897168 at (2,2)
+[T:134 09:06:12.136] MOVE_START: Agent agent_16_1751897169 at (1,1) - {target: :north_east}
+[T:134 09:06:12.136] MOVE_SUCCESS: Agent agent_16_1751897169 at (2,0) - {from: [1, 1]}
+[T:134 09:06:12.136] MOVE_START: Agent agent_15_1751897168 at (2,2) - {target: :north}
+[T:134 09:06:12.136] MOVE_SUCCESS: Agent agent_15_1751897168 at (2,1) - {from: [2, 2]}
+[T:135 09:06:12.238] MOVE_START: Agent agent_16_1751897169 at (2,0) - {target: :west}
+[T:135 09:06:12.238] MOVE_SUCCESS: Agent agent_16_1751897169 at (1,0) - {from: [2, 0]}
+[T:135 09:06:12.238] MOVE_START: Agent agent_15_1751897168 at (2,1) - {target: :south}
+[T:135 09:06:12.239] MOVE_SUCCESS: Agent agent_15_1751897168 at (2,2) - {from: [2, 1]}
+[T:136 09:06:12.341] MOVE_START: Agent agent_16_1751897169 at (1,0) - {target: :east}
+[T:136 09:06:12.341] MOVE_SUCCESS: Agent agent_16_1751897169 at (2,0) - {from: [1, 0]}
+[T:136 09:06:12.341] MOVE_START: Agent agent_15_1751897168 at (2,2) - {target: :north_west}
+[T:136 09:06:12.341] MOVE_SUCCESS: Agent agent_15_1751897168 at (1,1) - {from: [2, 2]}
+[T:137 09:06:12.443] MOVE_START: Agent agent_16_1751897169 at (2,0) - {target: :west}
+[T:137 09:06:12.443] MOVE_SUCCESS: Agent agent_16_1751897169 at (1,0) - {from: [2, 0]}
+[T:137 09:06:12.443] MOVE_START: Agent agent_15_1751897168 at (1,1) - {target: :south_west}
+[T:137 09:06:12.443] MOVE_SUCCESS: Agent agent_15_1751897168 at (0,2) - {from: [1, 1]}
+[T:138 09:06:12.546] MOVE_START: Agent agent_16_1751897169 at (1,0) - {target: :south}
+[T:138 09:06:12.546] MOVE_SUCCESS: Agent agent_16_1751897169 at (1,1) - {from: [1, 0]}
+[T:138 09:06:12.546] REST: Agent agent_15_1751897168 at (0,2)
+[T:139 09:06:12.648] MOVE_START: Agent agent_16_1751897169 at (1,1) - {target: :west}
+[T:139 09:06:12.648] MOVE_SUCCESS: Agent agent_16_1751897169 at (0,1) - {from: [1, 1]}
+[T:139 09:06:12.648] MOVE_START: Agent agent_15_1751897168 at (0,2) - {target: :east}
+[T:139 09:06:12.648] MOVE_SUCCESS: Agent agent_15_1751897168 at (1,2) - {from: [0, 2]}
+[T:140 09:06:12.750] REST: Agent agent_16_1751897169 at (0,1)
+[T:140 09:06:12.750] MOVE_START: Agent agent_15_1751897168 at (1,2) - {target: :east}
+[T:140 09:06:12.750] MOVE_SUCCESS: Agent agent_15_1751897168 at (2,2) - {from: [1, 2]}
+[T:141 09:06:12.853] REST: Agent agent_16_1751897169 at (0,1)
+[T:141 09:06:12.853] MOVE_START: Agent agent_15_1751897168 at (2,2) - {target: :north}
+[T:141 09:06:12.853] MOVE_SUCCESS: Agent agent_15_1751897168 at (2,1) - {from: [2, 2]}
+[T:142 09:06:12.955] REST: Agent agent_16_1751897169 at (0,1)
+[T:142 09:06:12.955] MOVE_START: Agent agent_15_1751897168 at (2,1) - {target: :west}
+[T:142 09:06:12.955] MOVE_SUCCESS: Agent agent_15_1751897168 at (1,1) - {from: [2, 1]}
