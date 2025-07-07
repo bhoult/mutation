@@ -265,7 +265,7 @@ end
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
 ## 🤝 Contributing
 
@@ -273,4 +273,4 @@ Contributions are welcome! Please see our [Contributing Guide](docs/contributing
 
 ---
 
-**[📚 Full Documentation](docs/)** | **[🐛 Report Issues](https://github.com/user/mutation/issues)** | **[💬 Discussions](https://github.com/user/mutation/discussions)**
+**[📚 Full Documentation](docs/)** | **[🐛 Report Issues](https://github.com/bhoult/mutation/issues)** | **[💬 Contact](mailto:bhoult@gmail.com)**
