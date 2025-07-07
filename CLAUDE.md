@@ -341,12 +341,23 @@ Valid target directions for attacks (Moore neighborhood):
 ## Logging and Performance Tracking
 
 ### Logs Directory Structure
-The `logs/` directory contains comprehensive simulation data:
+The `logs/` directory contains comprehensive simulation data organized for easy analysis:
 
-- **agent_performance_stats.log**: Cross-simulation performance statistics tracking agent win rates
-- **simulation_YYYYMMDD_HHMMSS_xxx/**: Individual simulation folders containing:
-  - **world_events.log**: Detailed world events (moves, attacks, replications, deaths)
-  - **agent_agent_ID_TIMESTAMP.log**: Individual agent interaction logs (input/output/timing)
+- **agent_performance_stats.log**: Cross-simulation performance statistics tracking agent win rates and participation
+- **simulation_YYYYMMDD_HHMMSS_xxx/**: Individual simulation folders (automatically created for each run):
+  - **world_events.log**: Detailed chronological world events with timestamps showing agent actions:
+    - MOVE_START/SUCCESS: Agent movement with from/to positions
+    - ATTACK_START/DAMAGE: Combat events with damage amounts
+    - REPLICATE_START: Agent replication attempts
+    - REST: Energy restoration events
+    - Agent death and energy changes
+  - **agent_agent_ID_TIMESTAMP.log**: Individual agent interaction logs showing IPC communication
+
+### Log Management Features
+- **Automatic cleanup**: Old simulation directories automatically removed (keeps 3 most recent)
+- **Per-simulation isolation**: Each simulation run creates its own log directory to prevent data mixing
+- **Agent log rotation**: Limits agent logs per simulation to prevent disk space issues
+- **Performance tracking**: Persistent agent win rate statistics across all simulations
   - **survivors.log**: Successful survivor code snippets (when generated)
   - **curses_debug.log**: Debug output from visual display mode (when used)
 
