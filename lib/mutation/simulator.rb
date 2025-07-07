@@ -144,6 +144,10 @@ module Mutation
           # This prevents the simulation from running indefinitely waiting for the last agent to starve
           if Mutation.configuration.auto_reset
             Mutation.logger.info("🏁 Lone survivor saved, triggering extinction for auto-reset")
+            
+            # Track performance BEFORE killing the survivor
+            track_simulation_performance
+            
             survivor.die!
             @world.agent_manager.remove_agent(survivor.agent_id)
             @world.cleanup_mutation_tracking(survivor.agent_id)
@@ -343,8 +347,13 @@ module Mutation
       survivors = @world.living_agents
       @survivor_logger&.log_survivors(survivors)
       
-      # Track performance before reset
-      track_simulation_performance
+      # Track performance before reset (only if we haven't already tracked for a single survivor)
+      # We check if there are living agents - if none, it means we already tracked the single survivor
+      if survivors.any?
+        track_simulation_performance
+      else
+        Mutation.logger.debug("PERF_TRACK: Skipping duplicate performance tracking in extinction handler")
+      end
 
       @world.prepare_for_reset
 
@@ -555,18 +564,29 @@ module Mutation
       final_survivors = @world.living_agents
       winning_agent = nil
       
+      Mutation.logger.debug("PERF_TRACK: #{final_survivors.size} final survivors found")
+      
       # If there's exactly one survivor, they are the winner
       if final_survivors.size == 1
         winning_agent = final_survivors.first
+        Mutation.logger.debug("PERF_TRACK: Single winner: #{@performance_tracker.extract_agent_type(winning_agent)}")
       elsif final_survivors.size > 1
         # If multiple survivors, the one with highest fitness wins
         winning_agent = final_survivors.max_by(&:fitness)
+        Mutation.logger.debug("PERF_TRACK: Multiple survivors, winner by fitness: #{@performance_tracker.extract_agent_type(winning_agent)}")
+      else
+        Mutation.logger.debug("PERF_TRACK: No survivors - extinction")
       end
+      
+      # Debug initial agents
+      initial_types = @simulation_start_agents.map { |a| @performance_tracker.extract_agent_type(a) }.uniq
+      Mutation.logger.debug("PERF_TRACK: Initial agents: #{initial_types.join(', ')}")
       
       # Record the simulation results
       @performance_tracker.record_simulation(@simulation_start_agents, winning_agent)
       
-      Mutation.logger.info("Performance stats updated for simulation with #{@simulation_start_agents.size} initial agents")
+      winner_type = winning_agent ? @performance_tracker.extract_agent_type(winning_agent) : "none"
+      Mutation.logger.info("Performance stats updated: #{@simulation_start_agents.size} initial agents, winner: #{winner_type}")
     rescue StandardError => e
       Mutation.logger.error("Failed to track simulation performance: #{e.message}")
     end
