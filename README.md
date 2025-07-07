@@ -265,11 +265,11 @@ end
 
 ## 📄 License
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU General Public License v3.0.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please see our [Contributing Guide](docs/contributing.md) for details.
+Contributions are welcome! Please contact bhoult@gmail.com for details.
 
 ---
 
