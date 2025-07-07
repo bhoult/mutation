@@ -1,570 +1,185 @@
-# 🧬 Mutation Simulator
+# Mutation Simulator
 
-A Ruby-based evolutionary simulation where agents with self-modifying code compete, evolve, and adapt through natural selection.
+A Ruby-based evolutionary simulation where agents with self-modifying code compete, evolve, and adapt through natural selection in a 2D grid world environment.
 
-## Overview
+![Mutation Simulator Demo](docs/images/demo.gif)
 
-This project implements a digital ecosystem where simple agents defined by executable Ruby code interact, mutate, and evolve over time. The simulation is inspired by principles of evolutionary biology and artificial life.
-
-### Key Features
-
-- **Self-Modifying Code**: Agents are defined by Ruby code that can mutate and evolve
-- **Natural Selection**: Agents compete for survival based on energy and fitness
-- **Generational Evolution**: Successful traits propagate through generations
-- **Process-Based Agents**: Each agent runs as a separate OS process for true isolation and parallelism
-- **Configurable Environment**: Highly customizable simulation parameters
-- **Enhanced Safety**: Process isolation provides robust security
-- **Rich Logging**: Detailed logging with colorized output
-- **CLI Interface**: Command-line tools for running simulations
-- **Interactive Mode**: Step-by-step simulation control
-- **Visual Mode**: Curses-based real-time visualization
-- **True Parallel Processing**: Multi-processor agent processing bypassing Ruby's GIL
-
-## Quick Start
-
-### Installation
+## 🚀 Quick Start
 
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd mutation
-
 # Install dependencies
 bundle install
 
-# Make the executable file runnable
-chmod +x bin/mutation
-```
-
-### Running a Simulation
-
-```bash
-# Basic simulation
+# Run a visual simulation with auto-sized grid
 ./bin/mutation start
 
-# Interactive mode
+# Run with custom world size
+./bin/mutation start --size 30
+./bin/mutation start --width 20 --height 15
+
+# Run non-visual simulation
+./bin/mutation start --visual false
+
+# Interactive mode for step-by-step control
 ./bin/mutation interactive
-
-# Custom parameters
-./bin/mutation start --size 30 --energy 15 --delay 0.1
-
-# Run for specific number of ticks
-./bin/mutation start --ticks 1000
-
-# Enable parallel processing with custom processor count
-./bin/mutation start --parallel --processors 8
-
-# Visual mode (curses-based display)
-./bin/mutation visual
-
-# Visual mode with custom size
-./bin/mutation visual --width 20 --height 10 --delay 0.05
-
-# Custom agent scripts
-./bin/mutation start --agents path/to/agent1.rb path/to/agent2.rb
-
-# Show configuration
-./bin/mutation config
 ```
 
-### Using Rake Tasks
+## 📖 Documentation
 
-```bash
-# Run tests
-rake test
+### Core Concepts
+- **[Architecture Overview](docs/architecture.md)** - System design and core components
+- **[Agent System](docs/agents.md)** - How agents work, communication protocol, and examples
+- **[World Mechanics](docs/world.md)** - Grid environment, energy system, and evolution
+- **[Mutation Engine](docs/mutation.md)** - Genetic evolution and code mutation
 
-# Run simulation
-rake simulate
+### Usage Guides
+- **[Command Line Usage](docs/cli.md)** - All command line options and examples
+- **[Configuration Guide](docs/configuration.md)** - Complete configuration reference
+- **[Visual Mode](docs/visual-mode.md)** - Using the curses-based visual interface
 
-# Run benchmark
-rake benchmark
+### Development
+- **[Agent Development](docs/agent-development.md)** - Creating custom agents
+- **[Testing](docs/testing.md)** - Running tests and benchmarks
+- **[Contributing](docs/contributing.md)** - Development setup and guidelines
 
-# Start console
-rake console
-```
+## 🎮 Visual Mode
 
-## Project Structure
+The simulator features a real-time curses-based visual display:
 
-```
-mutation/
-├── lib/
-│   ├── mutation.rb              # Main module
-│   └── mutation/
-│       ├── agent_process.rb     # Agent process management
-│       ├── agent_manager.rb     # Agent orchestrator
-│       ├── cli.rb               # Command-line interface
-│       ├── configuration.rb     # Configuration management
-│       ├── genetic_pool.rb      # Persistent agent script storage
-│       ├── logger.rb            # Logging system
-│       ├── process_mutation_engine.rb # Code mutation logic
-│       ├── process_world.rb     # 2D grid world environment
-│       ├── simulator.rb         # Simulation orchestrator
-│       ├── version.rb           # Version information
-│       └── world.rb             # World wrapper
-├── spec/                        # Test files
-├── config/                      # Configuration files
-├── bin/                         # Executable files
-├── examples/
-│   └── agents/                  # Example agent scripts
-├── Gemfile                      # Dependencies
-├── Rakefile                     # Rake tasks
-└── README.md                    # This file
-```
+- **Real-time visualization**: Watch agents as colored characters based on energy levels
+- **Interactive controls**: WASD panning, space to pause, R to reset view
+- **Status information**: Live display of ticks, generation, agent count, and statistics
+- **Auto-sizing**: Automatically fits world to your terminal size
 
-## How It Works
+### Visual Legend
+- `*` - Living agents (color changes based on energy level)
+  - 🟢 Green: High energy (8+)
+  - 🟡 Yellow: Medium energy (4-7)  
+  - 🔴 Red: Low energy (1-3)
+- `x` - Dead agents (red)
+- ` ` - Empty space
 
-### Agent Architecture
+### Controls
+- **WASD**: Pan camera around large worlds
+- **Space**: Pause/resume simulation
+- **R**: Reset camera to origin (0,0)
+- **Q/Esc**: Quit simulation
 
-All agents run as separate OS processes:
-- Each agent runs as an independent Ruby process
-- True parallelism bypassing Ruby's GIL
-- Enhanced isolation and security
-- Communication via JSON over stdin/stdout pipes
-- Persistent memory storage in `/tmp/agents/`
-- Robust error handling and timeout protection
+## 🧬 Agent System
 
-### Agent Behavior
+Agents are autonomous entities that:
+- Run as separate OS processes for true parallelism
+- Receive world state via JSON messages
+- Return actions (attack, rest, replicate, move, die)
+- Can see in a 5-square radius (11x11 grid)
+- Evolve through mutation and natural selection
 
-Each agent contains:
-- **Energy**: Life force that decreases over time
-- **Code**: Ruby script defining behavior
-- **Process**: External Ruby process executing agent logic
-- **Generation**: Evolutionary lineage
-- **Memory**: Persistent state between turns
+### Basic Agent Actions
+- **Attack**: Deal damage to neighboring agents for energy
+- **Rest**: Recover energy 
+- **Replicate**: Create mutated offspring (costs 5 energy)
+- **Move**: Move to adjacent cells, eat dead agents (+10 energy)
+- **Die**: Voluntary termination
 
-Agents can perform these actions:
-- `:attack` - Attack neighbors for energy
-- `:rest` - Gain energy by resting
-- `:replicate` - Create mutated offspring
-- `:die` - End existence
+## 🏗️ Architecture
 
-### Environment
+The simulator uses a modular, process-based architecture:
 
-The world is a 2D grid where:
-- Agents observe all 8 neighboring positions (Moore neighborhood)
-- Each position contains either an agent or empty space
-- Actions affect energy levels and grid positions
-- Empty spaces can be filled by replication
-- Energy decays each tick (world-controlled)
-- Grid supports both square and rectangular dimensions
+- **Agents**: Individual Ruby processes with bidirectional JSON communication
+- **World**: 2D grid environment managing agent interactions
+- **Simulator**: Orchestrates simulation lifecycle and timing
+- **Mutation Engine**: Handles genetic evolution and code mutations
+- **Visual Display**: Real-time curses-based interface
 
-### Mutation
+## ⚙️ Configuration
 
-When agents replicate, their code mutates through:
-- **Numeric mutations**: Change threshold values
-- **Probability mutations**: Modify randomness
-- **Operator mutations**: Change comparison operators
-- **Threshold mutations**: Alter decision boundaries
-
-### Evolution
-
-The simulation supports:
-- **Extinction events**: When all agents die
-- **Automatic reseeding**: New generations from survivors
-- **Fitness tracking**: Energy × generation scoring
-- **Lineage tracking**: Parent-child relationships
-
-## Configuration
-
-Configuration is managed through YAML files and command-line options:
+Comprehensive YAML-based configuration system:
 
 ```yaml
-# config/mutation.yml
-world_size: 20
-initial_energy: 10
-energy_decay: 1
-attack_damage: 3
-mutation_rate: 0.5
-simulation_delay: 0.2
-safe_mode: true
-parallel_agents: false
-processor_count: null
-log_level: info
+# Basic world setup
+world:
+  size: 20                    # Square grid size
+  width: 30                   # Or rectangular...
+  height: 20                  # ...grid dimensions
+  initial_coverage: 0.1       # 10% initial population
+
+# Energy and action costs
+action_costs:
+  replicate:
+    cost: 5                   # Energy cost to replicate
+  move:
+    dead_agent_energy_gain: 10 # Energy from eating dead agents
+
+# Visual display
+display:
+  visual_mode: true           # Default to visual mode
 ```
 
-## API Usage
+See [Configuration Guide](docs/configuration.md) for complete reference.
 
-```ruby
-require 'mutation'
+## 🧪 Examples
 
-# Configure the simulation
-Mutation.configure do |config|
-  config.world_size = 30
-  config.initial_energy = 15
-  config.mutation_rate = 0.3
-  config.parallel_agents = true
-  config.processor_count = 8  # Use 8 processors
-end
-
-# Create and run simulation
-simulator = Mutation::Simulator.new
-simulator.start
-
-# Step-by-step control
-simulator.step
-simulator.pause
-simulator.resume
-simulator.stop
-
-# Get statistics
-puts simulator.detailed_report
-```
-
-## Examples
-
-### Basic Simulation
-
-```ruby
-# Create a simple simulation
-simulator = Mutation::Simulator.new(world_size: 10)
-simulator.run_for_ticks(100)
-```
-
-### Custom Agent Code
-
-```ruby
-# Create agent with custom behavior
-custom_code = <<~RUBY
-  Proc.new do |env|
-    if env[:neighbor_energy] > 8
-      :attack
-    elsif env[:tick] % 5 == 0
-      :replicate
-    else
-      :rest
-    end
-  end
-RUBY
-
-agent = Mutation::Agent.new(code_str: custom_code)
-```
-
-### Interactive Session
-
-```ruby
-# Start interactive mode
-simulator = Mutation::Simulator.new
-simulator.start
-
-# In another context, control the simulation
-simulator.pause
-puts simulator.current_status
-simulator.resume
-```
-
-## Process-Based Agent Architecture
-
-### How Process Agents Work
-
-Each process-based agent runs as an independent Ruby process:
-
-1. **Process Spawning**: AgentManager creates processes using `Open3.popen3`
-2. **Communication Protocol**: JSON messages exchanged via stdin/stdout
-3. **State Management**: Agents maintain memory in `/tmp/agents/{agent_id}/`
-4. **Process Monitoring**: Health checks using `Process.getpgid`
-5. **Graceful Shutdown**: TERM signal followed by KILL if needed
-
-### Agent Communication Protocol
-
-```json
-// Input from World to Agent
-{
-  "tick": 42,
-  "agent_id": "agent_1_1234567890", 
-  "position": [5, 3],
-  "energy": 10,
-  "world_size": [20, 20],
-  "neighbors": {
-    "north": {"energy": 5, "agent_id": "agent_2_..."},
-    "south": {"energy": 0, "agent_id": null},
-    // ... other directions
-  },
-  "generation": 3,
-  "timeout_ms": 1000,
-  "memory": {}
-}
-
-// Output from Agent to World
-{
-  "action": "attack",
-  "target": "north", 
-  "memory": {"turns_played": 10, "last_action": "rest"}
-}
-```
-
-### Genetic Pool System
-
-Process-based agents evolve through a persistent genetic pool:
-
-- **Storage**: Scripts saved in `/tmp/genetic_pool/`
-- **Metadata**: Fingerprints track lineage and mutations
-- **Selection**: Random selection weighted by recency
-- **Persistence**: Survives simulation restarts
-
-### Writing Custom Process Agents
-
-Create executable Ruby scripts that follow the agent protocol:
-
+### Minimal Agent
 ```ruby
 #!/usr/bin/env ruby
 require 'json'
 
-while input = $stdin.gets
-  world_state = JSON.parse(input)
+while (input = $stdin.gets)
+  message = JSON.parse(input.strip)
+  exit(0) if message['command'] == 'die'
   
-  # Agent logic here
-  action = { action: 'rest' }
+  my_energy = message['energy'] || 0
   
-  puts JSON.generate(action)
-  $stdout.flush
-end
-```
-
-## Agent Protocol Reference
-
-### Agent Actions
-
-Agents can perform exactly four actions:
-
-| Action | Description | Energy Cost | Requirements |
-|--------|-------------|-------------|--------------|
-| `attack` | Attack a neighbor for energy | 1.2 units | Valid target direction |
-| `rest` | Gain energy by resting | 0.2 units | None |
-| `replicate` | Create mutated offspring | 0.2 + replication_cost | Sufficient energy, empty adjacent space |
-| `die` | Voluntarily end existence | 0 units | None |
-
-### Input Format (World → Agent)
-
-Agents receive a JSON object via stdin:
-
-```json
-{
-  "tick": 42,
-  "agent_id": "agent_1_1234567890",
-  "position": [5, 10],
-  "energy": 15,
-  "world_size": [20, 20],
-  "neighbors": {
-    "north_west": {"energy": 10, "agent_id": "agent_2_..."},
-    "north": {"energy": 0, "agent_id": null},
-    "north_east": {"energy": 5, "agent_id": "agent_3_..."},
-    "west": {"energy": 3, "agent_id": "agent_4_..."},
-    "east": {"energy": 0, "agent_id": null},
-    "south_west": {"energy": 8, "agent_id": "agent_5_..."},
-    "south": {"energy": 0, "agent_id": null},
-    "south_east": {"energy": 12, "agent_id": "agent_6_..."}
-  },
-  "generation": 5,
-  "timeout_ms": 1000,
-  "memory": {
-    "turns_played": 10,
-    "last_action": "rest"
-  }
-}
-```
-
-### Output Format (Agent → World)
-
-Return JSON via stdout:
-
-```json
-// Attack action
-{
-  "action": "attack",
-  "target": "north_east"  // Required for attack
-}
-
-// Rest action
-{
-  "action": "rest"
-}
-
-// Replicate action
-{
-  "action": "replicate"
-}
-
-// Die action
-{
-  "action": "die"
-}
-
-// With memory (optional)
-{
-  "action": "rest",
-  "memory": {
-    "turns_played": 11,
-    "energy_history": [15, 14, 13, 12, 13]
-  }
-}
-```
-
-### Neighbor Directions
-
-The 8 valid directions for attacks (Moore neighborhood):
-
-```
-north_west   north   north_east
-     \        |        /
-      \       |       /
-west ---   agent   --- east
-      /       |       \
-     /        |        \
-south_west   south   south_east
-```
-
-### Energy Dynamics
-
-All actions have energy implications:
-
-- **Base action cost**: 0.2 units (process agents only)
-- **Attack**: Costs 1.0 extra, gains `attack_energy_gain`
-- **Rest**: Gains `rest_energy_gain`
-- **Replicate**: Costs `replication_cost`
-- **Die**: No cost
-- **Passive decay**: All agents lose `energy_decay` per tick
-
-### Memory Persistence
-
-Process agents can maintain state between turns:
-
-```ruby
-# Load memory
-memory = world_state['memory'] || {}
-
-# Update memory
-memory['turns_played'] = (memory['turns_played'] || 0) + 1
-memory['attack_count'] = (memory['attack_count'] || 0) + 1
-
-# Return with action
-action = {
-  'action' => 'attack',
-  'target' => 'north',
-  'memory' => memory
-}
-```
-
-### Error Handling
-
-- Invalid actions default to `rest`
-- Timeout triggers default action
-- JSON parse errors trigger default action
-- Process crashes are handled gracefully
-
-### Example Agent Implementation
-
-```ruby
-#!/usr/bin/env ruby
-require 'json'
-
-while input = $stdin.gets
-  world_state = JSON.parse(input)
-  
-  my_energy = world_state['energy']
-  neighbors = world_state['neighbors']
-  memory = world_state['memory'] || {}
-  
-  # Find best target
-  best_target = neighbors.max_by { |dir, info| info['energy'] }
-  target_dir, target_info = best_target
-  
-  # Decision logic
-  action = if my_energy <= 2
-    { 'action' => 'die' }
-  elsif my_energy >= 8 && neighbors.values.any? { |n| n['energy'] == 0 }
-    { 'action' => 'replicate' }
-  elsif target_info['energy'] >= 5
-    { 'action' => 'attack', 'target' => target_dir }
+  action = if my_energy < 3
+    { action: 'rest' }           # Low energy - rest
+  elsif my_energy > 15
+    { action: 'replicate' }      # High energy - reproduce
   else
-    { 'action' => 'rest' }
+    { action: 'move', target: ['north', 'south', 'east', 'west'].sample }
   end
   
-  # Update memory
-  memory['decisions'] = (memory['decisions'] || 0) + 1
-  action['memory'] = memory
-  
-  puts JSON.generate(action)
+  puts JSON.generate(action.merge(memory: {}))
   $stdout.flush
 end
 ```
 
-## Parallel Processing
+### Running Custom Simulations
+```bash
+# Custom world size and energy
+./bin/mutation start --size 50 --energy 20
 
-The simulator includes experimental parallel processing support for agent decisions:
+# Multiple simulations for statistics
+./bin/mutation start --simulations 5
 
-- **Agent Parallelization**: Process agent decisions using multiple threads
-- **Configurable**: Control processor count and enable/disable parallel processing  
-- **Safe Execution**: Actions are applied sequentially to prevent race conditions
+# Custom agent with time limit
+./bin/mutation start --agents my_agent.rb --ticks 1000
 
-### Performance Notes
-
-**Advantage**: Process-based agents provide true parallelism by running each agent in a separate OS process, completely bypassing Ruby's Global Interpreter Lock (GIL). This enables:
-
-- **True CPU parallelism**: Each agent process can utilize separate CPU cores
-- **Enhanced isolation**: Process crashes don't affect other agents or the simulator
-- **Better resource utilization**: Full utilization of multi-core systems
-- **Scalable performance**: Performance scales linearly with available CPU cores
-
-### Usage
-
-```ruby
-# Enable parallel processing
-Mutation.configure do |config|
-  config.parallel_agents = true
-  config.processor_count = 4  # Use 4 processors
-end
-
-# Or via CLI
+# Parallel processing for performance
 ./bin/mutation start --parallel --processors 4
 ```
 
-## Safety Features
+## 📊 Performance
 
-- **Safe Mode**: Restricts dangerous operations
-- **Code Validation**: Prevents malicious code execution
-- **Error Handling**: Graceful handling of invalid mutations
-- **Timeout Protection**: Prevents infinite loops
-- **Resource Limits**: Controls memory and CPU usage
+- **True parallelism**: Each agent runs in separate OS process
+- **Configurable timing**: Adjustable simulation speed and timeouts
+- **Memory efficient**: Agent log rotation and cleanup
+- **Scalable**: Supports large worlds with hundreds of agents
 
-## Testing
+## 🔧 Requirements
 
-```bash
-# Run all tests
-rake test
+- Ruby 3.0+
+- Curses library (for visual mode)
+- YAML support
+- Unix-like environment (Linux/macOS)
 
-# Run specific test files
-rspec spec/agent_spec.rb
+## 📄 License
 
-# Run with coverage
-COVERAGE=true rspec
-```
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Contributing
+## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Add tests for new functionality
-4. Ensure all tests pass
-5. Submit a pull request
+Contributions are welcome! Please see our [Contributing Guide](docs/contributing.md) for details.
 
-## Extensions
+---
 
-Potential enhancements:
-- **2D World**: Add spatial movement
-- **Communication**: Agent-to-agent messaging
-- **Memory**: Persistent agent state
-- **Visualization**: Real-time graphics
-- **Metrics**: Advanced analytics
-- **Networking**: Distributed simulation
-
-## License
-
-This project is open source. See LICENSE file for details.
-
-## Acknowledgments
-
-Inspired by:
-- Evolutionary computation research
-- Artificial life studies
-- Complex adaptive systems
-- Digital evolution experiments 
+**[📚 Full Documentation](docs/)** | **[🐛 Report Issues](https://github.com/user/mutation/issues)** | **[💬 Discussions](https://github.com/user/mutation/discussions)**

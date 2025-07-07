@@ -28,10 +28,42 @@ module Mutation
     
     def current_log_path(filename)
       return File.join(LOGS_DIR, filename) unless @current_simulation_dir
+      
+      # Handle agent log rotation
+      if filename.start_with?('agent_')
+        manage_agent_log_rotation
+      end
+      
       File.join(@current_simulation_dir, filename)
     end
     
     private
+    
+    def manage_agent_log_rotation
+      return unless @current_simulation_dir
+      
+      # Find all agent log files in current simulation
+      agent_logs = Dir.glob(File.join(@current_simulation_dir, 'agent_*.log'))
+      
+      # If we're at or over the limit, remove oldest logs
+      max_logs = Mutation.configuration.max_agent_logs_per_simulation
+      if agent_logs.size >= max_logs
+        # Sort by modification time (oldest first)
+        agent_logs.sort_by! { |file| File.mtime(file) }
+        
+        # Calculate how many to remove (keep room for one new log)
+        logs_to_remove = agent_logs.size - max_logs + 1
+        
+        if logs_to_remove > 0
+          agent_logs.first(logs_to_remove).each do |log_file|
+            File.delete(log_file) if File.exist?(log_file)
+          end
+        end
+      end
+    rescue StandardError => e
+      # Don't let log rotation errors break the simulation
+      warn "Warning: Agent log rotation failed: #{e.message}"
+    end
     
     def cleanup_old_logs_on_startup
       # Remove all logs when program starts

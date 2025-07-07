@@ -24,12 +24,15 @@ module Mutation
 
       agent_executables = options[:agents]
       
+      # Default to visual mode unless explicitly disabled
+      visual_mode = options[:visual].nil? ? Mutation.configuration.visual_mode : options[:visual]
+      
       simulator = Simulator.new(
         world_size: options[:size],
         width: options[:width],
         height: options[:height],
         agent_executables: agent_executables,
-        curses_mode: options[:visual]
+        curses_mode: visual_mode
       )
 
       if options[:simulations]

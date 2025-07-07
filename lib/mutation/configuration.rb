@@ -43,6 +43,8 @@ module Mutation
                   :benchmark_default_size, :benchmark_default_generations, :benchmark_default_runs,
                   # Survivor logging
                   :survivor_log_max_count,
+                  # Agent logging
+                  :max_agent_logs_per_simulation,
                   # Agent behavior defaults
                   :agent_personality_aggression_min, :agent_personality_aggression_max,
                   :agent_personality_greed_min, :agent_personality_greed_max,
@@ -174,6 +176,9 @@ module Mutation
       # Survivor logging
       @survivor_log_max_count = 3
       
+      # Agent logging
+      @max_agent_logs_per_simulation = 100
+      
       # Agent behavior defaults
       @agent_personality_aggression_min = 0.3
       @agent_personality_aggression_max = 0.9
@@ -216,17 +221,153 @@ module Mutation
 
     def load_config_file
       config = YAML.load_file(config_file_path)
+      
+      # Handle flat structure (legacy) and nested structure (new)
+      if config.key?('world') || config.key?('energy') || config.key?('action_costs')
+        # New nested structure
+        load_nested_config(config)
+      else
+        # Legacy flat structure
+        load_flat_config(config)
+      end
+    rescue StandardError => e
+      # Use warn instead of puts so it can be suppressed during curses mode
+      warn "Warning: Could not load config file: #{e.message}"
+    end
+    
+    def load_nested_config(config)
+      # Map nested config sections to flat attribute names
+      config.each do |section, values|
+        case section
+        when 'world'
+          load_section(values, {
+            'size' => :world_size,
+            'width' => :world_width,
+            'height' => :world_height,
+            'initial_coverage' => :initial_coverage,
+            'agent_vision_radius' => :agent_vision_radius,
+            'performance_log_frequency' => :world_performance_log_frequency,
+            'agent_check_frequency' => :world_agent_check_frequency
+          })
+        when 'energy'
+          load_section(values, {
+            'decay' => :energy_decay,
+            'precision_threshold' => :energy_precision_threshold,
+            'initial_min' => :initial_energy_min,
+            'initial_max' => :initial_energy_max,
+            'initial_legacy' => :initial_energy
+          })
+        when 'action_costs'
+          load_action_costs(values)
+        when 'agent_management'
+          load_section(values, {
+            'max_agent_count' => :max_agent_count,
+            'parallel_processing_threshold' => :parallel_processing_threshold,
+            'max_parallel_threads' => :max_parallel_threads,
+            'response_timeout' => :agent_response_timeout,
+            'process_cleanup_delay' => :process_cleanup_delay,
+            'graceful_death_timeout' => :graceful_death_timeout,
+            'default_timeout_ms' => :default_timeout_ms,
+            'timeout_ms' => :agent_timeout_ms
+          })
+        when 'simulation'
+          load_section(values, {
+            'delay' => :simulation_delay,
+            'max_ticks' => :max_ticks,
+            'auto_reset' => :auto_reset,
+            'safe_mode' => :safe_mode,
+            'status_log_frequency' => :simulator_status_log_frequency,
+            'status_log_early_threshold' => :simulator_status_log_early_threshold,
+            'loop_sleep_interval' => :simulator_loop_sleep_interval,
+            'min_world_size' => :simulator_min_world_size,
+            'fallback_width' => :simulator_fallback_width,
+            'fallback_height' => :simulator_fallback_height
+          })
+        when 'parallel'
+          load_section(values, {
+            'enabled' => :parallel_agents,
+            'processor_count' => :processor_count
+          })
+        when 'mutation'
+          load_section(values, {
+            'rate' => :mutation_rate,
+            'probability' => :mutation_probability,
+            'small_variation_min' => :mutation_small_variation_min,
+            'small_variation_max' => :mutation_small_variation_max,
+            'large_variation_percent' => :mutation_large_variation_percent,
+            'probability_variation_min' => :mutation_probability_variation_min,
+            'probability_variation_max' => :mutation_probability_variation_max,
+            'probability_min_bound' => :mutation_probability_min_bound,
+            'probability_max_bound' => :mutation_probability_max_bound,
+            'threshold_variation_min' => :mutation_threshold_variation_min,
+            'threshold_variation_max' => :mutation_threshold_variation_max,
+            'operator_probability' => :mutation_operator_probability,
+            'personality_shift_min' => :mutation_personality_shift_min,
+            'personality_shift_max' => :mutation_personality_shift_max,
+            'personality_min_bound' => :mutation_personality_min_bound,
+            'personality_max_bound' => :mutation_personality_max_bound,
+            'personality_int_shift_min' => :mutation_personality_int_shift_min,
+            'personality_int_shift_max' => :mutation_personality_int_shift_max,
+            'personality_int_max_bound' => :mutation_personality_int_max_bound
+          })
+        when 'genetic_pool'
+          load_section(values, {
+            'fingerprint_length' => :genetic_fingerprint_length,
+            'survival_threshold' => :genetic_survival_threshold,
+            'sample_size' => :genetic_sample_size
+          })
+        when 'logging'
+          load_section(values, {
+            'level' => :log_level,
+            'max_agent_logs_per_simulation' => :max_agent_logs_per_simulation,
+            'survivor_filename' => :survivors_log,
+            'survivor_max_count' => :survivor_log_max_count
+          })
+        when 'display'
+          load_section(values, {
+            'visual_mode' => :visual_mode
+          })
+        when 'benchmark'
+          load_section(values, {
+            'default_size' => :benchmark_default_size,
+            'default_generations' => :benchmark_default_generations,
+            'default_runs' => :benchmark_default_runs
+          })
+        when 'file_paths'
+          load_section(values, {
+            'agents_directory' => :agents_directory,
+            'base_agent_path' => :base_agent_path,
+            'agent_memory_base_path' => :agent_memory_base_path,
+            'default_agent_executable' => :default_agent_executable
+          })
+        when 'fitness'
+          load_section(values, {
+            'energy_multiplier' => :fitness_energy_multiplier,
+            'generation_multiplier' => :fitness_generation_multiplier
+          })
+        end
+      end
+    end
+    
+    def load_flat_config(config)
+      # Legacy flat structure loading
       config.each do |key, value|
         if key == 'action_costs' && value.is_a?(Hash)
-          # Handle nested action_costs structure
           load_action_costs(value)
         elsif respond_to?("#{key}=")
           instance_variable_set("@#{key}", value)
         end
       end
-    rescue StandardError => e
-      # Use warn instead of puts so it can be suppressed during curses mode
-      warn "Warning: Could not load config file: #{e.message}"
+    end
+    
+    def load_section(section_values, mapping)
+      return unless section_values.is_a?(Hash)
+      
+      section_values.each do |key, value|
+        if mapping[key] && respond_to?("#{mapping[key]}=")
+          instance_variable_set("@#{mapping[key]}", value)
+        end
+      end
     end
     
     def load_action_costs(costs_hash)
