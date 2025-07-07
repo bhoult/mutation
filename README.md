@@ -36,7 +36,7 @@ The curses display shows a live view of the simulation:
      (World Grid)                       
 ------------------------------------------
 | LOG: Agent spawned at (2,3)     | T:42/256 G:1           |
-| LOG: Attack at (5,1)            | Agents:23/25 M:4       |
+| LOG: Attack at (5,1)            | Agents:23 M:4          |
 | LOG: Agent died at (4,2)        | AvgE:7.2 FPS:30        |
 | LOG: Replication at (1,4)       | ---Top Agents---       |
 |                                 | 1. active_explore..: 8 |
@@ -59,7 +59,7 @@ WASD:Scroll | SPACE:Pause | R:Reset View | Q:Quit
 **Status Panel Shows:**
 - `T:` Current tick / Total ticks across all simulations
 - `G:` Generation count
-- `Agents:` Manager count / Grid count (M: mutations)
+- `Agents:` Living agent count (M: mutations)
 - `AvgE:` Average energy of all agents
 - `FPS:` Display refresh rate
 - `Top Agents:` Most populous agent types (truncated names)
