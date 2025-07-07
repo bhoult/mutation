@@ -27,22 +27,29 @@ This starts a visual simulation with:
 The curses display shows a live view of the simulation:
 
 ```
-┌─────────────────────────────────────┬──────────────────────┐
-│  Y                                  │ ==== STATUS ====     │
-│  0  * *   *     *                   │ T: 42 G: 1          │
-│  1    *     x                       │ Agents: 23          │
-│  2  *   *       *                   │ Camera: (0,0)       │
-│       (World Grid)                  │                     │
-│                                     │ ---Top Agents---    │
-│                                     │ 1. active_explore: 8│
-│                                     │ 2. cautious_econ: 6│
-│                                     │ 3. reproductive: 5  │
-└─────────────────────────────────────┴──────────────────────┘
-[WASD: Move, Space: Pause, R: Reset, Q: Quit] | Tick 42: 23 agents
+     0         10        20        30   (X-axis labels)
+  0  * *   O     *                      
+  1    *     x          *   O           
+  2  *   *       *                      
+  3      x    *     *                    
+  4  O       *   *     x                
+     (World Grid)                       
+------------------------------------------
+| LOG: Agent spawned at (2,3)     | T:42/256 G:1           |
+| LOG: Attack at (5,1)            | Agents:23/25 M:4       |
+| LOG: Agent died at (4,2)        | AvgE:7.2 FPS:30        |
+| LOG: Replication at (1,4)       | ---Top Agents---       |
+|                                 | 1. active_explore..: 8 |
+|                                 | 2. cautious_econ..: 6  |
+|                                 | 3. reproductive_c..: 5 |
+|                                 | View:(0,0)/170,25      |
+------------------------------------------
+WASD:Scroll | SPACE:Pause | R:Reset View | Q:Quit
 ```
 
 **Grid Symbols:**
-- `*` = Living agent (color indicates energy level)
+- `*` = Original agent (color indicates energy level)
+- `O` = Mutated agent (color indicates energy level)
   - 🟢 Green = High energy (8+ energy)
   - 🟡 Yellow = Medium energy (4-7 energy)
   - 🔴 Red = Low energy (1-3 energy)
@@ -50,11 +57,13 @@ The curses display shows a live view of the simulation:
 - ` ` = Empty space
 
 **Status Panel Shows:**
-- `T:` Current tick number
+- `T:` Current tick / Total ticks across all simulations
 - `G:` Generation count
-- `Agents:` Living agent count
-- `Camera:` Your current view position
-- `Top Agents:` Most populous agent types
+- `Agents:` Manager count / Grid count (M: mutations)
+- `AvgE:` Average energy of all agents
+- `FPS:` Display refresh rate
+- `Top Agents:` Most populous agent types (truncated names)
+- `View:` Camera position / Max camera position (for large worlds)
 
 ### 3. Monitor Agent Performance
 
