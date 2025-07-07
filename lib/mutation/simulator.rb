@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'fileutils'
+require_relative 'agent_performance_tracker'
 
 module Mutation
   class Simulator
@@ -46,6 +47,8 @@ module Mutation
       @curses_mode = curses_mode
       @curses_display = nil
       @survivor_logger = nil  # Will be initialized when simulation starts
+      @performance_tracker = AgentPerformanceTracker.new
+      @simulation_start_agents = []
       @running = false
       @quit_requested = false
       @statistics = {
@@ -66,6 +69,9 @@ module Mutation
       # Initialize survivor logger with simulation-specific path
       survivor_log_path = Mutation.log_manager.current_log_path('survivors.log')
       @survivor_logger = SurvivorLogger.new(log_file: survivor_log_path)
+      
+      # Record initial agents for performance tracking
+      @simulation_start_agents = @world.living_agents.dup
 
       if @curses_mode
         # Mutation.logger.suppress_output = true # Temporarily disable for debugging
@@ -94,6 +100,9 @@ module Mutation
 
       # Log survivors when simulation ends
       log_final_survivors
+      
+      # Track performance statistics
+      track_simulation_performance
       
       # Clean up temporary mutation agent files
       cleanup_temp_mutation_agents
@@ -333,6 +342,9 @@ module Mutation
       # Log survivors before extinction
       survivors = @world.living_agents
       @survivor_logger&.log_survivors(survivors)
+      
+      # Track performance before reset
+      track_simulation_performance
 
       @world.prepare_for_reset
 
@@ -346,6 +358,9 @@ module Mutation
         @world.reset_grid
         @world.reset_tick
         
+        # Record new simulation's initial agents
+        @simulation_start_agents = @world.living_agents.dup
+        
         # Start a new simulation log folder for the new generation
         Mutation.log_manager.start_new_simulation
         
@@ -355,6 +370,9 @@ module Mutation
         
         # Re-initialize world logging to use new folder
         @world.reinitialize_logging if @world.respond_to?(:reinitialize_logging)
+        
+        # Record new simulation's initial agents
+        @simulation_start_agents = @world.living_agents.dup
         
         Mutation.logger.generation('🔄 Auto-reset enabled, starting new generation')
       else
@@ -530,6 +548,27 @@ module Mutation
       end
     rescue StandardError => e
       Mutation.logger.warn("Failed to clean up temp mutation agents: #{e.message}")
+    end
+    
+    def track_simulation_performance
+      # Get the final survivors
+      final_survivors = @world.living_agents
+      winning_agent = nil
+      
+      # If there's exactly one survivor, they are the winner
+      if final_survivors.size == 1
+        winning_agent = final_survivors.first
+      elsif final_survivors.size > 1
+        # If multiple survivors, the one with highest fitness wins
+        winning_agent = final_survivors.max_by(&:fitness)
+      end
+      
+      # Record the simulation results
+      @performance_tracker.record_simulation(@simulation_start_agents, winning_agent)
+      
+      Mutation.logger.info("Performance stats updated for simulation with #{@simulation_start_agents.size} initial agents")
+    rescue StandardError => e
+      Mutation.logger.error("Failed to track simulation performance: #{e.message}")
     end
   end
 end

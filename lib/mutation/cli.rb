@@ -43,7 +43,9 @@ module Mutation
           simulator.reset unless i == count - 1
         end
       elsif options[:ticks]
+        simulator.start
         simulator.run_for_ticks(options[:ticks])
+        simulator.stop
       else
         simulator.start
       end
