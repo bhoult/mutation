@@ -75,7 +75,7 @@ module Mutation
 
       loop do
         print '> '
-        input = gets.chomp.split
+        input = $stdin.gets.chomp.split
         command = input[0]&.downcase
 
         case command
