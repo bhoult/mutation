@@ -6,22 +6,104 @@ A Ruby-based evolutionary simulation where agents with self-modifying code compe
 
 ## 🚀 Quick Start
 
+### 1. Install and Run Your First Simulation
+
 ```bash
 # Install dependencies
 bundle install
 
-# Run a visual simulation with auto-sized grid
-./bin/mutation start
+# Run a visual simulation with default parameters
+./bin/mutation visual
+```
 
-# Run with custom world size
-./bin/mutation start --size 30
-./bin/mutation start --width 20 --height 15
+This starts a visual simulation with:
+- Auto-sized world to fit your terminal
+- 10% initial population coverage
+- 6 different agent types competing
+- Real-time visualization
 
-# Run non-visual simulation
-./bin/mutation start --visual false
+### 2. Understanding the Visual Interface
 
-# Interactive mode for step-by-step control
-./bin/mutation interactive
+The curses display shows a live view of the simulation:
+
+```
+┌─────────────────────────────────────┬──────────────────────┐
+│  Y                                  │ ==== STATUS ====     │
+│  0  * *   *     *                   │ T: 42 G: 1          │
+│  1    *     x                       │ Agents: 23          │
+│  2  *   *       *                   │ Camera: (0,0)       │
+│       (World Grid)                  │                     │
+│                                     │ ---Top Agents---    │
+│                                     │ 1. active_explore: 8│
+│                                     │ 2. cautious_econ: 6│
+│                                     │ 3. reproductive: 5  │
+└─────────────────────────────────────┴──────────────────────┘
+[WASD: Move, Space: Pause, R: Reset, Q: Quit] | Tick 42: 23 agents
+```
+
+**Grid Symbols:**
+- `*` = Living agent (color indicates energy level)
+  - 🟢 Green = High energy (8+ energy)
+  - 🟡 Yellow = Medium energy (4-7 energy)
+  - 🔴 Red = Low energy (1-3 energy)
+- `x` = Dead agent corpse (can be eaten for +10 energy)
+- ` ` = Empty space
+
+**Status Panel Shows:**
+- `T:` Current tick number
+- `G:` Generation count
+- `Agents:` Living agent count
+- `Camera:` Your current view position
+- `Top Agents:` Most populous agent types
+
+### 3. Monitor Agent Performance
+
+While the simulation runs, track agent success rates:
+
+```bash
+# In another terminal, watch performance stats
+tail -f logs/agent_performance_stats.log
+```
+
+This shows win rates across all simulations:
+```
+1. active_explorer_agent:
+   Participated: 35 | Won: 26 | Win Rate: 74.29%
+
+2. reproductive_colonizer:
+   Participated: 35 | Won: 5 | Win Rate: 14.29%
+```
+
+### 4. Find Successful Mutations
+
+Check for evolved agents that survived:
+
+```bash
+# List successful mutations
+ls -la agents/*/
+
+# Example output:
+agents/active_explorer_agent_mutations/
+├── active_explorer_agent_18e6ed0b_survival_150_gen_4_20250707_124051.rb
+└── active_explorer_agent_982e99f3_survival_244_gen_2_20250707_121904.rb
+```
+
+These files contain mutated code that survived longest in simulations.
+
+### 5. Customize Your Simulation
+
+```bash
+# Larger world with more initial energy
+./bin/mutation visual --size 50 --energy 20
+
+# Specific dimensions
+./bin/mutation visual --width 100 --height 30
+
+# Faster simulation
+./bin/mutation visual --delay 0.01
+
+# Run specific agents only
+./bin/mutation visual --agents aggressive_hunter.rb,cautious_economist.rb
 ```
 
 ## 📖 Documentation
