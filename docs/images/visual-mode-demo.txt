@@ -1,0 +1,44 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│  *   *       x         *     x             *   *           x     *               *         x       │
+│      *   *       *   x             *                   *       *     x   *           *         *   │
+│  x       * *     *     *   *           *     x               *   *       x         *           *   │
+│      *           x   *               *         *   x           *             x   *       *     x   │
+│    *   x   *   *       *   x     *           *       *     x       *   *           *   x         *│
+│  *       *   x     *     *           x   *       *           *   x     *       *         *   x     │
+│          *     x   *       *   x               *   *     x         *       x   *           *       │
+│  *   x       *         *   x     *       x   *       *         x   *     *       *   x         *   │
+│      *     x       *         *   x           *   x     *           *   x       *         *         │
+│  x   *       *   x     *           *     x       *         x   *       *     x       *   *     x   │
+│  *           x   *       *     x         *   *           x   *         *   x       *         *     │
+│      x   *       *         x   *     *           *   x         *     x   *       *           x     │
+│  *       *     x   *           *   x     *     x       *   *         x   *         *   x         * │
+│    *   x         *     x   *       *           *   x       *         x       *   *         *   x   │
+│  x       *   *         x   *     *       x   *         *   x     *         x   *       *         * │
+│  *     x       *   *         x       *         *   x         *   x       *         x   *         x │
+│      *         x   *     *         x   *     *           x   *         *   x     *         *       │
+│  x   *       *         x   *           *   x     *         x       *   *         x         *   x   │
+│  *         x   *     *         x   *         *   x           *         x   *   *         x       * │
+│      x   *         *   x     *           x   *       *         x   *         *   x     *           │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Tick: 1247        Generation: 15        Agents: 23/28        Camera: (15,8)        Procs: 23      │
+│ WASD=Navigate | SPACE=Pause | R=Reset View | Q=Quit                                               │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+Legend:
+  * = Living agents (Green/Yellow/Red based on energy level)
+  x = Dead agents (Red) - Can be consumed for +10 energy
+    = Empty space (Available for movement)
+
+Controls:
+  WASD - Pan camera around large worlds
+  SPACE - Pause/resume simulation  
+  R - Reset camera to origin (0,0)
+  Q/Esc - Quit simulation
+
+Features:
+  ✓ Real-time visualization of 100×100 grid world
+  ✓ Color-coded agents by energy level
+  ✓ Interactive navigation for large worlds
+  ✓ Live statistics and status information
+  ✓ Viewport system for worlds larger than terminal

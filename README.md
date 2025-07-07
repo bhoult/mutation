@@ -2,7 +2,7 @@
 
 A Ruby-based evolutionary simulation where agents with self-modifying code compete, evolve, and adapt through natural selection in a 2D grid world environment.
 
-![Mutation Simulator Demo](docs/images/demo.gif)
+**[📺 View Visual Mode Demo (100×100 Grid)](docs/images/visual-demo.md)**
 
 ## 🚀 Quick Start
 
