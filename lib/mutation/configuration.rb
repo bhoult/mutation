@@ -15,7 +15,7 @@ module Mutation
                   # Action costs
                   :base_action_cost, :attack_action_cost, :additional_replication_cost,
                   # Agent management
-                  :max_agent_count, :parallel_processing_threshold, :max_parallel_threads,
+                  :max_agent_count, :parallel_processing_threshold, :max_parallel_threads, :max_agent_lifespan,
                   # Process management
                   :agent_response_timeout, :process_cleanup_delay, :graceful_death_timeout, :default_timeout_ms,
                   # Fitness calculation
@@ -111,6 +111,7 @@ module Mutation
       @max_agent_count = 100
       @parallel_processing_threshold = 5
       @max_parallel_threads = 8
+      @max_agent_lifespan = 1000
       
       # Process management
       @agent_response_timeout = 0.1
@@ -264,6 +265,7 @@ module Mutation
             'max_agent_count' => :max_agent_count,
             'parallel_processing_threshold' => :parallel_processing_threshold,
             'max_parallel_threads' => :max_parallel_threads,
+            'max_lifespan' => :max_agent_lifespan,
             'response_timeout' => :agent_response_timeout,
             'process_cleanup_delay' => :process_cleanup_delay,
             'graceful_death_timeout' => :graceful_death_timeout,

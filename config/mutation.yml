@@ -40,7 +40,7 @@ action_costs:
     energy_gain: 1              # Energy gained when resting
   
   replicate:
-    cost: 5                     # Total energy cost to replicate
+    cost: 10                     # Total energy cost to replicate
   
   move:
     dead_agent_energy_gain: 10  # Energy gained from eating dead agents
@@ -54,6 +54,9 @@ agent_management:
   max_agent_count: 100          # Maximum number of concurrent agents
   parallel_processing_threshold: 5  # Minimum agents before using parallel processing
   max_parallel_threads: 8       # Maximum threads for parallel processing
+  
+  # Agent lifecycle
+  max_lifespan: 1000            # Maximum cycles an agent can live (prevents immortal agents)
   
   # Process management
   response_timeout: 0.5         # Timeout for agent responses (seconds)

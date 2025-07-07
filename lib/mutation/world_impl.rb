@@ -318,23 +318,31 @@ module Mutation
 
           execute_action(agent, action, x, y, new_grid)
 
+          # Age the agent and check for maximum lifespan
+          died_of_old_age = agent.age_one_cycle!
+          
           # Apply additional energy decay (aging/metabolism)
           current_energy = agent.energy
           new_energy = current_energy - Mutation.configuration.energy_decay
           @agent_manager.update_agent_energy(agent.agent_id, new_energy)
 
-          # Keep agent if still alive after all energy deductions (fix floating point precision)
-          if agent.alive && new_energy > 0.001
+          # Keep agent if still alive after all checks (energy and age)
+          if agent.alive && new_energy > 0.001 && !died_of_old_age
             # Only place agent at original position if it didn't move
             # (Movement already places the agent in the new position)
             unless action_type == :move
               new_grid[y][x] = agent
             end
           else
-            # Agent died - only remove if not already removed by execute_action
+            # Agent died - handle different death causes
             if agent.alive
-              Mutation.logger.debug("Agent #{agent.agent_id} at (#{x},#{y}) dying (energy: #{new_energy})")
-              log_world_event("DEATH_ENERGY", agent.agent_id, [x, y], { energy: new_energy })
+              if died_of_old_age
+                Mutation.logger.debug("Agent #{agent.agent_id} at (#{x},#{y}) died of old age (age: #{agent.age})")
+                log_world_event("DEATH_AGE", agent.agent_id, [x, y], { age: agent.age, energy: new_energy })
+              else
+                Mutation.logger.debug("Agent #{agent.agent_id} at (#{x},#{y}) dying (energy: #{new_energy})")
+                log_world_event("DEATH_ENERGY", agent.agent_id, [x, y], { energy: new_energy })
+              end
               agent.die!
               @agent_manager.remove_agent(agent.agent_id)
               cleanup_mutation_tracking(agent.agent_id)

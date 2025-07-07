@@ -7,7 +7,7 @@ require 'fileutils'
 
 module Mutation
   class Agent
-    attr_reader :agent_id, :executable_path, :position, :energy, :generation, :pid
+    attr_reader :agent_id, :executable_path, :position, :energy, :generation, :pid, :age
     attr_accessor :alive, :memory
     
     @@firejail_warning_shown = false
@@ -19,6 +19,7 @@ module Mutation
       @energy = energy || Mutation.configuration.random_initial_energy
       @generation = generation
       @alive = true
+      @age = 0  # Track agent age in cycles
       @pid = nil
       @stdin = nil
       @stdout = nil
@@ -132,9 +133,30 @@ module Mutation
 
     def die!
       @alive = false
-      Mutation.logger.info("🏴 Agent #{@agent_id} died naturally (energy: #{@energy})")
+      Mutation.logger.info("🏴 Agent #{@agent_id} died naturally (energy: #{@energy}, age: #{@age})")
       # Defer graceful death to avoid blocking simulation
       # The agent cleanup will be handled by the cleanup queue
+    end
+
+    # Age the agent by one cycle and check for maximum lifespan
+    def age_one_cycle!
+      @age += 1
+      
+      # Check if agent has exceeded maximum lifespan
+      max_lifespan = Mutation.configuration.max_agent_lifespan
+      if @age >= max_lifespan
+        Mutation.logger.info("⏳ Agent #{@agent_id} died of old age (age: #{@age})")
+        die!
+        return true  # Indicate agent died of old age
+      end
+      
+      false  # Agent still alive
+    end
+
+    # Check if agent has exceeded maximum lifespan
+    def exceeds_max_lifespan?
+      max_lifespan = Mutation.configuration.max_agent_lifespan
+      @age >= max_lifespan
     end
 
     def request_graceful_death
