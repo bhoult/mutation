@@ -12,6 +12,7 @@ require_relative 'mutation/world_impl'
 require_relative 'mutation/world'
 require_relative 'mutation/curses_display'
 require_relative 'mutation/survivor_logger'
+require_relative 'mutation/mutated_agent_manager'
 require_relative 'mutation/simulator'
 require_relative 'mutation/cli'
 

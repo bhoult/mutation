@@ -46,8 +46,6 @@ module Mutation
       @genetic_pool.statistics
     end
 
-    private
-
     def mutate_code(code)
       lines = code.lines.map do |line|
         if should_mutate_line?
@@ -59,6 +57,8 @@ module Mutation
 
       lines.join
     end
+
+    private
 
     def should_mutate_line?
       rand < Mutation.configuration.mutation_rate

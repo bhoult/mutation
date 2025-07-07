@@ -225,6 +225,48 @@ module Mutation
 
     private
 
+    def save_single_survivor(agent)
+      # Only save if the agent has mutation metadata
+      return unless agent.memory && agent.memory['is_mutation']
+      
+      # Gather simulation statistics for the metadata
+      simulation_stats = {
+        survival_ticks: @world.tick,
+        generation: @world.generation,
+        world_size: "#{@world.width}x#{@world.height}",
+        total_agents: @statistics[:total_agents_created],
+        simulation_delay: Mutation.configuration.simulation_delay,
+        final_agent_count: 1,
+        created_at: Time.now.strftime('%Y-%m-%d %H:%M:%S')
+      }
+      
+      # Reconstruct agent data from memory
+      agent_data = {
+        code: get_agent_code(agent),
+        is_mutation: agent.memory['is_mutation'],
+        original_agent: agent.memory['original_agent']
+      }
+      
+      # Save the survivor using the mutated agent manager
+      saved_path = @world.instance_variable_get(:@mutated_agent_manager)&.save_survivor(agent_data, simulation_stats)
+      
+      if saved_path
+        Mutation.logger.info("🏆 Saved last surviving mutated agent: #{File.basename(saved_path)}")
+      end
+    rescue StandardError => e
+      Mutation.logger.warn("Failed to save surviving mutated agent: #{e.message}")
+    end
+
+    def get_agent_code(agent)
+      # Get the stored agent code from memory
+      if agent.memory && agent.memory['agent_code']
+        return agent.memory['agent_code']
+      end
+      
+      # Fallback if code not found in memory
+      return "# Agent code could not be retrieved\n# Agent ID: #{agent.agent_id}\n# This was a surviving mutated agent"
+    end
+
     def run_simulation_loop
       while @running
         step
@@ -244,8 +286,14 @@ module Mutation
     def handle_extinction
       @statistics[:extinctions] += 1
 
+      # Check for single surviving mutated agent to save
+      survivors = @world.living_agents
+      if survivors.size == 1
+        save_single_survivor(survivors.first)
+      end
+
       # Log survivors before extinction
-      @survivor_logger&.log_survivors(@world.living_agents)
+      @survivor_logger&.log_survivors(survivors)
 
       @world.prepare_for_reset
 

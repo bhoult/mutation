@@ -49,6 +49,7 @@ module Mutation
       @agent_manager = AgentManager.new
       @agent_executables = agent_executables || []
       @mutation_engine = MutationEngine.new
+      @mutated_agent_manager = MutatedAgentManager.new
       @statistics = {
         total_agents_created: 0,
         total_generations: 0,
@@ -84,25 +85,36 @@ module Mutation
       end
       positions.shuffle!
 
-      # Spawn initial agents from genetic pool or provided executables
+      # Create initial mutations (10% of population)
+      initial_mutations = @mutated_agent_manager.create_initial_mutations(agent_count)
+      
+      # Spawn initial agents (mix of originals and mutations)
       agent_count.times do |i|
         break if positions.empty?
 
         x, y = positions.pop
         
-        # Prefer genetic pool over provided executables
-        executable = if @mutation_engine.respond_to?(:random_agent_from_pool)
-          @mutation_engine.random_agent_from_pool || default_executable
+        # Use mutation if available, otherwise random agent
+        if i < initial_mutations.size
+          # Use a pre-created mutation
+          mutation_data = initial_mutations[i]
+          agent = spawn_agent_from_data(mutation_data, x, y)
         else
-          default_executable
+          # Use random agent from available pool
+          agent_data = @mutated_agent_manager.select_random_agent
+          if agent_data
+            agent = spawn_agent_from_data(agent_data, x, y)
+          else
+            # Fallback to default executable
+            executable = default_executable
+            agent = @agent_manager.spawn_agent(
+              executable, x, y, 
+              Mutation.configuration.random_initial_energy, 
+              @generation + 1,
+              {} # Initial empty memory
+            )
+          end
         end
-        
-        agent = @agent_manager.spawn_agent(
-          executable, x, y, 
-          Mutation.configuration.random_initial_energy, 
-          @generation + 1,
-          {} # Initial empty memory
-        )
         
         if agent
           @grid[y][x] = agent
@@ -122,6 +134,39 @@ module Mutation
     
     def reinitialize_logging
       initialize_world_logging
+    end
+
+    # Helper method to spawn agent from mutation data
+    def spawn_agent_from_data(agent_data, x, y)
+      # Create a temporary file for the agent code
+      temp_dir = "/tmp/mutation_agents"
+      FileUtils.mkdir_p(temp_dir)
+      
+      # Create unique filename
+      timestamp = Time.now.strftime('%Y%m%d_%H%M%S_%N')
+      temp_filename = "temp_agent_#{timestamp}.rb"
+      temp_filepath = File.join(temp_dir, temp_filename)
+      
+      # Write the agent code to temporary file
+      File.write(temp_filepath, agent_data[:code])
+      File.chmod(0755, temp_filepath) # Make executable
+      
+      # Spawn the agent
+      agent = @agent_manager.spawn_agent(
+        temp_filepath, x, y,
+        Mutation.configuration.random_initial_energy,
+        @generation + 1,
+        { 
+          is_mutation: agent_data[:is_mutation],
+          original_agent: agent_data[:original_agent],
+          agent_code: agent_data[:code] # Store the code for later retrieval
+        }
+      )
+      
+      # Clean up temporary file after agent is spawned
+      File.delete(temp_filepath) if File.exist?(temp_filepath)
+      
+      agent
     end
 
     def step
