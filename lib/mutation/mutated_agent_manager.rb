@@ -171,7 +171,7 @@ module Mutation
         path: selected_path
       }
       
-      puts "SELECT_ORIGINAL: #{result[:name]} is_mutation=#{result[:is_mutation]}"
+      Mutation.logger.debug("SELECT_ORIGINAL: #{result[:name]} is_mutation=#{result[:is_mutation]}")
       result
     end
 
