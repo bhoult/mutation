@@ -18,14 +18,20 @@ This is a Ruby-based evolutionary simulation called "Mutation Simulator" where a
 - **Logger**: Specialized logging with colorized output
 
 ### Key Components
-- **lib/mutation/agent_process.rb**: Manages individual agent OS processes with stdin/stdout IPC
-- **lib/mutation/process_world.rb**: 2D grid environment where agents interact
-- **lib/mutation/world.rb**: Thin wrapper around ProcessWorld for backward compatibility
+- **lib/mutation/agent.rb**: Individual agent process management with stdin/stdout IPC
+- **lib/mutation/world_impl.rb**: Core 2D grid environment where agents interact
+- **lib/mutation/world.rb**: Thin wrapper around WorldImpl for backward compatibility
 - **lib/mutation/agent_manager.rb**: Orchestrates collection of agent processes
-- **lib/mutation/process_mutation_engine.rb**: Mutates agent scripts and manages genetic pool
+- **lib/mutation/mutated_agent_manager.rb**: Manages agent mutations and genetic diversity
 - **lib/mutation/genetic_pool.rb**: Persistent storage of evolved agent scripts
 - **lib/mutation/simulator.rb**: Main simulation loop and lifecycle management
 - **lib/mutation/configuration.rb**: Configuration loading and validation
+- **lib/mutation/agent_performance_tracker.rb**: Tracks agent win/loss statistics across simulations
+- **lib/mutation/curses_display.rb**: Real-time visual display system
+- **lib/mutation/simulation_log_manager.rb**: Manages simulation-specific logging
+- **lib/mutation/survivor_logger.rb**: Logs and tracks evolutionary survivors
+- **lib/mutation/cli.rb**: Command-line interface and argument parsing
+- **lib/mutation/logger.rb**: Specialized logging with colorized output
 
 ## Common Development Commands
 
@@ -99,12 +105,17 @@ Configuration is managed through:
 - **Programmatic configuration**: Via `Mutation.configure` block
 
 Key configuration areas:
-- World settings (size for square grid, or width/height for rectangular grid, initial energy, coverage)
-- Energy system (decay, attack damage, replication cost)
-- Mutation parameters (rate, probability)
-- Simulation settings (delay, max ticks, auto-reset)
-- Safety and parallel processing options
-- Visual display settings (survivors log file)
+- **World settings**: Size for square grid, or width/height for rectangular grid, initial energy, coverage
+- **Energy system**: Decay, initial energy ranges (20-60), attack damage, replication cost  
+- **Agent management**: Maximum agent count, lifespan limits (1000 cycles), process timeouts
+- **Mutation parameters**: Rate, probability, variation ranges for different mutation types
+- **Simulation settings**: Delay, max ticks, auto-reset, status logging frequency
+- **Parallel processing**: Enable/disable, processor count, threading thresholds
+- **Visual display**: Layout settings, color thresholds, FPS, panel sizing
+- **Agent behavior**: Personality ranges, energy thresholds, replication parameters
+- **Logging**: Log levels, file rotation, survivor tracking
+- **Genetic pool**: Fingerprint length, survival thresholds, sample sizes
+- **File paths**: Agent directories, memory storage paths, default executables
 
 ## Agent Behavior System
 
@@ -114,6 +125,12 @@ All agents run as separate OS processes for enhanced isolation and true parallel
 - `:replicate` - Create mutated offspring
 - `:move` - Move to adjacent position (can eat dead agents for +10 energy)
 - `:die` - End existence
+
+### Agent Lifespan System
+- **Maximum Lifespan**: Agents automatically die after 1000 cycles to prevent immortal agents
+- **Age Tracking**: Each agent tracks its age in cycles from birth
+- **Death Types**: Agents can die from energy depletion, old age, or voluntary termination
+- **Automatic Victory**: If an agent is the last survivor, it automatically wins the simulation
 
 ### Agent Architecture
 - **Process Spawning**: Each agent runs as an independent Ruby process using `Open3.popen3`
@@ -264,6 +281,24 @@ Agents receive vision data showing a 5-square radius around their position (11x1
 - Recommended for complex agent behaviors that benefit from isolation
 - Agent process limit of 100 to prevent resource exhaustion
 
+## Agent Ecosystem
+
+### Current Agent Types
+The system includes several pre-built agent types with different strategies:
+
+- **active_explorer_agent**: Balanced exploration and survival strategy, currently leading with ~74% win rate
+- **aggressive_hunter**: Focuses on attacking other agents for energy
+- **cautious_economist**: Conservative energy management with defensive tactics
+- **defensive_fortress**: Prioritizes survival and defensive positioning
+- **opportunistic_scavenger**: Seeks dead agents for food and avoids confrontation
+- **reproductive_colonizer**: Emphasizes rapid replication and territory expansion
+
+### Agent Evolution System
+- **Mutation Storage**: Successful mutations stored in `agents/{type}_mutations/` directories
+- **Genetic Pool**: Temporary mutations managed in `agents/temp_mutation_agents/`
+- **Lineage Tracking**: Fingerprint-based system tracks successful evolutionary lines
+- **Performance Tracking**: Win rates tracked across all simulations in `logs/agent_performance_stats.log`
+
 ## Agent Command Reference
 
 ### Available Actions
@@ -303,6 +338,29 @@ Valid target directions for attacks (Moore neighborhood):
 - Replicate requires sufficient energy and empty adjacent space
 - All actions validated before execution
 
+## Logging and Performance Tracking
+
+### Logs Directory Structure
+The `logs/` directory contains comprehensive simulation data:
+
+- **agent_performance_stats.log**: Cross-simulation performance statistics tracking agent win rates
+- **simulation_YYYYMMDD_HHMMSS_xxx/**: Individual simulation folders containing:
+  - **world_events.log**: Detailed world events (moves, attacks, replications, deaths)
+  - **agent_agent_ID_TIMESTAMP.log**: Individual agent interaction logs (input/output/timing)
+  - **survivors.log**: Successful survivor code snippets (when generated)
+  - **curses_debug.log**: Debug output from visual display mode (when used)
+
+### Agent Performance Tracking
+- **Cross-Simulation Statistics**: Tracks participation, wins, and win percentages for each agent type
+- **Base Name Normalization**: Consolidates statistics by agent base names (ignoring mutation suffixes)
+- **Automatic Updates**: Performance stats updated at end of each simulation
+- **Sorted Ranking**: Agents ranked by win percentage for competitive analysis
+
+### Visual Display Enhancements
+- **Top Agent Display**: Shows the 3 most populous agent types with counts in status panel
+- **Population Tracking**: Real-time agent population counts by type
+- **Enhanced Status Panel**: Expanded status display with agent statistics and simulation progress
+
 ## Development Notes
 
 - The project uses Ruby ~> 3.0
@@ -313,8 +371,10 @@ Valid target directions for attacks (Moore neighborhood):
 - Evolution occurs through survival of the fittest and code mutation
 - 2D grid supports both square (size parameter) and rectangular (width/height) configurations
 - Agent environment provides vision data in a 5-square radius (11x11 grid centered on agent)
-- Survivor codes are automatically logged to `survivors.log` to track evolutionary progress
+- Survivor codes are automatically logged to track evolutionary progress
 - Visual mode requires a curses-compatible terminal
 - Initial world coverage is configurable (default 10%) for realistic population dynamics
 - Curses display includes stability improvements for long-running simulations
 - Process-based agents provide true parallelism bypassing Ruby's GIL
+- Agent lifespan limited to 1000 cycles to ensure simulation completion
+- Comprehensive logging system tracks all agent interactions and world events
