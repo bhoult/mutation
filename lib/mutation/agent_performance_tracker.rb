@@ -27,33 +27,47 @@ module Mutation
       # Extract base name from path
       basename = File.basename(path, '.rb')
       
-      # Remove mutation suffixes and timestamps
+      # Remove mutation suffixes and timestamps to get base agent name
       # Examples:
       # active_explorer_agent_18e6ed0b_survival_150_gen_4_20250707_124051 -> active_explorer_agent
       # aggressive_hunter_mutation_gen14_20250707_131713_321396629 -> aggressive_hunter
+      # cautious_economist_133744_472842708 -> cautious_economist
+      # reproductive_colonizer_133812_811442569_133816_357998508_... -> reproductive_colonizer
       
-      # First, handle mutation variants with fingerprints
+      # Strategy: Find the base agent name by removing all timestamp/hash patterns
+      
+      # 1. Handle mutation variants with fingerprints (saved survivors)
       if basename =~ /^(.+?)_[a-f0-9]{8}_survival_/
         return $1
       end
       
-      # Handle temp mutation files
+      # 2. Handle temp mutation files
       if basename =~ /^(.+?)_mutation_gen\d+_/
         return $1
       end
       
-      # Handle timestamped mutation files
-      if basename =~ /^(.+?)_\d{8}_\d{6}/
+      # 3. Handle any sequence of numbers (timestamps, hashes, etc.)
+      # Remove patterns like: _123456_789012345, _133744_472842708, etc.
+      # This catches both single and multiple timestamp sequences
+      clean_name = basename.gsub(/_\d{6,}_\d{6,}/, '') # Remove _numbers_numbers patterns
+      clean_name = clean_name.gsub(/_\d{6,}$/, '')     # Remove trailing _numbers
+      
+      # 4. Handle standard mutation patterns (after number cleanup)
+      if clean_name =~ /^(.+?)_mutation/
         return $1
       end
       
-      # Return as-is for regular agent files
-      basename
+      # 5. Remove any remaining timestamp patterns
+      clean_name = clean_name.gsub(/_gen\d+_.*$/, '')     # Remove _gen1_timestamp
+      clean_name = clean_name.gsub(/_\d{8}_.*$/, '')      # Remove _20250707_timestamp
+      
+      # Return the cleaned base name
+      clean_name.empty? ? basename : clean_name
     end
     
     # Record a simulation with its participants and winner
     def record_simulation(participating_agents, winning_agent = nil)
-      # Extract unique agent types from participating agents
+      # Extract unique agent types from participating agents (using base names)
       agent_types = Set.new
       participating_agents.each do |agent|
         agent_type = extract_agent_type(agent)
@@ -78,7 +92,18 @@ module Mutation
 
     # Get sorted statistics
     def sorted_stats
-      @stats.map do |agent_type, data|
+      # First, consolidate stats by extracting base names from existing entries
+      consolidated_stats = Hash.new { |h, k| h[k] = { participations: 0, wins: 0 } }
+      
+      @stats.each do |agent_type, data|
+        # Re-extract the base name to ensure consistency
+        base_name = extract_base_name_from_string(agent_type)
+        consolidated_stats[base_name][:participations] += data[:participations]
+        consolidated_stats[base_name][:wins] += data[:wins]
+      end
+      
+      # Convert to output format
+      consolidated_stats.map do |agent_type, data|
         win_percentage = if data[:participations] > 0
                           (data[:wins].to_f / data[:participations] * 100).round(2)
                         else
@@ -92,6 +117,38 @@ module Mutation
           win_percentage: win_percentage
         }
       end.sort_by { |stat| -stat[:win_percentage] }
+    end
+    
+    # Helper method to extract base name from a string (for consolidating existing stats)
+    def extract_base_name_from_string(agent_name)
+      # Apply the same logic as extract_agent_type but for strings
+      basename = agent_name
+      
+      # Handle mutation variants with fingerprints (saved survivors)
+      if basename =~ /^(.+?)_[a-f0-9]{8}_survival_/
+        return $1
+      end
+      
+      # Handle temp mutation files
+      if basename =~ /^(.+?)_mutation_gen\d+_/
+        return $1
+      end
+      
+      # Handle any sequence of numbers (timestamps, hashes, etc.)
+      clean_name = basename.gsub(/_\d{6,}_\d{6,}/, '') # Remove _numbers_numbers patterns
+      clean_name = clean_name.gsub(/_\d{6,}$/, '')     # Remove trailing _numbers
+      
+      # Handle standard mutation patterns (after number cleanup)
+      if clean_name =~ /^(.+?)_mutation/
+        return $1
+      end
+      
+      # Remove any remaining timestamp patterns
+      clean_name = clean_name.gsub(/_gen\d+_.*$/, '')     # Remove _gen1_timestamp
+      clean_name = clean_name.gsub(/_\d{8}_.*$/, '')      # Remove _20250707_timestamp
+      
+      # Return the cleaned base name
+      clean_name.empty? ? basename : clean_name
     end
 
     private
