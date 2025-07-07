@@ -27,12 +27,21 @@ module Mutation
     end
     
     def current_log_path(filename)
-      return File.join(LOGS_DIR, filename) unless @current_simulation_dir
-      
-      # Handle agent log rotation
-      if filename.start_with?('agent_')
-        manage_agent_log_rotation
+      # For world_events.log and agent logs, always use simulation directory
+      if filename == 'world_events.log' || filename.start_with?('agent_')
+        # Ensure we have a simulation directory
+        start_new_simulation unless @current_simulation_dir
+        
+        # Handle agent log rotation
+        if filename.start_with?('agent_')
+          manage_agent_log_rotation
+        end
+        
+        return File.join(@current_simulation_dir, filename)
       end
+      
+      # For other files (like agent_performance_stats.log), use base logs directory
+      return File.join(LOGS_DIR, filename) unless @current_simulation_dir
       
       File.join(@current_simulation_dir, filename)
     end
