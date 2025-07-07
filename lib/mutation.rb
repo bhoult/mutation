@@ -3,6 +3,7 @@
 require_relative 'mutation/version'
 require_relative 'mutation/configuration'
 require_relative 'mutation/logger'
+require_relative 'mutation/simulation_log_manager'
 require_relative 'mutation/agent'
 require_relative 'mutation/agent_manager'
 require_relative 'mutation/genetic_pool'
@@ -29,10 +30,15 @@ module Mutation
     def logger
       @logger ||= Logger.new(configuration.log_level)
     end
+    
+    def log_manager
+      @log_manager ||= SimulationLogManager.new
+    end
 
     def reset!
       @configuration = nil
       @logger = nil
+      @log_manager = nil
     end
   end
 end

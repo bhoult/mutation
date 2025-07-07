@@ -13,16 +13,28 @@ begin
     exit(0) if message['command'] == 'die'
     
     # Get world state info
-    neighbors = message['neighbors'] || {}
     vision = message['vision'] || {}
     my_energy = message['energy'] || 0
     
-    # Find empty directions for movement
-    directions = %w[north south east west north_east north_west south_east south_west]
+    # Helper method to get adjacent positions for each direction
+    direction_offsets = {
+      'north' => [0, -1],
+      'south' => [0, 1], 
+      'east' => [1, 0],
+      'west' => [-1, 0],
+      'north_east' => [1, -1],
+      'north_west' => [-1, -1],
+      'south_east' => [1, 1],
+      'south_west' => [-1, 1]
+    }
+    
+    # Find empty directions for movement using vision data
     empty_directions = []
-    directions.each do |dir|
-      neighbor = neighbors[dir]
-      empty_directions << dir if neighbor.nil? || neighbor['energy'] == 0 || neighbor['alive'] == false
+    direction_offsets.each do |dir, (dx, dy)|
+      relative_key = "#{dx},#{dy}"
+      cell_info = vision[relative_key]
+      # Direction is empty if not in vision (empty space) or if it's a dead agent
+      empty_directions << dir if cell_info.nil? || cell_info['type'] == 'dead_agent'
     end
     
     # Look for dead agents in vision for food
@@ -54,9 +66,11 @@ begin
                                  when [0, -1] then 'north'
                                  end
                
-               # Check if the move towards food is valid
-               neighbor = neighbors[target_direction]
-               if target_direction && (neighbor.nil? || neighbor['energy'] == 0 || neighbor['alive'] == false)
+               # Check if the move towards food is valid using vision data
+               dx_target, dy_target = direction_offsets[target_direction] || [0, 0]
+               target_key = "#{dx_target},#{dy_target}"
+               target_cell = vision[target_key]
+               if target_direction && (target_cell.nil? || target_cell['type'] == 'dead_agent')
                  { action: 'move', target: target_direction }
                elsif !empty_directions.empty?
                  # Can't move towards food directly, try any empty direction

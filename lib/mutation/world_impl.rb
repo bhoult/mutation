@@ -116,6 +116,14 @@ module Mutation
       Mutation.logger.generation("🌱 Generation #{@generation} seeded with #{living_agents.count} agents (#{coverage_percentage}% of #{@width}x#{@height})")
     end
 
+    def reset_tick
+      @tick = 0
+    end
+    
+    def reinitialize_logging
+      initialize_world_logging
+    end
+
     def step
       begin
         step_start = Time.now
@@ -128,9 +136,6 @@ module Mutation
         row.each_with_index do |agent, x|
           next unless agent&.alive?
 
-          # Get neighbors for this specific agent
-          neighbors = get_neighbors(x, y)
-          
           # Get vision data for this agent (2-square radius for performance)
           vision = get_vision(x, y, radius: 2)
           
@@ -141,7 +146,6 @@ module Mutation
             energy: agent.energy,
             world_size: [@width, @height],
             timeout_ms: Mutation.configuration.agent_timeout_ms,
-            neighbors: neighbors,
             vision: vision,
             generation: agent.generation,
             memory: agent.memory # Pass agent's memory to the process
@@ -470,21 +474,21 @@ module Mutation
           if valid_position?(vision_x, vision_y)
             cell = @grid[vision_y][vision_x]
             if cell.nil?
-              # Empty space
-              vision[relative_key] = { type: 'empty', energy: 0, alive: nil }
+              # Empty space - skip (don't add to vision hash to reduce data)
+              next
             elsif cell.is_a?(DeadAgent)
-              # Dead agent
-              vision[relative_key] = { type: 'dead_agent', energy: 0, alive: false }
+              # Dead agent - only include energy if non-zero
+              vision[relative_key] = { type: 'dead_agent' }
             elsif cell.alive?
-              # Living agent
-              vision[relative_key] = { type: 'living_agent', energy: cell.energy, alive: true }
+              # Living agent - include energy
+              vision[relative_key] = { type: 'living_agent', energy: cell.energy }
             else
               # Dead agent (should not happen with current logic but safe fallback)
-              vision[relative_key] = { type: 'dead_agent', energy: 0, alive: false }
+              vision[relative_key] = { type: 'dead_agent' }
             end
           else
-            # Out of bounds
-            vision[relative_key] = { type: 'boundary', energy: 0, alive: nil }
+            # Out of bounds - include for boundary detection
+            vision[relative_key] = { type: 'boundary' }
           end
         end
       end
@@ -568,17 +572,13 @@ module Mutation
     private
 
     def initialize_world_logging
-      # Create logs directory if it doesn't exist
-      logs_dir = 'logs'
-      Dir.mkdir(logs_dir) unless Dir.exist?(logs_dir)
+      # Get the current simulation log path from log manager
+      @world_log_file = Mutation.log_manager.current_log_path('world_events.log')
       
-      # Clear existing log files
-      Dir.glob(File.join(logs_dir, '*.log')).each do |log_file|
-        File.delete(log_file) rescue nil
-      end
+      # Ensure directory exists
+      FileUtils.mkdir_p(File.dirname(@world_log_file))
       
       # Initialize world events log
-      @world_log_file = File.join(logs_dir, 'world_events.log')
       File.open(@world_log_file, 'w') do |f|
         f.puts "=== WORLD EVENTS LOG - Started at #{Time.now} ==="
       end

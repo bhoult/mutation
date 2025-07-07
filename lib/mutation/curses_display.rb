@@ -442,7 +442,8 @@ module Mutation
         Curses.attron(Curses.color_pair(5))
 
         # Status information
-        tick = @world.tick
+        current_tick = @world.tick
+        cumulative_ticks = @simulator&.statistics ? @simulator.statistics[:total_ticks] : 0
         generation = @world.generation
         agents = @world.agent_count
         procs = @world.respond_to?(:process_count) ? @world.process_count : 0
@@ -450,8 +451,9 @@ module Mutation
         fps = calculate_fps
 
         status_items = [
-          "T: #{tick}",
-          "G: #{generation}",
+          "Tick: #{current_tick}",
+          "Total Ticks: #{cumulative_ticks}",
+          "Generation: #{generation}",
           "Agents: #{agents}",
           "Procs: #{procs}",
           "AvgE: #{avg_energy}",

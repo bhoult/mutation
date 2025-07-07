@@ -23,8 +23,37 @@ rescue
 end
 
 def choose_action(world_state, memory)
-  neighbors = world_state['neighbors'] || {}
+  vision = world_state['vision'] || {}
   my_energy = world_state['energy'] || 0
+  
+  # Helper method to get adjacent positions for each direction
+  direction_offsets = {
+    'north' => [0, -1],
+    'south' => [0, 1], 
+    'east' => [1, 0],
+    'west' => [-1, 0],
+    'north_east' => [1, -1],
+    'north_west' => [-1, -1],
+    'south_east' => [1, 1],
+    'south_west' => [-1, 1]
+  }
+  
+  # Build neighbors hash from vision data for adjacent cells only
+  neighbors = {}
+  direction_offsets.each do |dir, (dx, dy)|
+    relative_key = "#{dx},#{dy}"
+    cell_info = vision[relative_key]
+    
+    if cell_info.nil?
+      # Empty space
+      neighbors[dir] = { 'energy' => 0 }
+    elsif cell_info['type'] == 'living_agent'
+      neighbors[dir] = { 'energy' => cell_info['energy'] || 0 }
+    else
+      # Dead agent or boundary - treat as empty for attack purposes
+      neighbors[dir] = { 'energy' => 0 }
+    end
+  end
   
   # Find the neighbor with the highest energy (handle empty neighbors)
   if neighbors.empty?

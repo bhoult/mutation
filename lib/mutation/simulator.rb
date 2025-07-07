@@ -28,7 +28,7 @@ module Mutation
       @world = World.new(size: world_size, width: width, height: height, seed_code: seed_code, agent_executables: agent_executables)
       @curses_mode = curses_mode
       @curses_display = nil
-      @survivor_logger = SurvivorLogger.new
+      @survivor_logger = nil  # Will be initialized when simulation starts
       @running = false
       @quit_requested = false
       @statistics = {
@@ -42,6 +42,13 @@ module Mutation
     def start
       @running = true
       @statistics[:start_time] = Time.now
+      
+      # Start a new simulation log folder
+      Mutation.log_manager.start_new_simulation
+      
+      # Initialize survivor logger with simulation-specific path
+      survivor_log_path = Mutation.log_manager.current_log_path('survivors.log')
+      @survivor_logger = SurvivorLogger.new(log_file: survivor_log_path)
 
       if @curses_mode
         # Mutation.logger.suppress_output = true # Temporarily disable for debugging
@@ -140,8 +147,9 @@ module Mutation
 
     def reset
       @world.reset_grid
+      @world.reset_tick
       @statistics[:extinctions] = 0
-      @statistics[:total_ticks] = 0
+      @quit_requested = false
 
       Mutation.logger.info('🔄 Simulation reset')
     end
@@ -223,7 +231,7 @@ module Mutation
       @statistics[:extinctions] += 1
 
       # Log survivors before extinction
-      @survivor_logger.log_survivors(@world.living_agents)
+      @survivor_logger&.log_survivors(@world.living_agents)
 
       @world.prepare_for_reset
 
@@ -232,6 +240,18 @@ module Mutation
       # Don't auto-reset if simulator has been stopped or quit was requested
       if @running && !@quit_requested && Mutation.configuration.auto_reset
         @world.reset_grid
+        @world.reset_tick
+        
+        # Start a new simulation log folder for the new generation
+        Mutation.log_manager.start_new_simulation
+        
+        # Re-initialize survivor logger with new simulation-specific path
+        survivor_log_path = Mutation.log_manager.current_log_path('survivors.log')
+        @survivor_logger = SurvivorLogger.new(log_file: survivor_log_path)
+        
+        # Re-initialize world logging to use new folder
+        @world.reinitialize_logging if @world.respond_to?(:reinitialize_logging)
+        
         Mutation.logger.generation('🔄 Auto-reset enabled, starting new generation')
       else
         Mutation.logger.info('Auto-reset disabled, stopping simulation')
@@ -288,11 +308,11 @@ module Mutation
       # Redirect stdout and stderr to log file instead of /dev/null to capture debug info
       original_stdout = $stdout
       original_stderr = $stderr
-      debug_log_path = 'logs/curses_debug.log'
+      debug_log_path = Mutation.log_manager.current_log_path('curses_debug.log')
       
       begin
-        # Ensure logs directory exists
-        FileUtils.mkdir_p('logs')
+        # Ensure log directory exists
+        FileUtils.mkdir_p(File.dirname(debug_log_path))
         
         # Redirect output to debug log file
         debug_log = File.open(debug_log_path, 'a')
@@ -356,7 +376,7 @@ module Mutation
       survivors = @world.living_agents
       return unless survivors.any?
 
-      count = @survivor_logger.log_survivors(survivors)
+      count = @survivor_logger&.log_survivors(survivors) || 0
       return unless count.positive?
 
       Mutation.logger.info("Final simulation: logged #{count} new survivor codes")
@@ -364,7 +384,7 @@ module Mutation
 
     def show_final_results
       # Only show results if logging is not suppressed (i.e., not in curses mode)
-      return if Mutation.logger.suppress_output
+      return if Mutation.logger.suppress_output?
 
       puts "\n#{'=' * 60}"
       puts 'SIMULATION COMPLETED'

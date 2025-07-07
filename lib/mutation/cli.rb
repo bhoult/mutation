@@ -17,6 +17,8 @@ module Mutation
     option :parallel, type: :boolean, aliases: '-p', desc: 'Enable parallel processing'
     option :processors, type: :numeric, desc: 'Number of processors to use'
     option :agents, type: :array, desc: 'Agent executable paths'
+    option :simulations, type: :numeric, aliases: '-n', desc: 'Number of simulations to run'
+    option :visual, type: :boolean, aliases: '-V', desc: 'Enable visual mode'
     def start
       configure_from_options
 
@@ -26,10 +28,18 @@ module Mutation
         world_size: options[:size],
         width: options[:width],
         height: options[:height],
-        agent_executables: agent_executables
+        agent_executables: agent_executables,
+        curses_mode: options[:visual]
       )
 
-      if options[:ticks]
+      if options[:simulations]
+        count = options[:simulations]
+        count.times do |i|
+          Mutation.logger.info("--- Simulation #{i + 1}/#{count} ---")
+          simulator.start
+          simulator.reset unless i == count - 1
+        end
+      elsif options[:ticks]
         simulator.run_for_ticks(options[:ticks])
       else
         simulator.start
@@ -139,42 +149,6 @@ module Mutation
       end
 
       print_benchmark_results(results)
-    end
-
-    desc 'visual', 'Start visual simulation with curses display'
-    option :size, type: :numeric, aliases: '-s', desc: 'World size (for square grid)'
-    option :width, type: :numeric, aliases: '-w', desc: 'World width (for rectangular grid)'
-    option :height, type: :numeric, aliases: '-h', desc: 'World height (for rectangular grid)'
-    option :energy, type: :numeric, aliases: '-e', desc: 'Initial energy'
-    option :delay, type: :numeric, aliases: '-d', desc: 'Simulation delay'
-    option :config, type: :string, aliases: '-c', desc: 'Configuration file'
-    option :safe, type: :boolean, desc: 'Safe mode (default: true)'
-    option :parallel, type: :boolean, aliases: '-p', desc: 'Enable parallel processing'
-    option :processors, type: :numeric, desc: 'Number of processors to use'
-    option :agents, type: :array, desc: 'Agent executable paths'
-    def visual
-      configure_from_options
-      
-      # Force disable parallel processing in visual mode
-      Mutation.configuration.parallel_agents = false
-
-      begin
-        agent_executables = options[:agents]
-        
-        simulator = Simulator.new(
-          world_size: options[:size],
-          width: options[:width],
-          height: options[:height],
-          curses_mode: true,
-          agent_executables: agent_executables
-        )
-
-        simulator.start
-      rescue StandardError => e
-        puts "Error starting visual mode: #{e.message}"
-        puts "Make sure you're running in a terminal that supports curses"
-        exit 1
-      end
     end
 
     desc 'version', 'Show version information'

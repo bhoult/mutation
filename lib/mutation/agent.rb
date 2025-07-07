@@ -268,7 +268,6 @@ module Mutation
         position: world_state[:position],
         energy: world_state[:energy],  # World-controlled energy, not agent's
         world_size: world_state[:world_size],
-        neighbors: format_neighbors(world_state[:neighbors]),
         vision: world_state[:vision] || {},  # Pass vision data to agent
         generation: world_state[:generation],
         timeout_ms: world_state[:timeout_ms] || Mutation.configuration.default_timeout_ms,
@@ -276,50 +275,6 @@ module Mutation
       }
     end
 
-    def format_neighbors(neighbors)
-      directions = ['north_west', 'north', 'north_east', 'west', 'east', 'south_west', 'south', 'south_east']
-      
-      result = {}
-      
-      if neighbors.is_a?(Hash)
-        # neighbors is already a hash, just format it
-        neighbors.each do |direction, neighbor|
-          if neighbor && neighbor.respond_to?(:energy)
-            result[direction] = {
-              energy: neighbor.energy,
-              agent_id: neighbor.agent_id,
-              alive: neighbor.respond_to?(:alive?) ? neighbor.alive? : true
-            }
-          else
-            result[direction] = {
-              energy: 0,
-              agent_id: nil,
-              alive: false
-            }
-          end
-        end
-      else
-        # neighbors is an array
-        neighbors.each_with_index do |neighbor, index|
-          direction = directions[index]
-          if neighbor && neighbor.respond_to?(:energy)
-            result[direction] = {
-              energy: neighbor.energy,
-              agent_id: neighbor.agent_id,
-              alive: neighbor.respond_to?(:alive?) ? neighbor.alive? : true
-            }
-          else
-            result[direction] = {
-              energy: 0,
-              agent_id: nil,
-              alive: false
-            }
-          end
-        end
-      end
-      
-      result
-    end
 
     def parse_action(response)
       return default_action unless response.is_a?(Hash)
@@ -356,12 +311,11 @@ module Mutation
     end
 
     def log_agent_interaction(direction, data)
-      # Create logs directory if it doesn't exist
-      logs_dir = 'logs'
-      Dir.mkdir(logs_dir) unless Dir.exist?(logs_dir)
+      # Get the current simulation log path from log manager
+      log_file = Mutation.log_manager.current_log_path("agent_#{@agent_id}.log")
       
-      # Create individual log file for this agent
-      log_file = File.join(logs_dir, "agent_#{@agent_id}.log")
+      # Ensure directory exists
+      FileUtils.mkdir_p(File.dirname(log_file))
       
       timestamp = Time.now.strftime("%H:%M:%S.%3N")
       File.open(log_file, 'a') do |f|
