@@ -6,7 +6,7 @@ module Mutation
   class CursesDisplay
     attr_reader :running, :camera_x, :camera_y
 
-    BOTTOM_PANEL_HEIGHT = 5 # Height of the combined log and status area
+    BOTTOM_PANEL_HEIGHT = 8 # Height of the combined log and status area
     HELP_LINES = 1 # Number of lines for help information
     TOTAL_BOTTOM_LINES = BOTTOM_PANEL_HEIGHT + HELP_LINES
 
@@ -46,7 +46,7 @@ module Mutation
       @screen_width -= BORDER_SIZE # Only left border now
 
       # Calculate panel widths (accounting for separator)
-      @status_panel_width = ((@screen_width - 1) / 4).floor # Half of previous width
+      @status_panel_width = ((@screen_width - 1) / 3).floor # Wider status panel for agent info
       @log_panel_width = @screen_width - @status_panel_width - 1 # -1 for the separator
 
       # Initialize color pairs
@@ -120,7 +120,7 @@ module Mutation
       # Only add if different from the last logged message
       unless formatted_message == @last_logged_message
         @log_buffer << formatted_message
-        @log_buffer.shift if @log_buffer.size > BOTTOM_PANEL_HEIGHT # Keep only the last N unique messages
+        @log_buffer.shift if @log_buffer.size > BOTTOM_PANEL_HEIGHT - 1 # Keep only the last N-1 unique messages to leave room
         @last_logged_message = formatted_message
       end
     end
@@ -385,8 +385,12 @@ module Mutation
     def agent_display(agent)
       energy = agent.energy
 
-      # All agents display as '*' character
-      char = '*'
+      # Check if agent is a mutation and display accordingly
+      if @world.is_mutation?(agent.agent_id)
+        char = 'O'  # Mutated agents display as 'O'
+      else
+        char = '*'  # Normal agents display as '*'
+      end
 
       # Choose color based on energy level
       color = case energy
@@ -441,19 +445,31 @@ module Mutation
         generation = @world.generation
         agents = @world.agent_count
         grid_agents = @world.respond_to?(:grid_agent_count) ? @world.grid_agent_count : agents
+        mutations = @world.respond_to?(:mutation_count) ? @world.mutation_count : 0
         procs = @world.respond_to?(:process_count) ? @world.process_count : 0
         avg_energy = @world.average_energy.round(1)
         fps = calculate_fps
 
+        # Compact status items to make room for agent counts
         status_items = [
-          "Tick: #{current_tick}",
-          "Total Ticks: #{cumulative_ticks}",
-          "Generation: #{generation}",
-          "Agents: #{agents}/#{grid_agents}",
-          "Procs: #{procs}",
-          "AvgE: #{avg_energy}",
-          "FPS: #{fps}"
+          "T:#{current_tick}/#{cumulative_ticks} G:#{generation}",
+          "Agents:#{agents}/#{grid_agents} M:#{mutations}",
+          "AvgE:#{avg_energy} FPS:#{fps}"
         ]
+        
+        # Add top 3 agents by population
+        if @world.respond_to?(:top_agents_by_population)
+          top_agents = @world.top_agents_by_population(3)
+          status_items << "---Top Agents---"
+          top_agents.each_with_index do |agent_info, idx|
+            # Shorten long agent names for display
+            name = agent_info[:name]
+            if name.length > 18
+              name = name[0..15] + ".."
+            end
+            status_items << "#{idx + 1}. #{name}: #{agent_info[:count]}"
+          end
+        end
 
         # Add camera info if applicable
         if @needs_scrolling_x || @needs_scrolling_y

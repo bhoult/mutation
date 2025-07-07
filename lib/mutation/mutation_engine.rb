@@ -72,7 +72,18 @@ module Mutation
       mutation_type = detect_mutation_type(line)
       return line unless mutation_type
 
-      @mutation_strategies[mutation_type].call(line)
+      # Store original line for comment
+      original_line = line.chomp
+      mutated_line = @mutation_strategies[mutation_type].call(line)
+      
+      # Add comment showing original if line was actually changed
+      if mutated_line.chomp != original_line
+        # Remove any existing mutation comment first
+        mutated_line = mutated_line.sub(/ # MUTATION: was:.*$/, '')
+        mutated_line.chomp + " # MUTATION: was: #{original_line.strip}\n"
+      else
+        mutated_line
+      end
     end
 
     def detect_mutation_type(line)
@@ -83,9 +94,10 @@ module Mutation
         :probability  
       when /energy.*[<>]=?\s*\d+/, /my_energy.*[<>]=?\s*\d+/
         :threshold
-      when /[<>]=?/
-        # Only mutate comparison operators, not array append (<<) or other operators
-        return nil if line.include?('<<') || line.include?('>>')
+      when /\b(if|elsif|when|while|until|unless)\b.*[<>]=?/
+        # Only mutate comparison operators in conditional contexts
+        return nil if line.include?('<<') || line.include?('>>') || line.include?('=~')
+        return nil if line =~ /["'].*[<>]=?.*["']/  # Skip if in string
         :operator
       when /'aggression'.*rand/, /'greed'.*rand/, /'cooperation'.*rand/, /'death_threshold'.*rand/
         :personality
@@ -93,7 +105,10 @@ module Mutation
     end
 
     def mutate_numeric(line)
-      line.gsub(/\d+/) do |match|
+      # Remove any existing mutation comment before processing
+      clean_line = line.sub(/ # MUTATION: was:.*$/, '')
+      
+      clean_line.gsub(/\d+/) do |match|
         old_value = match.to_i
         if old_value < 5
           # For small numbers (thresholds), vary by configured range
@@ -110,7 +125,10 @@ module Mutation
     end
 
     def mutate_probability(line)
-      line.gsub(/rand < \d+\.\d+|rand > \d+\.\d+/) do |match|
+      # Remove any existing mutation comment before processing
+      clean_line = line.sub(/ # MUTATION: was:.*$/, '')
+      
+      clean_line.gsub(/rand < \d+\.\d+|rand > \d+\.\d+/) do |match|
         operator = match.include?('<') ? '<' : '>'
         old_prob = match.match(/\d+\.\d+/)[0].to_f
         
@@ -124,7 +142,10 @@ module Mutation
     end
 
     def mutate_threshold(line)
-      line.gsub(/[<>]=?\s*\d+/) do |match|
+      # Remove any existing mutation comment before processing
+      clean_line = line.sub(/ # MUTATION: was:.*$/, '')
+      
+      clean_line.gsub(/[<>]=?\s*\d+/) do |match|
         operator = match.match(/[<>]=?/)[0]
         old_threshold = match.match(/\d+/)[0].to_i
         
@@ -141,8 +162,18 @@ module Mutation
       # Occasionally change comparison operators
       return line unless rand < Mutation.configuration.mutation_operator_probability
       
+      # Only mutate comparison operators in conditional contexts, not assignments
+      # Look for patterns like "if x > y", "elsif energy < 5", "when value >= 10"
+      # Avoid mutating '=' in assignments, '==' in equality checks, or operators in strings
+      return line if line =~ /["'].*[<>]=?.*["']/  # Skip if operator is in a string
+      return line unless line =~ /\b(if|elsif|when|while|until|unless)\b.*[<>]=?/
+      
+      # Remove any existing mutation comment before processing
+      clean_line = line.sub(/ # MUTATION: was:.*$/, '')
+      
       operators = ['<', '>', '<=', '>=']
-      line.gsub(/[<>]=?/) do |match|
+      clean_line.gsub(/\b([<>]=?)(?!=)/) do |match|
+        # The negative lookahead (?!=) ensures we don't match == or assignments
         current_operators = operators.dup
         current_operators.delete(match) # Don't pick the same operator
         current_operators.sample
@@ -150,8 +181,11 @@ module Mutation
     end
 
     def mutate_personality(line)
+      # Remove any existing mutation comment before processing
+      clean_line = line.sub(/ # MUTATION: was:.*$/, '')
+      
       # Mutate personality trait ranges and fixed values
-      line.gsub(/rand\((\d+\.\d+)\.\.(\d+\.\d+)\)/) do |match|
+      clean_line.gsub(/rand\((\d+\.\d+)\.\.(\d+\.\d+)\)/) do |match|
         min_val = $1.to_f
         max_val = $2.to_f
         

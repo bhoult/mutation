@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'set'
+
 module Mutation
   # Simple class to represent dead agents on the grid for display purposes
   class DeadAgent
@@ -21,7 +23,7 @@ module Mutation
 
   class WorldImpl
     attr_accessor :grid, :tick, :last_survivor_code, :generation, :statistics
-    attr_reader :agent_manager
+    attr_reader :agent_manager, :width, :height
 
     def initialize(width: nil, height: nil, size: nil, seed_code: nil, agent_executables: nil)
       initialize_world_logging
@@ -57,6 +59,10 @@ module Mutation
         longest_survival_ticks: 0
       }
 
+      # Track mutations externally (not in agent memory for security)
+      @mutation_agents = Set.new  # Set of agent_ids that are mutations
+      @mutation_metadata = {}     # agent_id => {original_agent: name, code: string}
+
       reset_grid
     end
 
@@ -70,11 +76,24 @@ module Mutation
 
       # Create empty grid
       @grid = Array.new(@height) { Array.new(@width) { nil } }
+      
+      # Clear mutation tracking
+      @mutation_agents.clear
+      @mutation_metadata.clear
 
       # Calculate initial agent count
       total_positions = @width * @height
-      agent_count = (total_positions * Mutation.configuration.initial_coverage).round
+      coverage = Mutation.configuration.initial_coverage
+      agent_count = (total_positions * coverage).round
       agent_count = [agent_count, 1].max # Ensure at least 1 agent
+      
+      # Apply max agent count limit
+      max_agents = Mutation.configuration.max_agent_count
+      actual_agent_count = [agent_count, max_agents].min
+      
+      puts "DEBUG: World size #{@width}x#{@height} = #{total_positions} positions"
+      puts "DEBUG: Coverage #{coverage} => desired agent_count = #{agent_count}"
+      puts "DEBUG: Max agent limit = #{max_agents}, actual_agent_count = #{actual_agent_count}"
 
       # Get available positions
       positions = []
@@ -85,12 +104,19 @@ module Mutation
       end
       positions.shuffle!
 
-      # Create initial mutations (10% of population)
-      initial_mutations = @mutated_agent_manager.create_initial_mutations(agent_count)
+      # Create initial mutations (10% of actual population that will be spawned)
+      puts "DEBUG: actual_agent_count = #{actual_agent_count}"
+      initial_mutations = @mutated_agent_manager.create_initial_mutations(actual_agent_count)
+      puts "INIT_AGENTS: Total=#{actual_agent_count} InitialMutations=#{initial_mutations.size} (#{(initial_mutations.size.to_f/actual_agent_count*100).round(1)}%)"
+      puts "DEBUG: initial_mutations.size = #{initial_mutations.size}"
       
       # Spawn initial agents (mix of originals and mutations)
-      agent_count.times do |i|
-        break if positions.empty?
+      actual_spawned = 0
+      actual_agent_count.times do |i|
+        if positions.empty?
+          puts "SPAWN_BREAK: Breaking at slot #{i} - no more positions available"
+          break
+        end
 
         x, y = positions.pop
         
@@ -98,11 +124,13 @@ module Mutation
         if i < initial_mutations.size
           # Use a pre-created mutation
           mutation_data = initial_mutations[i]
+          puts "SPAWN_SLOT_#{i}: Using MUTATION from #{mutation_data[:original_agent]}"
           agent = spawn_agent_from_data(mutation_data, x, y)
         else
-          # Use random agent from available pool
-          agent_data = @mutated_agent_manager.select_random_agent
+          # Use only original (non-mutation) agents for the remaining 90%
+          agent_data = @mutated_agent_manager.select_original_agent
           if agent_data
+            puts "SPAWN_SLOT_#{i}: Using ORIGINAL #{agent_data[:name]}"
             agent = spawn_agent_from_data(agent_data, x, y)
           else
             # Fallback to default executable
@@ -119,13 +147,26 @@ module Mutation
         if agent
           @grid[y][x] = agent
           @statistics[:total_agents_created] += 1
+          actual_spawned += 1
+        else
+          puts "SPAWN_FAILED: Failed to spawn agent at slot #{i}"
         end
       end
+      
+      puts "SPAWN_COMPLETE: Attempted=#{actual_agent_count} ActualSpawned=#{actual_spawned} PositionsRemaining=#{positions.size}"
 
       @generation += 1
       @statistics[:total_generations] = @generation
 
-      Mutation.logger.generation("🌱 Generation #{@generation} seeded with #{living_agents.count} agents (#{coverage_percentage}% of #{@width}x#{@height})")
+      # Log final mutation tracking state
+      total_spawned = living_agents.count
+      tracked_mutations = @mutation_agents.size
+      counted_mutations = mutation_count
+      
+      puts "SPAWN_SUMMARY: Total=#{total_spawned} TrackedMutations=#{tracked_mutations} CountedMutations=#{counted_mutations}"
+      puts "MUTATION_AGENTS: #{@mutation_agents.to_a}"
+      
+      Mutation.logger.generation("🌱 Generation #{@generation} seeded with #{total_spawned} agents (#{coverage_percentage}% of #{@width}x#{@height})")
     end
 
     def reset_tick
@@ -142,7 +183,9 @@ module Mutation
       
       # If no path (in-memory mutation), create a temporary file
       if executable_path.nil?
-        executable_path = create_temp_agent_file(agent_data[:code])
+        # Extract parent name from the agent data
+        parent_name = agent_data[:original_agent]
+        executable_path = create_temp_agent_file(agent_data[:code], parent_name)
         temp_file_created = true
       else
         temp_file_created = false
@@ -160,24 +203,35 @@ module Mutation
         Mutation.configuration.random_initial_energy,
         @generation + 1,
         { 
-          is_mutation: agent_data[:is_mutation],
-          original_agent: agent_data[:original_agent],
-          agent_code: agent_data[:code], # Store the code for later retrieval
           temp_file_path: temp_file_created ? executable_path : nil # Track temp files for cleanup
         }
       )
+      
+      # Track mutations externally if this is a mutation
+      if agent && agent_data[:is_mutation]
+        @mutation_agents.add(agent.agent_id)
+        @mutation_metadata[agent.agent_id] = {
+          original_agent: agent_data[:original_agent],
+          code: agent_data[:code]
+        }
+        puts "SPAWN_MUTATION: #{agent.agent_id} from #{agent_data[:original_agent]} - Added to @mutation_agents (now #{@mutation_agents.size})"
+      else
+        puts "SPAWN_NORMAL: #{agent&.agent_id || 'nil'} is_mutation=#{agent_data[:is_mutation]} - NOT added to @mutation_agents (still #{@mutation_agents.size})"
+      end
       
       agent
     end
 
     # Create a temporary file for agent code that persists during simulation
-    def create_temp_agent_file(code)
-      temp_dir = "/tmp/mutation_agents"
+    def create_temp_agent_file(code, parent_name = nil)
+      project_root = File.expand_path('../../../', __FILE__)
+      temp_dir = File.join(project_root, 'agents', 'temp_mutation_agents')
       FileUtils.mkdir_p(temp_dir)
       
-      # Create unique filename with generation info
+      # Create unique filename with generation info and parent name
       timestamp = Time.now.strftime('%Y%m%d_%H%M%S_%N')
-      temp_filename = "temp_agent_gen#{@generation}_#{timestamp}.rb"
+      base_name = parent_name ? "#{parent_name}_mutation" : "temp_agent"
+      temp_filename = "#{base_name}_gen#{@generation}_#{timestamp}.rb"
       temp_filepath = File.join(temp_dir, temp_filename)
       
       # Write the agent code to temporary file
@@ -283,6 +337,7 @@ module Mutation
               log_world_event("DEATH_ENERGY", agent.agent_id, [x, y], { energy: new_energy })
               agent.die!
               @agent_manager.remove_agent(agent.agent_id)
+              cleanup_mutation_tracking(agent.agent_id)
             end
             # Create dead agent marker
             dead_agent = DeadAgent.new(agent.agent_id, [x, y])
@@ -336,6 +391,7 @@ module Mutation
               if agent
                 agent.die!
                 @agent_manager.remove_agent(agent_id)
+                cleanup_mutation_tracking(agent_id)
               end
             end
           end
@@ -403,6 +459,7 @@ module Mutation
       if new_energy <= 0.001
         agent.die!
         @agent_manager.remove_agent(agent.agent_id)
+        cleanup_mutation_tracking(agent.agent_id)
       end
       
       # Optional: Log slow actions for debugging
@@ -433,6 +490,7 @@ module Mutation
         # Create dead agent marker before removing from manager
         dead_agent = DeadAgent.new(target_agent.agent_id, [target_x, target_y])
         @agent_manager.remove_agent(target_agent.agent_id)
+        cleanup_mutation_tracking(target_agent.agent_id)
         @grid[target_y][target_x] = dead_agent
         log_world_event("ATTACK_KILL", agent.agent_id, [x, y], { killed: target_agent.agent_id, at: [target_x, target_y] })
       else
@@ -499,14 +557,30 @@ module Mutation
         return
       end
 
-      # Create offspring with mutation
-      offspring = @agent_manager.create_offspring(agent, offspring_x, offspring_y, @mutation_engine, agent.memory)
+      # Create offspring - exact duplicate with 10% chance of mutation
+      should_mutate = rand < 0.1  # 10% chance of mutation
+      
+      if should_mutate
+        # Create mutated offspring
+        offspring = create_mutated_offspring(agent, offspring_x, offspring_y)
+        Mutation.logger.info("REPLICATE_MUTATED: #{agent.agent_id} -> #{offspring&.agent_id}")
+      else
+        # Create exact duplicate
+        offspring = create_duplicate_offspring(agent, offspring_x, offspring_y)
+        Mutation.logger.info("REPLICATE_DUPLICATE: #{agent.agent_id} -> #{offspring&.agent_id}")
+      end
+      
       return unless offspring
 
       # Note: Replication cost is now handled in execute_action, not here
       # Place offspring in grid
       new_grid[offspring_y][offspring_x] = offspring
       @statistics[:total_agents_created] += 1
+      
+      # Note: We don't automatically track replicated agents as mutations
+      # Only initial mutations (10%) should be counted as "mutations" in the display
+      # Replicated agents are just evolutionary descendants, not mutations per se
+      
       log_world_event("REPLICATE_SUCCESS", agent.agent_id, [x, y], { offspring: offspring.agent_id, at: [offspring_x, offspring_y] })
     end
 
@@ -614,6 +688,29 @@ module Mutation
       living_agents.count
     end
     
+    def mutation_count
+      # Count only agents tracked externally as mutations
+      living = living_agents
+      mutation_count = living.count do |agent|
+        @mutation_agents.include?(agent.agent_id)
+      end
+      
+      # Debug logging every 10 ticks or at tick 0 (spawn)
+      if @tick % 10 == 0 || @tick == 0
+        total_agents = living.count
+        tracked_mutations = @mutation_agents.size
+        puts "MUTATION_COUNT_DEBUG: T:#{@tick} Total:#{total_agents} TrackedMutations:#{tracked_mutations} CountedMutations:#{mutation_count}"
+        
+        # Show sample of which agents are/aren't counted as mutations (first 3 only)
+        living.first(3).each do |agent|
+          is_tracked = @mutation_agents.include?(agent.agent_id)
+          puts "  Sample Agent #{agent.agent_id}: tracked=#{is_tracked}"
+        end
+      end
+      
+      mutation_count
+    end
+    
     def grid_agent_count
       count = 0
       @grid.each do |row|
@@ -642,6 +739,113 @@ module Mutation
 
     def fittest_agent
       living_agents.max_by(&:fitness)
+    end
+
+    # External mutation tracking methods (secure - agents can't modify these)
+    def is_mutation?(agent_id)
+      @mutation_agents.include?(agent_id)
+    end
+
+    def get_mutation_metadata(agent_id)
+      @mutation_metadata[agent_id] || {}
+    end
+    
+    def agent_counts_by_type
+      counts = Hash.new(0)
+      
+      living_agents.each do |agent|
+        # Extract base name from executable path
+        base_name = File.basename(agent.executable_path, '.rb')
+        
+        # Remove mutation suffixes to group by original type
+        # Handle various naming patterns:
+        # - "active_explorer_agent_mutation_123" -> "active_explorer_agent"
+        # - "active_explorer_agent_mutation_gen1_timestamp" -> "active_explorer_agent" 
+        # - "cautious_economist_125719_629281511_mutation_gen1_timestamp" -> "cautious_economist"
+        # - "reproductive_colonizer_125717_084253360_125724_198537629_mutation_gen1_timestamp" -> "reproductive_colonizer"
+        # - "temp_agent_gen1_timestamp" -> "temp_agent" (legacy format)
+        
+        # First remove any hash/timestamp patterns before _mutation
+        base_name = base_name.gsub(/_\d{6}_\d{9}/, '')  # Remove _125719_629281511 patterns
+        # Then remove mutation suffixes
+        base_name = base_name.gsub(/_mutation(_gen\d+)?_\d+/, '')
+        
+        counts[base_name] += 1
+      end
+      
+      counts
+    end
+    
+    def top_agents_by_population(limit = 3)
+      agent_counts_by_type
+        .sort_by { |_, count| -count }
+        .first(limit)
+        .map { |name, count| { name: name, count: count } }
+    end
+
+
+    # Clean up mutation tracking when agent is removed
+    def cleanup_mutation_tracking(agent_id)
+      @mutation_agents.delete(agent_id)
+      @mutation_metadata.delete(agent_id)
+    end
+
+    # Create an exact duplicate of the parent agent
+    def create_duplicate_offspring(parent_agent, x, y)
+      offspring_energy = Mutation.configuration.random_initial_energy
+      offspring_generation = parent_agent.generation + 1
+      
+      # Use the exact same executable as the parent
+      @agent_manager.spawn_agent(
+        parent_agent.executable_path,
+        x, y,
+        offspring_energy,
+        offspring_generation,
+        {} # Empty memory for offspring
+      )
+    end
+
+    # Create a mutated version of the parent agent
+    def create_mutated_offspring(parent_agent, x, y)
+      offspring_energy = Mutation.configuration.random_initial_energy
+      offspring_generation = parent_agent.generation + 1
+      
+      # Get the parent's code and mutate it
+      begin
+        parent_code = File.read(parent_agent.executable_path)
+        mutated_code = @mutation_engine.mutate_code(parent_code)
+        
+        # Get parent name for temp file naming
+        parent_name = File.basename(parent_agent.executable_path, '.rb')
+        # Remove any existing mutation suffix to get the base name
+        parent_base_name = parent_name.gsub(/_mutation_gen\d+_\d+/, '')
+        
+        # Create temporary file for mutated code
+        temp_file = create_temp_agent_file(mutated_code, parent_base_name)
+        
+        offspring = @agent_manager.spawn_agent(
+          temp_file,
+          x, y,
+          offspring_energy,
+          offspring_generation,
+          { temp_file_path: temp_file } # Track temp file for cleanup
+        )
+        
+        # Track this as a mutation since it was actively mutated
+        if offspring
+          @mutation_agents.add(offspring.agent_id)
+          @mutation_metadata[offspring.agent_id] = {
+            original_agent: parent_base_name,
+            code: mutated_code
+          }
+        end
+        
+        offspring
+      rescue StandardError => e
+        Mutation.logger.error("Failed to create mutated offspring: #{e.message}")
+        # Fallback to duplicate if mutation fails
+        create_duplicate_offspring(parent_agent, x, y)
+      end
     end
 
     def status_line

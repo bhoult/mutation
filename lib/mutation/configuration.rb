@@ -202,7 +202,7 @@ module Mutation
       # File system paths
       @agents_directory = 'agents'
       @base_agent_path = 'examples/agents/ruby_agent.rb'
-      @agent_memory_base_path = '/tmp/agents'
+      @agent_memory_base_path = File.join(Dir.pwd, 'agents', 'memory')
       
       # Core simulation settings
       @mutation_rate = 0.5
@@ -216,7 +216,7 @@ module Mutation
       @processor_count = nil   # nil means use all available processors
       @visual_mode = false     # Use curses display
       @survivors_log = 'survivors.log' # Survivor codes log file
-      @default_agent_executable = File.join(Dir.pwd, 'examples', 'agents', 'ruby_agent.rb') # Default agent executable path
+      @default_agent_executable = File.join(Dir.pwd, 'agents', 'active_explorer_agent.rb') # Default agent executable path
     end
 
     def load_config_file

@@ -32,10 +32,13 @@ module Mutation
 
           width = [max_viewport_width, 5].max  # Ensure minimum size
           height = [max_viewport_height, 5].max # Ensure minimum size
+          
+          puts "DEBUG: Auto-sized to terminal: #{width}x#{height}"
         rescue StandardError
           # Fallback to default size if curses initialization fails
           width = 80
           height = 24
+          puts "DEBUG: Curses auto-size failed, using fallback: #{width}x#{height}"
         end
       end
 
@@ -91,6 +94,9 @@ module Mutation
 
       # Log survivors when simulation ends
       log_final_survivors
+      
+      # Clean up temporary mutation agent files
+      cleanup_temp_mutation_agents
 
       print_final_statistics unless @curses_mode
     end
@@ -118,8 +124,26 @@ module Mutation
       @world.step
       @statistics[:total_ticks] += 1
 
-      # Only handle extinction if we're still running and quit wasn't requested
-      handle_extinction if @running && !@quit_requested && @world.all_dead?
+      # Check for single surviving mutated agent before extinction
+      if @running && !@quit_requested
+        survivors = @world.living_agents
+        if survivors.size == 1
+          survivor = survivors.first
+          save_single_survivor(survivor)
+          
+          # If auto-reset is enabled, trigger extinction after saving lone survivor
+          # This prevents the simulation from running indefinitely waiting for the last agent to starve
+          if Mutation.configuration.auto_reset
+            Mutation.logger.info("🏁 Lone survivor saved, triggering extinction for auto-reset")
+            survivor.die!
+            @world.agent_manager.remove_agent(survivor.agent_id)
+            @world.cleanup_mutation_tracking(survivor.agent_id)
+          end
+        end
+        
+        # Handle extinction if all agents are dead
+        handle_extinction if @world.all_dead?
+      end
 
       log_status if should_log_status?
     end
@@ -226,8 +250,13 @@ module Mutation
     private
 
     def save_single_survivor(agent)
-      # Only save if the agent has mutation metadata
-      return unless agent.memory && agent.memory['is_mutation']
+      # Save any last survivor that represents successful evolution
+      is_mutation = @world.is_mutation?(agent.agent_id)  # Initial mutations or actively mutated offspring
+      is_evolved = agent.generation > 1  # Any agent that evolved through replication
+      should_save = is_mutation || is_evolved
+      
+      Mutation.logger.info("SAVE_SURVIVOR_CHECK: #{agent.agent_id} is_mutation=#{is_mutation} evolved=#{is_evolved} should_save=#{should_save}")
+      return unless should_save
       
       # Gather simulation statistics for the metadata
       simulation_stats = {
@@ -240,31 +269,46 @@ module Mutation
         created_at: Time.now.strftime('%Y-%m-%d %H:%M:%S')
       }
       
-      # Reconstruct agent data from memory
-      agent_data = {
-        code: get_agent_code(agent),
-        is_mutation: agent.memory['is_mutation'],
-        original_agent: agent.memory['original_agent']
-      }
+      # Reconstruct agent data from world's external tracking or evolution
+      mutation_metadata = @world.get_mutation_metadata(agent.agent_id)
+      
+      if is_mutation && mutation_metadata.any?
+        # Use stored mutation metadata (initial mutations or actively mutated offspring)
+        agent_data = {
+          code: mutation_metadata[:code],
+          is_mutation: true,
+          original_agent: mutation_metadata[:original_agent]
+        }
+      else
+        # This is an evolved agent (duplicate offspring) - create metadata
+        agent_data = {
+          code: get_agent_code_fallback(agent),
+          is_mutation: true, # Mark as mutation for saving purposes
+          original_agent: is_evolved ? 'evolved' : 'unknown'
+        }
+      end
       
       # Save the survivor using the mutated agent manager
-      saved_path = @world.instance_variable_get(:@mutated_agent_manager)&.save_survivor(agent_data, simulation_stats)
+      mutated_agent_manager = @world.instance_variable_get(:@mutated_agent_manager)
+      saved_path = mutated_agent_manager&.save_survivor(agent_data, simulation_stats)
       
       if saved_path
         Mutation.logger.info("🏆 Saved last surviving mutated agent: #{File.basename(saved_path)}")
+      else
+        Mutation.logger.warn("Failed to save survivor - no path returned")
       end
     rescue StandardError => e
       Mutation.logger.warn("Failed to save surviving mutated agent: #{e.message}")
     end
 
-    def get_agent_code(agent)
-      # Get the stored agent code from memory
-      if agent.memory && agent.memory['agent_code']
-        return agent.memory['agent_code']
+    def get_agent_code_fallback(agent)
+      # Try to read the actual agent code from its executable file
+      if agent.executable_path && File.exist?(agent.executable_path)
+        File.read(agent.executable_path)
+      else
+        # Last resort fallback
+        "# Agent code could not be retrieved\n# Agent ID: #{agent.agent_id}\n# Executable path: #{agent.executable_path}\n# This was a surviving mutated agent"
       end
-      
-      # Fallback if code not found in memory
-      return "# Agent code could not be retrieved\n# Agent ID: #{agent.agent_id}\n# This was a surviving mutated agent"
     end
 
     def run_simulation_loop
@@ -286,13 +330,8 @@ module Mutation
     def handle_extinction
       @statistics[:extinctions] += 1
 
-      # Check for single surviving mutated agent to save
-      survivors = @world.living_agents
-      if survivors.size == 1
-        save_single_survivor(survivors.first)
-      end
-
       # Log survivors before extinction
+      survivors = @world.living_agents
       @survivor_logger&.log_survivors(survivors)
 
       @world.prepare_for_reset
@@ -301,6 +340,9 @@ module Mutation
 
       # Don't auto-reset if simulator has been stopped or quit was requested
       if @running && !@quit_requested && Mutation.configuration.auto_reset
+        # Clean up temp mutation agents before starting new generation
+        cleanup_temp_mutation_agents
+        
         @world.reset_grid
         @world.reset_tick
         
@@ -472,6 +514,22 @@ module Mutation
       end
 
       puts "\n#{'=' * 60}"
+    end
+    
+    def cleanup_temp_mutation_agents
+      project_root = File.expand_path('../../..', __FILE__)
+      temp_dir = File.join(project_root, 'agents', 'temp_mutation_agents')
+      
+      if Dir.exist?(temp_dir)
+        # Remove all files in the temp directory
+        Dir.glob(File.join(temp_dir, '*')).each do |file|
+          File.delete(file) if File.file?(file)
+        end
+        
+        Mutation.logger.debug("Cleaned up temporary mutation agent files")
+      end
+    rescue StandardError => e
+      Mutation.logger.warn("Failed to clean up temp mutation agents: #{e.message}")
     end
   end
 end
