@@ -10,19 +10,24 @@ initial_coverage: 0.1       # Percentage of world to populate with agents initia
 
 # Energy system
 energy_decay: 1             # Energy lost per tick
-attack_damage: 3            # Damage dealt when attacking
-attack_energy_gain: 1       # Energy gained when attacking
-rest_energy_gain: 1         # Energy gained when resting
-replication_cost: 5         # Energy cost to replicate
 
 # Initial energy for new agents
 initial_energy_min: 28       # Minimum starting energy for new agents
 initial_energy_max: 42      # Maximum starting energy for new agents
 
-# Action costs (process-based agents)
-base_action_cost: 0.2       # Base energy cost for any action
-attack_action_cost: 1.0     # Additional cost for attacking
-additional_replication_cost: 0.5  # Additional cost beyond base replication cost
+# Action costs
+action_costs:
+  base_cost: 0.2            # Base energy cost for any action
+  attack:
+    cost: 1.0               # Additional energy cost for attacking
+    damage: 3               # Damage dealt when attacking
+    energy_gain: 1          # Energy gained when attacking
+  rest:
+    energy_gain: 1          # Energy gained when resting
+  replicate:
+    cost: 5                 # Total energy cost to replicate
+  move:
+    dead_agent_energy_gain: 10  # Energy gained from eating dead agents
 
 # Agent management
 max_agent_count: 100        # Maximum number of concurrent agents

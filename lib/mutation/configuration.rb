@@ -4,8 +4,8 @@ require 'yaml'
 
 module Mutation
   class Configuration
-    attr_accessor :world_size, :world_width, :world_height, :initial_energy, :energy_decay, :attack_damage,
-                  :attack_energy_gain, :rest_energy_gain, :replication_cost,
+    attr_accessor :world_size, :world_width, :world_height, :initial_energy, :energy_decay, :action_costs,
+                  :attack_damage, :attack_energy_gain, :rest_energy_gain, :replication_cost, :dead_agent_energy_gain,
                   :mutation_rate, :mutation_probability, :log_level,
                   :simulation_delay, :max_ticks, :auto_reset, :safe_mode,
                   :parallel_agents, :processor_count, :visual_mode, :survivors_log,
@@ -71,19 +71,39 @@ module Mutation
       
       # Energy system
       @energy_decay = 1
-      @attack_damage = 3
-      @attack_energy_gain = 1
-      @rest_energy_gain = 1
-      @replication_cost = 5
       
       # Initial energy range
       @initial_energy_min = 8
       @initial_energy_max = 12
       
-      # Action costs
-      @base_action_cost = 0.2
-      @attack_action_cost = 1.0
+      # Action costs (structured format)
+      @action_costs = {
+        base_cost: 0.2,
+        attack: {
+          cost: 1.0,
+          damage: 3,
+          energy_gain: 1
+        },
+        rest: {
+          energy_gain: 1
+        },
+        replicate: {
+          cost: 5
+        },
+        move: {
+          dead_agent_energy_gain: 10
+        }
+      }
+      
+      # Legacy individual cost settings (for backward compatibility)
+      @base_action_cost = @action_costs[:base_cost]
+      @attack_action_cost = @action_costs[:attack][:cost]
       @additional_replication_cost = 0.5
+      @attack_damage = @action_costs[:attack][:damage]
+      @attack_energy_gain = @action_costs[:attack][:energy_gain]
+      @rest_energy_gain = @action_costs[:rest][:energy_gain]
+      @replication_cost = @action_costs[:replicate][:cost]
+      @dead_agent_energy_gain = @action_costs[:move][:dead_agent_energy_gain]
       
       # Agent management
       @max_agent_count = 100
@@ -197,11 +217,51 @@ module Mutation
     def load_config_file
       config = YAML.load_file(config_file_path)
       config.each do |key, value|
-        instance_variable_set("@#{key}", value) if respond_to?("#{key}=")
+        if key == 'action_costs' && value.is_a?(Hash)
+          # Handle nested action_costs structure
+          load_action_costs(value)
+        elsif respond_to?("#{key}=")
+          instance_variable_set("@#{key}", value)
+        end
       end
     rescue StandardError => e
       # Use warn instead of puts so it can be suppressed during curses mode
       warn "Warning: Could not load config file: #{e.message}"
+    end
+    
+    def load_action_costs(costs_hash)
+      # Convert string keys to symbols and merge with defaults
+      symbolized_costs = deep_symbolize_keys(costs_hash)
+      @action_costs = @action_costs.merge(symbolized_costs)
+      
+      # Update legacy individual cost settings for backward compatibility
+      @base_action_cost = @action_costs[:base_cost] if @action_costs[:base_cost]
+      
+      if @action_costs[:attack]
+        @attack_action_cost = @action_costs[:attack][:cost] if @action_costs[:attack][:cost]
+        @attack_damage = @action_costs[:attack][:damage] if @action_costs[:attack][:damage]
+        @attack_energy_gain = @action_costs[:attack][:energy_gain] if @action_costs[:attack][:energy_gain]
+      end
+      
+      if @action_costs[:rest]
+        @rest_energy_gain = @action_costs[:rest][:energy_gain] if @action_costs[:rest][:energy_gain]
+      end
+      
+      if @action_costs[:replicate]
+        @replication_cost = @action_costs[:replicate][:cost] if @action_costs[:replicate][:cost]
+      end
+      
+      if @action_costs[:move]
+        @dead_agent_energy_gain = @action_costs[:move][:dead_agent_energy_gain] if @action_costs[:move][:dead_agent_energy_gain]
+      end
+    end
+    
+    def deep_symbolize_keys(hash)
+      hash.each_with_object({}) do |(key, value), result|
+        new_key = key.to_sym
+        new_value = value.is_a?(Hash) ? deep_symbolize_keys(value) : value
+        result[new_key] = new_value
+      end
     end
 
     def config_file_exists?

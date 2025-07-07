@@ -393,7 +393,7 @@ module Mutation
         log_world_event("MOVE_SUCCESS", agent.agent_id, [target_x, target_y], { from: [x, y] })
       elsif target_cell.is_a?(DeadAgent)
         # Dead agent - eat it and gain energy
-        dead_agent_energy_gain = 10  # Default energy gain from eating dead agents
+        dead_agent_energy_gain = Mutation.configuration.dead_agent_energy_gain
         new_energy = agent.energy + dead_agent_energy_gain
         @agent_manager.update_agent_energy(agent.agent_id, new_energy)
         @agent_manager.move_agent(agent.agent_id, target_x, target_y)
@@ -408,7 +408,7 @@ module Mutation
     end
 
     def execute_replicate(agent, x, y, new_grid)
-      total_replication_cost = Mutation.configuration.additional_replication_cost + Mutation.configuration.replication_cost
+      total_replication_cost = Mutation.configuration.replication_cost
       return if agent.energy < total_replication_cost
 
       # Population cap to prevent excessive spawning
