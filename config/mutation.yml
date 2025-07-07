@@ -21,8 +21,8 @@ energy:
   decay: 1                      # Energy lost per tick
   
   # Initial energy for new agents
-  initial_min: 8                # Minimum starting energy for new agents
-  initial_max: 12               # Maximum starting energy for new agents
+  initial_min: 20                # Minimum starting energy for new agents
+  initial_max: 60               # Maximum starting energy for new agents
 
 # =============================================================================
 # ACTION COSTS
