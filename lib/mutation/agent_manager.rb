@@ -160,7 +160,7 @@ module Mutation
       method_start = Time.now
       
       if @agents.empty?
-        puts "PERF: AgentManager: No active agents to kill. No workspace cleanup needed."
+        Mutation.logger.debug("AgentManager: No active agents to kill. No workspace cleanup needed.")
       else
         # Check which agents actually need killing
         check_start = Time.now
@@ -168,12 +168,12 @@ module Mutation
           agent.send(:process_alive?)
         end
         check_time = Time.now - check_start
-        puts "PERF: Process alive check took #{(check_time * 1000).round(2)}ms for #{@agents.size} agents"
+        Mutation.logger.debug("Process alive check took #{(check_time * 1000).round(2)}ms for #{@agents.size} agents")
         
         if agents_to_kill.empty?
-          puts "PERF: AgentManager: All #{@agents.size} agent processes already exited. No kills needed."
+          Mutation.logger.debug("AgentManager: All #{@agents.size} agent processes already exited. No kills needed.")
         else
-          puts "PERF: AgentManager: Performing final sweep, killing #{agents_to_kill.size} of #{@agents.size} remaining agents..."
+          Mutation.logger.debug("AgentManager: Performing final sweep, killing #{agents_to_kill.size} of #{@agents.size} remaining agents...")
           kill_start = Time.now
           
           # Kill agents in parallel to avoid blocking
@@ -183,7 +183,7 @@ module Mutation
                 agent_kill_start = Time.now
                 agent.kill_process
                 agent_kill_time = Time.now - agent_kill_start
-                puts "PERF: Killed agent #{agent_id} in #{(agent_kill_time * 1000).round(2)}ms"
+                Mutation.logger.debug("Killed agent #{agent_id} in #{(agent_kill_time * 1000).round(2)}ms")
               rescue => e
                 Mutation.logger.error("Failed to kill agent #{agent_id}: #{e.message}")
               end
@@ -194,13 +194,13 @@ module Mutation
           threads.each { |t| t.join(1.0) } # 1 second timeout per thread
           
           kill_time = Time.now - kill_start
-          puts "PERF: All agent kills completed in #{(kill_time * 1000).round(2)}ms"
+          Mutation.logger.debug("All agent kills completed in #{(kill_time * 1000).round(2)}ms")
         end
       end
       @agents.clear
       
       method_time = Time.now - method_start
-      puts "PERF: kill_all_agents total time: #{(method_time * 1000).round(2)}ms"
+      Mutation.logger.debug("kill_all_agents total time: #{(method_time * 1000).round(2)}ms")
     end
 
     def living_agents

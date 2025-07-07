@@ -36,7 +36,7 @@ module Mutation
         }
         
         mutations << mutation_data
-        puts "CREATE_MUTATION: #{mutation_data[:original_agent]} is_mutation=#{mutation_data[:is_mutation]}"
+        Mutation.logger.debug("CREATE_MUTATION: #{mutation_data[:original_agent]} is_mutation=#{mutation_data[:is_mutation]}")
       end
       
       mutations

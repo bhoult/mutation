@@ -453,7 +453,7 @@ module Mutation
         # Compact status items to make room for agent counts
         status_items = [
           "T:#{current_tick}/#{cumulative_ticks} G:#{generation}",
-          "Agents:#{agents}/#{grid_agents} M:#{mutations}",
+          "Agents:#{agents} M:#{mutations}",
           "AvgE:#{avg_energy} FPS:#{fps}"
         ]
         

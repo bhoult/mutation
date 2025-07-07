@@ -69,10 +69,10 @@ module Mutation
     def reset_grid
       # Kill all existing agents
       cleanup_start = Time.now
-      puts "PERF: Starting agent cleanup for reset..."
+      Mutation.logger.debug("Starting agent cleanup for reset...")
       @agent_manager.kill_all_agents
       cleanup_time = Time.now - cleanup_start
-      puts "PERF: Agent cleanup completed in #{(cleanup_time * 1000).round(2)}ms"
+      Mutation.logger.debug("Agent cleanup completed in #{(cleanup_time * 1000).round(2)}ms")
 
       # Create empty grid
       @grid = Array.new(@height) { Array.new(@width) { nil } }
@@ -91,9 +91,9 @@ module Mutation
       max_agents = Mutation.configuration.max_agent_count
       actual_agent_count = [agent_count, max_agents].min
       
-      puts "DEBUG: World size #{@width}x#{@height} = #{total_positions} positions"
-      puts "DEBUG: Coverage #{coverage} => desired agent_count = #{agent_count}"
-      puts "DEBUG: Max agent limit = #{max_agents}, actual_agent_count = #{actual_agent_count}"
+      Mutation.logger.debug("World size #{@width}x#{@height} = #{total_positions} positions")
+      Mutation.logger.debug("Coverage #{coverage} => desired agent_count = #{agent_count}")
+      Mutation.logger.debug("Max agent limit = #{max_agents}, actual_agent_count = #{actual_agent_count}")
 
       # Get available positions
       positions = []
@@ -105,16 +105,16 @@ module Mutation
       positions.shuffle!
 
       # Create initial mutations (10% of actual population that will be spawned)
-      puts "DEBUG: actual_agent_count = #{actual_agent_count}"
+      Mutation.logger.debug("actual_agent_count = #{actual_agent_count}")
       initial_mutations = @mutated_agent_manager.create_initial_mutations(actual_agent_count)
-      puts "INIT_AGENTS: Total=#{actual_agent_count} InitialMutations=#{initial_mutations.size} (#{(initial_mutations.size.to_f/actual_agent_count*100).round(1)}%)"
-      puts "DEBUG: initial_mutations.size = #{initial_mutations.size}"
+      Mutation.logger.debug("INIT_AGENTS: Total=#{actual_agent_count} InitialMutations=#{initial_mutations.size} (#{(initial_mutations.size.to_f/actual_agent_count*100).round(1)}%)")
+      Mutation.logger.debug("initial_mutations.size = #{initial_mutations.size}")
       
       # Spawn initial agents (mix of originals and mutations)
       actual_spawned = 0
       actual_agent_count.times do |i|
         if positions.empty?
-          puts "SPAWN_BREAK: Breaking at slot #{i} - no more positions available"
+          Mutation.logger.debug("SPAWN_BREAK: Breaking at slot #{i} - no more positions available")
           break
         end
 
@@ -124,13 +124,13 @@ module Mutation
         if i < initial_mutations.size
           # Use a pre-created mutation
           mutation_data = initial_mutations[i]
-          puts "SPAWN_SLOT_#{i}: Using MUTATION from #{mutation_data[:original_agent]}"
+          Mutation.logger.debug("SPAWN_SLOT_#{i}: Using MUTATION from #{mutation_data[:original_agent]}")
           agent = spawn_agent_from_data(mutation_data, x, y)
         else
           # Use only original (non-mutation) agents for the remaining 90%
           agent_data = @mutated_agent_manager.select_original_agent
           if agent_data
-            puts "SPAWN_SLOT_#{i}: Using ORIGINAL #{agent_data[:name]}"
+            Mutation.logger.debug("SPAWN_SLOT_#{i}: Using ORIGINAL #{agent_data[:name]}")
             agent = spawn_agent_from_data(agent_data, x, y)
           else
             # Fallback to default executable
@@ -149,11 +149,11 @@ module Mutation
           @statistics[:total_agents_created] += 1
           actual_spawned += 1
         else
-          puts "SPAWN_FAILED: Failed to spawn agent at slot #{i}"
+          Mutation.logger.debug("SPAWN_FAILED: Failed to spawn agent at slot #{i}")
         end
       end
       
-      puts "SPAWN_COMPLETE: Attempted=#{actual_agent_count} ActualSpawned=#{actual_spawned} PositionsRemaining=#{positions.size}"
+      Mutation.logger.debug("SPAWN_COMPLETE: Attempted=#{actual_agent_count} ActualSpawned=#{actual_spawned} PositionsRemaining=#{positions.size}")
 
       @generation += 1
       @statistics[:total_generations] = @generation
@@ -163,8 +163,8 @@ module Mutation
       tracked_mutations = @mutation_agents.size
       counted_mutations = mutation_count
       
-      puts "SPAWN_SUMMARY: Total=#{total_spawned} TrackedMutations=#{tracked_mutations} CountedMutations=#{counted_mutations}"
-      puts "MUTATION_AGENTS: #{@mutation_agents.to_a}"
+      Mutation.logger.debug("SPAWN_SUMMARY: Total=#{total_spawned} TrackedMutations=#{tracked_mutations} CountedMutations=#{counted_mutations}")
+      Mutation.logger.debug("MUTATION_AGENTS: #{@mutation_agents.to_a}")
       
       Mutation.logger.generation("🌱 Generation #{@generation} seeded with #{total_spawned} agents (#{coverage_percentage}% of #{@width}x#{@height})")
     end
@@ -214,9 +214,9 @@ module Mutation
           original_agent: agent_data[:original_agent],
           code: agent_data[:code]
         }
-        puts "SPAWN_MUTATION: #{agent.agent_id} from #{agent_data[:original_agent]} - Added to @mutation_agents (now #{@mutation_agents.size})"
+        Mutation.logger.debug("SPAWN_MUTATION: #{agent.agent_id} from #{agent_data[:original_agent]} - Added to @mutation_agents (now #{@mutation_agents.size})")
       else
-        puts "SPAWN_NORMAL: #{agent&.agent_id || 'nil'} is_mutation=#{agent_data[:is_mutation]} - NOT added to @mutation_agents (still #{@mutation_agents.size})"
+        Mutation.logger.debug("SPAWN_NORMAL: #{agent&.agent_id || 'nil'} is_mutation=#{agent_data[:is_mutation]} - NOT added to @mutation_agents (still #{@mutation_agents.size})")
       end
       
       agent
@@ -707,12 +707,12 @@ module Mutation
       if @tick % 10 == 0 || @tick == 0
         total_agents = living.count
         tracked_mutations = @mutation_agents.size
-        puts "MUTATION_COUNT_DEBUG: T:#{@tick} Total:#{total_agents} TrackedMutations:#{tracked_mutations} CountedMutations:#{mutation_count}"
+        Mutation.logger.debug("MUTATION_COUNT_DEBUG: T:#{@tick} Total:#{total_agents} TrackedMutations:#{tracked_mutations} CountedMutations:#{mutation_count}")
         
         # Show sample of which agents are/aren't counted as mutations (first 3 only)
         living.first(3).each do |agent|
           is_tracked = @mutation_agents.include?(agent.agent_id)
-          puts "  Sample Agent #{agent.agent_id}: tracked=#{is_tracked}"
+          Mutation.logger.debug("  Sample Agent #{agent.agent_id}: tracked=#{is_tracked}")
         end
       end
       
@@ -889,10 +889,10 @@ module Mutation
       
       # Clean up current agents
       prepare_cleanup_start = Time.now
-      puts "PERF: Starting agent cleanup for prepare_for_reset..."
+      Mutation.logger.debug("Starting agent cleanup for prepare_for_reset...")
       @agent_manager.kill_all_agents
       prepare_cleanup_time = Time.now - prepare_cleanup_start
-      puts "PERF: prepare_for_reset cleanup completed in #{(prepare_cleanup_time * 1000).round(2)}ms"
+      Mutation.logger.debug("prepare_for_reset cleanup completed in #{(prepare_cleanup_time * 1000).round(2)}ms")
     end
     
     def cleanup

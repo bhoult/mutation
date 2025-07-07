@@ -34,12 +34,12 @@ module Mutation
           width = [max_viewport_width, 5].max  # Ensure minimum size
           height = [max_viewport_height, 5].max # Ensure minimum size
           
-          puts "DEBUG: Auto-sized to terminal: #{width}x#{height}"
+          Mutation.logger.debug("Auto-sized to terminal: #{width}x#{height}")
         rescue StandardError
           # Fallback to default size if curses initialization fails
           width = 80
           height = 24
-          puts "DEBUG: Curses auto-size failed, using fallback: #{width}x#{height}"
+          Mutation.logger.debug("Curses auto-size failed, using fallback: #{width}x#{height}")
         end
       end
 
