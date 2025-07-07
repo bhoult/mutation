@@ -327,7 +327,19 @@ module Mutation
           })
         when 'display'
           load_section(values, {
-            'visual_mode' => :visual_mode
+            'visual_mode' => :visual_mode,
+            'bottom_panel_height' => :display_bottom_panel_height,
+            'help_lines' => :display_help_lines,
+            'border_size' => :display_border_size,
+            'fps' => :display_fps,
+            'status_panel_width_ratio' => :display_status_panel_width_ratio,
+            'energy_very_high_threshold' => :display_energy_very_high_threshold,
+            'energy_high_threshold' => :display_energy_high_threshold,
+            'energy_medium_threshold' => :display_energy_medium_threshold,
+            'energy_low_threshold' => :display_energy_low_threshold,
+            'color_high_threshold' => :display_color_high_threshold,
+            'color_medium_threshold' => :display_color_medium_threshold,
+            'color_low_threshold' => :display_color_low_threshold
           })
         when 'benchmark'
           load_section(values, {
@@ -346,6 +358,27 @@ module Mutation
           load_section(values, {
             'energy_multiplier' => :fitness_energy_multiplier,
             'generation_multiplier' => :fitness_generation_multiplier
+          })
+        when 'agent_behavior'
+          load_section(values, {
+            'personality_aggression_min' => :agent_personality_aggression_min,
+            'personality_aggression_max' => :agent_personality_aggression_max,
+            'personality_greed_min' => :agent_personality_greed_min,
+            'personality_greed_max' => :agent_personality_greed_max,
+            'personality_cooperation_min' => :agent_personality_cooperation_min,
+            'personality_cooperation_max' => :agent_personality_cooperation_max,
+            'personality_death_threshold_min' => :agent_personality_death_threshold_min,
+            'personality_death_threshold_max' => :agent_personality_death_threshold_max,
+            'death_history_check_length' => :agent_death_history_check_length,
+            'replication_energy_base' => :agent_replication_energy_base,
+            'replication_energy_greed_multiplier' => :agent_replication_energy_greed_multiplier,
+            'max_replications' => :agent_max_replications,
+            'min_replication_interval' => :agent_min_replication_interval,
+            'attack_min_energy' => :agent_attack_min_energy,
+            'weak_attack_min_energy' => :agent_weak_attack_min_energy,
+            'weak_attack_min_self_energy' => :agent_weak_attack_min_self_energy,
+            'rest_energy_base' => :agent_rest_energy_base,
+            'rest_energy_greed_multiplier' => :agent_rest_energy_greed_multiplier
           })
         end
       end

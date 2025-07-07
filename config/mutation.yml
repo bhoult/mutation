@@ -21,8 +21,8 @@ energy:
   decay: 1                      # Energy lost per tick
   
   # Initial energy for new agents
-  initial_min: 28               # Minimum starting energy for new agents
-  initial_max: 42               # Maximum starting energy for new agents
+  initial_min: 8                # Minimum starting energy for new agents
+  initial_max: 12               # Maximum starting energy for new agents
 
 # =============================================================================
 # ACTION COSTS
@@ -74,14 +74,12 @@ simulation:
   delay: 0.05                   # Delay between ticks (seconds)
   max_ticks: null               # Maximum ticks to run (null = unlimited)
   auto_reset: true              # Auto-reset after extinction
-  safe_mode: true               # Enable safe code execution
   
   # Status logging
   status_log_frequency: 10      # Log status every N ticks
   status_log_early_threshold: 5 # Always log status for first N ticks
   
-  # Auto-sizing
-  min_world_size: 5             # Minimum world size for auto-sizing
+  # Auto-sizing fallbacks
   fallback_width: 80            # Fallback width if auto-sizing fails
   fallback_height: 24           # Fallback height if auto-sizing fails
 
@@ -161,6 +159,22 @@ logging:
 display:
   # General display settings
   visual_mode: true             # Use curses display by default
+  
+  # Layout settings
+  bottom_panel_height: 8        # Height of the combined log and status area
+  help_lines: 1                 # Number of lines for help information
+  border_size: 3                # Space for Y-axis labels and top/left border
+  fps: 30                       # Target display refresh rate (frames per second)
+  status_panel_width_ratio: 0.33 # Width ratio of status panel (1/3 of status area)
+  
+  # Energy thresholds for display colors
+  energy_very_high_threshold: 15  # Energy level for very high energy display
+  energy_high_threshold: 10       # Energy level for high energy display  
+  energy_medium_threshold: 5      # Energy level for medium energy display
+  energy_low_threshold: 1         # Energy level for low energy display
+  color_high_threshold: 8         # Color threshold for high energy (green)
+  color_medium_threshold: 4       # Color threshold for medium energy (yellow)
+  color_low_threshold: 1          # Color threshold for low energy (red)
 
 # =============================================================================
 # BENCHMARK SETTINGS
