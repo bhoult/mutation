@@ -43,7 +43,7 @@ module Mutation
 
       # Adjust screen dimensions for border
       @screen_height -= BORDER_SIZE
-      @screen_width -= BORDER_SIZE * 2 # Left and right border
+      @screen_width -= BORDER_SIZE # Only left border now
 
       # Calculate panel widths (accounting for separator)
       @status_panel_width = ((@screen_width - 1) / 4).floor # Half of previous width
@@ -74,7 +74,7 @@ module Mutation
       world_height = @world.instance_variable_get(:@height)
 
       # Adjust viewport to fit within the screen dimensions, accounting for border
-      @viewport_width = [@screen_width - BORDER_SIZE * 2, world_width].min
+      @viewport_width = [@screen_width - BORDER_SIZE, world_width].min # Only left border
       @viewport_height = [@screen_height - BORDER_SIZE, world_height].min
 
       # Calculate if scrolling is needed
@@ -375,15 +375,9 @@ module Mutation
         end
       end
 
-      # Draw right border
-      (0...@viewport_height + BORDER_SIZE).each do |i|
-        Curses.setpos(i, BORDER_SIZE + @viewport_width)
-        Curses.addch('|')
-      end
-
       # Draw bottom border
       Curses.setpos(BORDER_SIZE + @viewport_height, 0)
-      Curses.addstr('-' * (@screen_width + BORDER_SIZE * 2))
+      Curses.addstr('-' * (@screen_width + BORDER_SIZE))
 
       Curses.attroff(Curses.color_pair(6))
     end
@@ -446,6 +440,7 @@ module Mutation
         cumulative_ticks = @simulator&.statistics ? @simulator.statistics[:total_ticks] : 0
         generation = @world.generation
         agents = @world.agent_count
+        grid_agents = @world.respond_to?(:grid_agent_count) ? @world.grid_agent_count : agents
         procs = @world.respond_to?(:process_count) ? @world.process_count : 0
         avg_energy = @world.average_energy.round(1)
         fps = calculate_fps
@@ -454,7 +449,7 @@ module Mutation
           "Tick: #{current_tick}",
           "Total Ticks: #{cumulative_ticks}",
           "Generation: #{generation}",
-          "Agents: #{agents}",
+          "Agents: #{agents}/#{grid_agents}",
           "Procs: #{procs}",
           "AvgE: #{avg_energy}",
           "FPS: #{fps}"

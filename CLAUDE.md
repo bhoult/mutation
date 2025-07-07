@@ -207,10 +207,12 @@ The simulator includes a curses-based visual display that shows the simulation l
      "position": [5, 3],
      "energy": 10,
      "world_size": [20, 20],
-     "neighbors": {
-       "north": {"energy": 5, "agent_id": "agent_2_..."},
-       "south": {"energy": 0, "agent_id": null},
-       // ... other directions
+     "vision": {
+       "0,-1": {"type": "living_agent", "energy": 5},
+       "1,0": {"type": "dead_agent"},
+       "-1,-1": {"type": "boundary"},
+       "3,2": {"type": "living_agent", "energy": 8},
+       // ... positions within 5-square radius
      },
      "generation": 3,
      "timeout_ms": 1000,
@@ -234,6 +236,17 @@ The simulator includes a curses-based visual display that shows the simulation l
    - Each agent has a workspace in `/tmp/agents/{agent_id}/`
    - Memory persisted as JSON for state between turns
    - Cleanup on agent death (Note: cleanup_agent_files method needs implementation)
+
+### Vision System
+Agents receive vision data showing a 5-square radius around their position (11x11 grid):
+- Vision data uses relative coordinates as keys: `"dx,dy"` where dx and dy range from -5 to 5
+- The agent's own position (0,0) is not included in the vision data
+- Vision cell types:
+  - `"living_agent"`: Contains `energy` field showing the agent's current energy
+  - `"dead_agent"`: A dead agent that can be consumed by moving onto it
+  - `"boundary"`: Position is outside the world boundaries
+  - Empty cells are not included in the vision data to reduce message size
+- Example: `"3,-2"` represents a position 3 cells east and 2 cells north of the agent
 
 ### Genetic Pool System
 - **Location**: `/tmp/genetic_pool/`
@@ -299,7 +312,7 @@ Valid target directions for attacks (Moore neighborhood):
 - Agents can observe all 8 neighboring positions (Moore neighborhood) in the 2D grid
 - Evolution occurs through survival of the fittest and code mutation
 - 2D grid supports both square (size parameter) and rectangular (width/height) configurations
-- Agent environment provides neighbor energy arrays and 2D position coordinates
+- Agent environment provides vision data in a 5-square radius (11x11 grid centered on agent)
 - Survivor codes are automatically logged to `survivors.log` to track evolutionary progress
 - Visual mode requires a curses-compatible terminal
 - Initial world coverage is configurable (default 10%) for realistic population dynamics

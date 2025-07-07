@@ -12,12 +12,26 @@ module Mutation
         begin
           require 'curses'
           Curses.init_screen
-          screen_width = Curses.cols
-          screen_height = Curses.lines - 2 # Leave room for status
+          
+          # Replicate the exact CursesDisplay calculations
+          total_lines = Curses.lines
+          total_cols = Curses.cols
+          
+          # Step 1: Calculate @screen_height and @screen_width (from CursesDisplay initialization)
+          screen_height = total_lines - CursesDisplay::TOTAL_BOTTOM_LINES - CursesDisplay::BORDER_SIZE
+          screen_width = total_cols - CursesDisplay::BORDER_SIZE # Only left border now
+          
+          # Step 2: Calculate viewport dimensions (from update_viewport method)
+          # @viewport_width = [@screen_width - BORDER_SIZE, world_width].min
+          # @viewport_height = [@screen_height - BORDER_SIZE, world_width].min
+          # We want world size to exactly match the max viewport, so:
+          max_viewport_width = screen_width - CursesDisplay::BORDER_SIZE # Only left border
+          max_viewport_height = screen_height - CursesDisplay::BORDER_SIZE
+          
           Curses.close_screen
 
-          width = screen_width
-          height = screen_height
+          width = [max_viewport_width, 5].max  # Ensure minimum size
+          height = [max_viewport_height, 5].max # Ensure minimum size
         rescue StandardError
           # Fallback to default size if curses initialization fails
           width = 80

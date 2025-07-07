@@ -16,8 +16,8 @@ rest_energy_gain: 1         # Energy gained when resting
 replication_cost: 5         # Energy cost to replicate
 
 # Initial energy for new agents
-initial_energy_min: 8       # Minimum starting energy for new agents
-initial_energy_max: 12      # Maximum starting energy for new agents
+initial_energy_min: 28       # Minimum starting energy for new agents
+initial_energy_max: 42      # Maximum starting energy for new agents
 
 # Action costs (process-based agents)
 base_action_cost: 0.2       # Base energy cost for any action

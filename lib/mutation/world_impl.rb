@@ -136,8 +136,8 @@ module Mutation
         row.each_with_index do |agent, x|
           next unless agent&.alive?
 
-          # Get vision data for this agent (2-square radius for performance)
-          vision = get_vision(x, y, radius: 2)
+          # Get vision data for this agent (5-square radius)
+          vision = get_vision(x, y, radius: 5)
           
           agent_world_states[agent.agent_id] = {
             tick: @tick,
@@ -234,9 +234,40 @@ module Mutation
         Mutation.logger.debug("PROFILE T:#{@tick} | Total: #{(total_step_time * 1000).round(2)}ms | WorldState: #{(world_state_time * 1000).round(2)}ms | Actions: #{(actions_time * 1000).round(2)}ms | GridSetup: #{(grid_setup_time * 1000).round(2)}ms | Execution: #{(action_execution_time * 1000).round(2)}ms")
       end
       
-      # Optional: Debug agent tracking mismatch
-      # if @tick % 20 == 0
-      #   living = living_agents
+      # Debug and fix agent tracking mismatch
+      if @tick % 20 == 0
+        manager_count = agent_count
+        grid_count = grid_agent_count
+        if manager_count != grid_count
+          Mutation.logger.warn("AGENT MISMATCH: Manager has #{manager_count} agents, Grid has #{grid_count} agents")
+          
+          # List agents in manager but not on grid
+          manager_agents = living_agents.map(&:agent_id).to_set
+          grid_agents = Set.new
+          @grid.each_with_index do |row, y|
+            row.each_with_index do |cell, x|
+              if cell&.alive?
+                grid_agents.add(cell.agent_id)
+              end
+            end
+          end
+          
+          missing_from_grid = manager_agents - grid_agents
+          if missing_from_grid.any?
+            Mutation.logger.warn("Agents in manager but not on grid: #{missing_from_grid.to_a.join(', ')}")
+            
+            # Clean up orphaned agents
+            missing_from_grid.each do |agent_id|
+              Mutation.logger.warn("Removing orphaned agent #{agent_id} from manager")
+              agent = @agent_manager.agents[agent_id]
+              if agent
+                agent.die!
+                @agent_manager.remove_agent(agent_id)
+              end
+            end
+          end
+        end
+      end
       #   grid_living = 0
       #   @grid.each do |row|
       #     row.each do |cell|
@@ -389,6 +420,12 @@ module Mutation
 
       offspring_x, offspring_y = empty_positions.sample
 
+      # Double-check the position is still empty in new_grid
+      if new_grid[offspring_y][offspring_x] != nil
+        log_world_event("REPLICATE_FAILED", agent.agent_id, [x, y], { reason: "position_occupied", at: [offspring_x, offspring_y] })
+        return
+      end
+
       # Create offspring with mutation
       offspring = @agent_manager.create_offspring(agent, offspring_x, offspring_y, @mutation_engine, agent.memory)
       return unless offspring
@@ -503,13 +540,24 @@ module Mutation
     def agent_count
       living_agents.count
     end
+    
+    def grid_agent_count
+      count = 0
+      @grid.each do |row|
+        row.each do |cell|
+          count += 1 if cell&.alive?
+        end
+      end
+      count
+    end
 
     def process_count
       @agent_manager.agents.size
     end
 
     def all_dead?
-      agent_count == 0
+      # Check both agent manager and grid to ensure consistency
+      agent_count == 0 && grid_agent_count == 0
     end
 
     def average_energy
