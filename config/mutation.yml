@@ -88,7 +88,7 @@ simulation:
 # =============================================================================
 
 parallel:
-  enabled: false                # Enable parallel agent processing
+  enabled: true                 # Enable parallel agent communication (improves performance)
   processor_count: null         # Number of processors to use (null = all available)
 
 # =============================================================================
