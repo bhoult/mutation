@@ -1,5 +1,7 @@
 # Mutation Simulator
 
+Made by Claude, instigated by [Brandon Hoult](https://hoult.co).
+
 A Ruby-based evolutionary simulation where agents with self-modifying code compete, evolve, and adapt through natural selection in a 2D grid world environment.
 
 **[📺 View Visual Mode Demo (100×100 Grid)](docs/images/visual-demo.md)**
